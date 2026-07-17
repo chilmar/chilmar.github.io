@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Game 12 Aturan Keselamatan Yamaha</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #F2EFE6;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .stripe {
+    height: 8px; flex-shrink: 0;
+    background: repeating-linear-gradient(-45deg, #1A1A1A 0 12px, #FFC400 12px 24px);
+  }
+  #app {
+    flex: 1; display: flex; flex-direction: column; min-height: 0;
+    max-width: 480px; width: 100%; margin: 0 auto; padding: 10px 14px 12px;
+  }
+  header { text-align: center; margin-bottom: 10px; flex-shrink: 0; }
+  .title-box {
+    display: inline-block; background: #FFC400; border: 2px solid #1A1A1A;
+    border-radius: 10px; padding: 6px 16px; box-shadow: 3px 3px 0 #1A1A1A;
+  }
+  .title-box .small { font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #1A1A1A; }
+  .title-box .big { font-size: 14.5px; font-weight: 900; color: #1A1A1A; line-height: 1.15; }
+
+  #screen { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+  button { font-family: inherit; cursor: pointer; }
+  .btn {
+    font-weight: 800; font-size: 13px; padding: 9px 14px;
+    border-radius: 9px; border: 2px solid #1A1A1A;
+    box-shadow: 2px 2px 0 #1A1A1A; background: #FFC400; color: #1A1A1A;
+  }
+  .btn.ghost { background: #FFF; }
+  .btn.small { padding: 6px 12px; font-size: 12px; }
+  .btn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+  /* Menu */
+  .menu { flex: 1; display: flex; flex-direction: column; gap: 9px; min-height: 0; }
+  .menu-item {
+    flex: 1; display: flex; align-items: center; gap: 12px;
+    background: #FFF; border: 3px solid #1A1A1A; border-radius: 12px;
+    padding: 8px 14px; box-shadow: 3px 3px 0 #1A1A1A; text-align: left; min-height: 0;
+  }
+  .menu-item:active { transform: translate(2px, 2px); box-shadow: none; }
+  .menu-item .icon { font-size: 26px; }
+  .menu-item .t { font-weight: 900; font-size: 14.5px; }
+  .menu-item .d { font-size: 11.5px; color: #666; }
+  .credit { font-size: 10.5px; color: #666; text-align: center; flex-shrink: 0; line-height: 1.5; }
+  .credit b { color: #1A1A1A; }
+
+  /* Score bar */
+  .scorebar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #1A1A1A; color: #FFC400; border-radius: 8px;
+    padding: 5px 12px; font-weight: 800; font-size: 12px; margin-bottom: 8px; flex-shrink: 0;
+  }
+
+  /* Flashcard */
+  .fc-group { font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; text-align: center; }
+  .flashcard {
+    flex: 1; border: 3px solid #1A1A1A; border-radius: 14px; background: #FFFDF5;
+    box-shadow: 4px 4px 0 #1A1A1A; padding: 14px;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; min-height: 0; overflow: hidden;
+  }
+  .num-circle {
+    border-radius: 50%; background: #1A1A1A; color: #FFC400;
+    display: flex; align-items: center; justify-content: center; font-weight: 900;
+  }
+  .fc-nav { display: flex; justify-content: space-between; margin-top: 10px; flex-shrink: 0; }
+  .rule-box {
+    font-size: 14px; line-height: 1.5; font-weight: 600;
+    background: #FFF6D6; border: 2px dashed #B8860B; border-radius: 10px; padding: 12px;
+  }
+  .hint { font-size: 12px; color: #777; margin-top: 10px; }
+
+  /* Quiz */
+  .q-label { font-size: 12.5px; font-weight: 700; color: #555; text-align: center; }
+  .opt-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; min-height: 0; }
+  .opt-card {
+    border-radius: 12px; padding: 6px; border: 3px solid #1A1A1A; background: #FFF;
+    box-shadow: 2px 2px 0 #1A1A1A;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .opt-card .em { font-size: 38px; }
+  .opt-card .nm { font-weight: 800; font-size: 12px; margin-top: 4px; }
+  .opt-card.ok { border-color: #15803D; background: #F0FDF4; }
+  .opt-card.bad { border-color: #B91C1C; background: #FEF2F2; }
+
+  .opt-list { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .opt-row {
+    flex: 1; padding: 6px 12px; border-radius: 10px; border: 3px solid #1A1A1A;
+    background: #FFF; box-shadow: 2px 2px 0 #1A1A1A; text-align: left;
+    font-size: 12.5px; line-height: 1.35; font-weight: 600;
+    display: flex; align-items: center;
+  }
+  .opt-row.ok { border-color: #15803D; background: #F0FDF4; }
+  .opt-row.bad { border-color: #B91C1C; background: #FEF2F2; }
+
+  .num-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; flex-shrink: 0; }
+  .num-btn {
+    aspect-ratio: 1; border-radius: 9px; font-size: 17px; font-weight: 900;
+    border: 3px solid #1A1A1A; background: #FFF; box-shadow: 2px 2px 0 #1A1A1A;
+  }
+  .num-btn.ok { border-color: #15803D; background: #F0FDF4; }
+  .num-btn.bad { border-color: #B91C1C; background: #FEF2F2; }
+
+  .aturan-quote {
+    flex: 1; margin: 8px 0; background: #FFF6D6; border: 2px dashed #B8860B;
+    border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600;
+    line-height: 1.5; text-align: center; display: flex;
+    align-items: center; justify-content: center; min-height: 0; overflow: auto;
+  }
+
+  /* Memory */
+  .mem-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; flex-shrink: 0; }
+  .mem-card {
+    aspect-ratio: 1; border-radius: 8px; border: 2px solid #1A1A1A;
+    background: #FFC400; font-size: 15px; font-weight: 900;
+    box-shadow: 1px 1px 0 #1A1A1A; padding: 0;
+  }
+  .mem-card.open { background: #FFFDF5; font-size: 18px; }
+  .mem-card.matched { border-color: #15803D; background: #F0FDF4; opacity: 0.65; font-size: 18px; }
+  .mem-info {
+    flex: 1; margin-top: 8px; min-height: 0; overflow: auto;
+    border: 2px dashed #CCC; background: #FAFAF5;
+    border-radius: 10px; padding: 10px; font-size: 12px; line-height: 1.45;
+  }
+  .mem-info.hit { border: 2px solid #15803D; background: #F0FDF4; }
+  .mem-info .empty { color: #999; text-align: center; padding-top: 8px; }
+
+  /* Overlay */
+  #overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: center; justify-content: center;
+    z-index: 50; padding: 16px;
+  }
+  #overlay.show { display: flex; }
+  .fb-card {
+    width: 100%; max-width: 360px; border-radius: 14px; padding: 16px;
+    border: 3px solid; font-size: 13px; line-height: 1.5;
+  }
+  .fb-card.ok { border-color: #15803D; background: #F0FDF4; }
+  .fb-card.bad { border-color: #B91C1C; background: #FEF2F2; }
+  .fb-head { font-weight: 900; font-size: 16px; margin-bottom: 6px; }
+  .fb-card.ok .fb-head { color: #15803D; }
+  .fb-card.bad .fb-head { color: #B91C1C; }
+  .fb-vis { font-style: italic; color: #555; margin: 4px 0; }
+  .fb-actions { margin-top: 10px; text-align: right; }
+
+  /* Result */
+  .result {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; text-align: center;
+  }
+  .result .em { font-size: 54px; }
+  .result .sc { font-size: 36px; font-weight: 900; margin: 6px 0; }
+  .result .msg { font-size: 14px; margin-bottom: 18px; color: #333; }
+  .result .actions { display: flex; gap: 10px; justify-content: center; }
+
+  .footer-nav { margin-top: 8px; text-align: center; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<div id="app">
+  <header>
+    <div class="title-box">
+      <div class="small">YAMAHA K3</div>
+      <div class="big">GAME 12 ATURAN KESELAMATAN</div>
+    </div>
+  </header>
+  <div id="screen"></div>
+</div>
+<div class="stripe"></div>
+<div id="overlay"></div>
+
+<script>
+// ============ DATA ============
+const RULES = [
+  { no: 1, cantolan: "KUAS", emoji: "🖌️", judul: "Kerja rapi, teliti, penuh perhatian",
+    visual: "Bentuk kuas seperti angka 1",
+    aturan: "Lakukan pekerjaan dengan benar, mengikuti Standar Kerja K3",
+    kelompok: "PERSIAPAN KERJA AMAN" },
+  { no: 2, cantolan: "BEBEK", emoji: "🦆", judul: "Rajin berkeliling (inspeksi)",
+    visual: "Bentuk bebek mirip angka 2",
+    aturan: "Lakukan inspeksi, agar mesin dan peralatan lainnya selalu dapat dipakai dalam kondisi aman",
+    kelompok: "PERSIAPAN KERJA AMAN" },
+  { no: 3, cantolan: "HATI", emoji: "❤️", judul: "Hati-hati terhadap bahaya tajam",
+    visual: "Ada bagian hati berbentuk angka 3",
+    aturan: "Tidak mendekatkan tangan ke benda bermata pisau yang sedang berputar",
+    kelompok: "PERSIAPAN KERJA AMAN" },
+  { no: 4, cantolan: "HELM", emoji: "⛑️", judul: "Helm / APD – Pelindung diri",
+    visual: "4 = AMPAD (APD)",
+    aturan: "Pakai Alat Pelindung Diri (APD) yang telah ditetapkan",
+    kelompok: "PERSIAPAN KERJA AMAN" },
+  { no: 5, cantolan: "KATROL", emoji: "🪝", judul: "Simbol mesin & maintenance",
+    visual: "Bentuk katrol seperti angka 5",
+    aturan: "Ketika melakukan maintenance, mesin harus berhenti dan berikan label \"Mesin Jangan Dioperasikan\"",
+    kelompok: "PERILAKU DI TEMPAT KERJA" },
+  { no: 6, cantolan: "PERAHU LAYAR", emoji: "⛵", judul: "Keseimbangan & kestabilan",
+    visual: "Perahu layar tempat yang stabil untuk 6 orang",
+    aturan: "Pastikan kestabilan tangga dan tidak berdiri di anak tangga teratas",
+    kelompok: "PERILAKU DI TEMPAT KERJA" },
+  { no: 7, cantolan: "EMBER", emoji: "🪣", judul: "3R (Ringkas, Rapi, Resik)",
+    visual: "Gagang pel miring di ember membentuk angka 7 — ember alat bersih-bersih",
+    aturan: "Selalu rawat area sekitar anda dengan melakukan Ringkas, Rapi dan Resik",
+    kelompok: "PERILAKU DI TEMPAT KERJA" },
+  { no: 8, cantolan: "ORANG BERJALAN", emoji: "🚶", judul: "Postur tegak, siap siaga",
+    visual: "Orang mempunyai 8 organ",
+    aturan: "Tidak berjalan dengan memasukkan tangan ke dalam saku",
+    kelompok: "PERILAKU DI TEMPAT KERJA" },
+  { no: 9, cantolan: "HP", emoji: "📱", judul: "Fokus, hindari distraksi",
+    visual: "HP punya angka sampai 9",
+    aturan: "Pada saat berjalan, tidak boleh membaca handphone atau dokumen",
+    kelompok: "PERGERAKAN & POSTUR AMAN" },
+  { no: 10, cantolan: "JEJAK KAKI", emoji: "🦶", judul: "Fokus pada langkah kaki",
+    visual: "Angka 10 bisa mirip seperti jejak kaki",
+    aturan: "Saat menuruni tangga, perhatikan dengan baik pijakan kaki anda",
+    kelompok: "PERGERAKAN & POSTUR AMAN" },
+  { no: 11, cantolan: "ULAR", emoji: "🐍", judul: "Bahaya tajam & cepat",
+    visual: "Angka 11 dibayangkan seperti ular",
+    aturan: "Tidak meletakkan tangan pada arah gerakan cutter/pisau",
+    kelompok: "PERGERAKAN & POSTUR AMAN" },
+  { no: 12, cantolan: "LENGAN KUAT", emoji: "💪", judul: "Angkat benar, pakai kaki",
+    visual: "Lengan kuat bisa dibayangkan seperti angka 2 (1+2)",
+    aturan: "Saat mengangkat barang berat, posisi badan jongkok dan angkat dengan tumpuan kaki",
+    kelompok: "PERGERAKAN & POSTUR AMAN" },
+];
+
+const GROUP_COLORS = {
+  "PERSIAPAN KERJA AMAN": "#0E7490",
+  "PERILAKU DI TEMPAT KERJA": "#B45309",
+  "PERGERAKAN & POSTUR AMAN": "#15803D",
+};
+
+const screen = document.getElementById("screen");
+const overlay = document.getElementById("overlay");
+
+// ============ UTIL ============
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickOptions(correct) {
+  const others = shuffle(RULES.filter(r => r.no !== correct.no)).slice(0, 3);
+  return shuffle([correct, ...others]);
+}
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+
+function showFeedback(correct, rule, onNext, isLast) {
+  overlay.innerHTML = `
+    <div class="fb-card ${correct ? "ok" : "bad"}">
+      <div class="fb-head">${correct ? "✅ BENAR!" : "❌ BELUM TEPAT"}</div>
+      <div><b>${rule.no}. ${rule.cantolan}</b> ${rule.emoji} — ${esc(rule.judul)}</div>
+      <div class="fb-vis">💡 ${esc(rule.visual)}</div>
+      <div><b>Aturan:</b> ${esc(rule.aturan)}</div>
+      <div class="fb-actions"><button class="btn" id="fb-next">${isLast ? "Lihat Hasil ➜" : "Lanjut ➜"}</button></div>
+    </div>`;
+  overlay.classList.add("show");
+  document.getElementById("fb-next").onclick = () => {
+    overlay.classList.remove("show");
+    overlay.innerHTML = "";
+    onNext();
+  };
+}
+
+function showResult(score, total, onRetry) {
+  const pct = Math.round((score / total) * 100);
+  let msg, em;
+  if (pct === 100) { msg = "SEMPURNA! Anda hafal 12 Aturan Keselamatan!"; em = "🏆"; }
+  else if (pct >= 80) { msg = "Hebat! Sedikit lagi sempurna."; em = "🌟"; }
+  else if (pct >= 60) { msg = "Bagus, terus berlatih!"; em = "👍"; }
+  else { msg = "Ayo pelajari lagi di Mode Belajar."; em = "📖"; }
+  screen.innerHTML = `
+    <div class="result">
+      <div class="em">${em}</div>
+      <div class="sc">${score}/${total}</div>
+      <div class="msg">${msg}</div>
+      <div class="actions">
+        <button class="btn" id="r-retry">🔄 Main Lagi</button>
+        <button class="btn ghost" id="r-home">🏠 Menu</button>
+      </div>
+    </div>`;
+  document.getElementById("r-retry").onclick = onRetry;
+  document.getElementById("r-home").onclick = renderMenu;
+}
+
+// ============ MENU ============
+const MODES = [
+  { id: "belajar", icon: "📖", title: "Mode Belajar", desc: "Kartu flash: nomor → cantolan → aturan", fn: () => renderBelajar() },
+  { id: "cantolan", icon: "🎯", title: "Kuis Cantolan", desc: "Lihat nomor, pilih gambar cantolannya", fn: () => renderKuisCantolan() },
+  { id: "aturan", icon: "📋", title: "Kuis Isi Aturan", desc: "Lihat cantolan, pilih bunyi aturannya", fn: () => renderKuisAturan() },
+  { id: "nomor", icon: "🔢", title: "Tebak Nomor", desc: "Baca aturan, tebak nomor pasalnya", fn: () => renderTebakNomor() },
+  { id: "pasangkan", icon: "🃏", title: "Pasangkan Kartu", desc: "Cocokkan nomor & gambar cantolan", fn: () => renderPasangkan() },
+];
+
+function renderMenu() {
+  screen.innerHTML = `
+    <div class="menu">
+      ${MODES.map((m, i) => `
+        <button class="menu-item" data-i="${i}">
+          <span class="icon">${m.icon}</span>
+          <span><div class="t">${m.title}</div><div class="d">${m.desc}</div></span>
+        </button>`).join("")}
+      <div class="credit">
+        Metode Cantol &amp; Jalin Cerita • PT Yamaha Music Manufacturing Indonesia
+        <div><b>Game ini dibuat oleh Chilmar</b></div>
+      </div>
+    </div>`;
+  screen.querySelectorAll(".menu-item").forEach(btn => {
+    btn.onclick = () => MODES[+btn.dataset.i].fn();
+  });
+}
+
+// ============ MODE BELAJAR ============
+function renderBelajar() {
+  let idx = 0, flipped = false;
+  function draw() {
+    const r = RULES[idx];
+    const color = GROUP_COLORS[r.kelompok];
+    screen.innerHTML = `
+      <div class="fc-group" style="color:${color}">${r.kelompok} • KARTU ${idx + 1}/12</div>
+      <div class="flashcard" id="fc">
+        ${!flipped ? `
+          <div class="num-circle" style="width:54px;height:54px;font-size:24px;margin-bottom:10px">${r.no}</div>
+          <div style="font-size:60px">${r.emoji}</div>
+          <div style="font-size:22px;font-weight:900;margin-top:6px">${r.cantolan}</div>
+          <div class="hint">👆 Ketuk untuk lihat aturan</div>
+        ` : `
+          <div style="font-size:13.5px;font-weight:800;color:${color};margin-bottom:8px">
+            ${r.no}. ${r.cantolan} ${r.emoji} — ${esc(r.judul)}
+          </div>
+          <div style="font-size:12.5px;font-style:italic;color:#666;margin-bottom:10px">💡 ${esc(r.visual)}</div>
+          <div class="rule-box">${esc(r.aturan)}</div>
+          <div class="hint">👆 Ketuk untuk kembali</div>
+        `}
+      </div>
+      <div class="fc-nav">
+        <button class="btn ghost" id="fc-prev">⬅</button>
+        <button class="btn ghost" id="fc-home">🏠</button>
+        <button class="btn" id="fc-next">➜</button>
+      </div>`;
+    document.getElementById("fc").onclick = () => { flipped = !flipped; draw(); };
+    document.getElementById("fc-prev").onclick = () => { idx = (idx + 11) % 12; flipped = false; draw(); };
+    document.getElementById("fc-next").onclick = () => { idx = (idx + 1) % 12; flipped = false; draw(); };
+    document.getElementById("fc-home").onclick = renderMenu;
+  }
+  draw();
+}
+
+// ============ KUIS GENERIK ============
+function makeQuiz(drawQuestion) {
+  const order = shuffle(RULES);
+  let qIdx = 0, score = 0, streak = 0;
+  function next() {
+    if (qIdx + 1 >= order.length) {
+      showResult(score, order.length, () => makeQuiz(drawQuestion));
+    } else { qIdx++; draw(); }
+  }
+  function onAnswer(pickedNo, redrawAnswered) {
+    const cur = order[qIdx];
+    const ok = pickedNo === cur.no;
+    if (ok) { score++; streak++; } else streak = 0;
+    redrawAnswered(pickedNo);
+    setTimeout(() => showFeedback(ok, cur, next, qIdx + 1 >= order.length), 350);
+  }
+  function draw() {
+    drawQuestion(order[qIdx], qIdx, order.length, score, streak, onAnswer);
+  }
+  draw();
+}
+
+function scoreBarHTML(score, total, streak) {
+  return `<div class="scorebar"><span>SKOR: ${score}/${total}</span><span>${streak >= 3 ? "🔥 " : ""}STREAK: ${streak}</span></div>`;
+}
+
+// ============ KUIS CANTOLAN ============
+function renderKuisCantolan() {
+  makeQuiz((cur, qIdx, total, score, streak, onAnswer) => {
+    const options = pickOptions(cur);
+    screen.innerHTML = `
+      ${scoreBarHTML(score, total, streak)}
+      <div class="q-label">Soal ${qIdx + 1}/${total} — Apa cantolan aturan nomor…</div>
+      <div class="num-circle" style="width:64px;height:64px;font-size:30px;margin:8px auto;border:3px solid #FFC400;box-shadow:0 0 0 3px #1A1A1A">${cur.no}</div>
+      <div class="opt-grid">
+        ${options.map(o => `
+          <button class="opt-card" data-no="${o.no}">
+            <div class="em">${o.emoji}</div><div class="nm">${o.cantolan}</div>
+          </button>`).join("")}
+      </div>
+      <div class="footer-nav"><button class="btn ghost small" id="q-home">🏠 Menu</button></div>`;
+    document.getElementById("q-home").onclick = renderMenu;
+    screen.querySelectorAll(".opt-card").forEach(btn => {
+      btn.onclick = () => {
+        const picked = +btn.dataset.no;
+        onAnswer(picked, () => {
+          screen.querySelectorAll(".opt-card").forEach(b => {
+            const n = +b.dataset.no;
+            if (n === cur.no) b.classList.add("ok");
+            else if (n === picked) b.classList.add("bad");
+            b.onclick = null;
+          });
+        });
+      };
+    });
+  });
+}
+
+// ============ KUIS ISI ATURAN ============
+function renderKuisAturan() {
+  makeQuiz((cur, qIdx, total, score, streak, onAnswer) => {
+    const options = pickOptions(cur);
+    screen.innerHTML = `
+      ${scoreBarHTML(score, total, streak)}
+      <div class="q-label">Soal ${qIdx + 1}/${total} — Apa bunyi aturannya?</div>
+      <div style="text-align:center;margin-bottom:6px">
+        <div style="font-size:40px;line-height:1.1">${cur.emoji}</div>
+        <div style="font-weight:900;font-size:16px">
+          <span class="num-circle" style="display:inline-flex;width:26px;height:26px;font-size:13px;margin-right:6px;vertical-align:middle">${cur.no}</span>${cur.cantolan}
+        </div>
+      </div>
+      <div class="opt-list">
+        ${options.map(o => `<button class="opt-row" data-no="${o.no}">${esc(o.aturan)}</button>`).join("")}
+      </div>
+      <div class="footer-nav"><button class="btn ghost small" id="q-home">🏠 Menu</button></div>`;
+    document.getElementById("q-home").onclick = renderMenu;
+    screen.querySelectorAll(".opt-row").forEach(btn => {
+      btn.onclick = () => {
+        const picked = +btn.dataset.no;
+        onAnswer(picked, () => {
+          screen.querySelectorAll(".opt-row").forEach(b => {
+            const n = +b.dataset.no;
+            if (n === cur.no) b.classList.add("ok");
+            else if (n === picked) b.classList.add("bad");
+            b.onclick = null;
+          });
+        });
+      };
+    });
+  });
+}
+
+// ============ TEBAK NOMOR ============
+function renderTebakNomor() {
+  makeQuiz((cur, qIdx, total, score, streak, onAnswer) => {
+    screen.innerHTML = `
+      ${scoreBarHTML(score, total, streak)}
+      <div class="q-label">Soal ${qIdx + 1}/${total} — Aturan ini nomor berapa?</div>
+      <div class="aturan-quote">"${esc(cur.aturan)}"</div>
+      <div class="num-grid">
+        ${RULES.map(r => `<button class="num-btn" data-no="${r.no}">${r.no}</button>`).join("")}
+      </div>
+      <div class="footer-nav"><button class="btn ghost small" id="q-home">🏠 Menu</button></div>`;
+    document.getElementById("q-home").onclick = renderMenu;
+    screen.querySelectorAll(".num-btn").forEach(btn => {
+      btn.onclick = () => {
+        const picked = +btn.dataset.no;
+        onAnswer(picked, () => {
+          screen.querySelectorAll(".num-btn").forEach(b => {
+            const n = +b.dataset.no;
+            if (n === cur.no) b.classList.add("ok");
+            else if (n === picked) b.classList.add("bad");
+            b.onclick = null;
+          });
+        });
+      };
+    });
+  });
+}
+
+// ============ PASANGKAN KARTU ============
+function renderPasangkan() {
+  let cards = shuffle(RULES.flatMap(r => [
+    { id: "n" + r.no, no: r.no, type: "num", label: String(r.no) },
+    { id: "e" + r.no, no: r.no, type: "img", label: r.emoji },
+  ]));
+  let open = [], matched = [], moves = 0, justMatched = null, locked = false;
+
+  function draw() {
+    if (matched.length === 12) {
+      showResult(12, 12, renderPasangkan);
+      return;
+    }
+    screen.innerHTML = `
+      <div class="scorebar"><span>PASANGAN: ${matched.length}/12</span><span>LANGKAH: ${moves}</span></div>
+      <div class="mem-grid">
+        ${cards.map(c => {
+          const isMatched = matched.includes(c.no);
+          const isOpen = open.includes(c.id) || isMatched;
+          return `<button class="mem-card ${isMatched ? "matched" : isOpen ? "open" : ""}" data-id="${c.id}">${isOpen ? c.label : "?"}</button>`;
+        }).join("")}
+      </div>
+      <div class="mem-info ${justMatched ? "hit" : ""}">
+        ${justMatched ? `
+          <b>✅ ${justMatched.no}. ${justMatched.cantolan} ${justMatched.emoji}</b>
+          <div style="font-style:italic;color:#555;margin:3px 0">💡 ${esc(justMatched.visual)}</div>
+          <div><b>Aturan:</b> ${esc(justMatched.aturan)}</div>
+        ` : `<div class="empty">Cocokkan kartu nomor dengan gambar cantolannya.<br>Aturan akan tampil di sini setiap pasangan cocok.</div>`}
+      </div>
+      <div class="footer-nav"><button class="btn ghost small" id="m-home">🏠 Menu</button></div>`;
+    document.getElementById("m-home").onclick = renderMenu;
+    screen.querySelectorAll(".mem-card").forEach(btn => {
+      btn.onclick = () => {
+        if (locked) return;
+        const card = cards.find(c => c.id === btn.dataset.id);
+        if (open.includes(card.id) || matched.includes(card.no)) return;
+        open.push(card.id);
+        draw();
+        if (open.length === 2) {
+          locked = true;
+          moves++;
+          const [a, b] = open.map(id => cards.find(c => c.id === id));
+          if (a.no === b.no && a.type !== b.type) {
+            setTimeout(() => {
+              matched.push(a.no);
+              justMatched = RULES.find(r => r.no === a.no);
+              open = []; locked = false; draw();
+            }, 350);
+          } else {
+            setTimeout(() => { open = []; locked = false; draw(); }, 800);
+          }
+        }
+      };
+    });
+  }
+  draw();
+}
+
+// Mulai
+renderMenu();
+</script>
+</body>
+</html>
