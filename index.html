@@ -2,7 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MFQ Quest">
 <meta name="theme-color" content="#2f6f5e">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -10,11 +13,11 @@
 <style>
 :root{--bg:#f7f4ea;--card:#fffdf7;--ink:#243238;--muted:#687076;--green:#2f6f5e;--soft:#d7eadf;--line:#d9d5c8;--gold:#d69b2d;--red:#ad4747}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-.app{max-width:920px;margin:auto;padding:14px 14px 90px}.top{text-align:center;padding:12px 0}.top h1{margin:0;font-size:clamp(1.9rem,7vw,3rem)}.top p{margin:5px 0;color:var(--muted)}
+.app{max-width:920px;margin:auto;padding:calc(12px + env(safe-area-inset-top)) 14px calc(92px + env(safe-area-inset-bottom))}.top{text-align:center;padding:16px 0 14px}.top h1{margin:0;font-size:clamp(1.9rem,7vw,3rem)}.top p{margin:5px 0;color:var(--muted)}.byline{font-weight:800;color:var(--green);letter-spacing:.2px;margin-top:8px}.intro{font-size:.92rem;line-height:1.45;max-width:520px;margin:8px auto 0;color:var(--muted)}
 .panel,.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 7px 20px rgba(0,0,0,.05)}
 .dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.metric{text-align:center;padding:10px;background:white;border:1px solid var(--line);border-radius:14px}.metric b{display:block;font-size:1.35rem}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
-button,select{font:inherit;border:1px solid var(--line);background:white;color:var(--ink);border-radius:13px;padding:11px;cursor:pointer}
+button,select{font:inherit;border:1px solid var(--line);background:white;color:var(--ink);border-radius:13px;padding:12px;min-height:46px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 button.active,button.primary{background:var(--green);color:white;border-color:var(--green)}button.soft{background:var(--soft);border-color:var(--green)}
 button:disabled{opacity:.5;cursor:not-allowed}.hidden{display:none!important}.badges{display:flex;gap:7px;flex-wrap:wrap}.badge{padding:6px 9px;border-radius:999px;background:var(--soft);color:var(--green);font-weight:700;font-size:.88rem}
 .surah{font-size:clamp(2rem,8vw,3.3rem);font-weight:850;margin:10px 0}.meaning{font-size:1.45rem;font-weight:800;color:var(--green)}.story{line-height:1.65;margin-top:13px}
@@ -22,11 +25,31 @@ button:disabled{opacity:.5;cursor:not-allowed}.hidden{display:none!important}.ba
 .progress{height:10px;background:#e7e2d5;border-radius:999px;overflow:hidden;margin:10px 0}.progress div{height:100%;background:var(--green);transition:.25s}.feedback{min-height:55px;margin-top:12px;font-weight:700;line-height:1.5}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.achievement{padding:12px;border:1px solid var(--line);border-radius:14px;background:white}.locked{opacity:.48;filter:grayscale(1)}
 .level-title{font-weight:800;margin:8px 0}.footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px}
-@media(max-width:700px){.dashboard{grid-template-columns:repeat(2,1fr)}.tabs,.levels{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.controls{flex-direction:column}}
+@media(max-width:700px){
+.dashboard{grid-template-columns:repeat(2,1fr)}
+.tabs{grid-template-columns:repeat(4,1fr);position:sticky;top:env(safe-area-inset-top);z-index:20;background:rgba(247,244,234,.96);padding:6px 0;backdrop-filter:blur(8px)}
+.tabs button{font-size:.78rem;padding:9px 4px;min-height:48px}
+.levels{grid-template-columns:repeat(2,1fr)}
+.grid{grid-template-columns:1fr}
+.controls{flex-direction:column}
+.card,.panel{padding:14px;border-radius:17px}
+.surah{font-size:clamp(1.75rem,9vw,2.55rem);line-height:1.12}
+.meaning{font-size:1.2rem}
+.story{font-size:.98rem}
+}
+@media(max-width:410px){
+.app{padding-left:10px;padding-right:10px}
+.dashboard{gap:6px}
+.metric{padding:8px 5px;font-size:.82rem}
+.metric b{font-size:1.15rem}
+.levels{gap:6px}
+.levels button{font-size:.88rem;padding:10px 6px}
+.top h1{font-size:2.15rem}
+}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><h1>MFQ Quest</h1><p>v1.0 · Menghafal Arti 114 Surat Al-Qur'an</p></header>
+<header class="top"><h1>MFQ Quest</h1><p>v1.0 · Menghafal Arti 114 Surat Al-Qur'an</p><div class="byline">by Chilmar &amp; ChatGPT</div><div class="intro">Belajar bertahap, bermain, dan mengulang hingga semakin melekat dalam ingatan.</div></header>
 
 <div class="dashboard">
  <div class="metric">Dipelajari<b id="mLearned">0/114</b></div>
