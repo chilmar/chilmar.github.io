@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a2521">
+<title>Rihlah Kata — Kosakata Al-Qur'an</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a2521;          /* base mosque-dark */
+    --ink2:#0f342e;         /* raised dark */
+    --parch:#f6efdd;        /* parchment card */
+    --parch2:#efe4c8;       /* parchment deep */
+    --gold:#cd9f43;         /* illumination gold */
+    --gold-soft:#e5c983;
+    --emerald:#1f9d7f;      /* jewel */
+    --emerald-d:#137a63;
+    --coral:#d76a58;        /* wrong */
+    --green:#37a26b;        /* right */
+    --ink-text:#20302c;
+    --ink-mute:#6d7d74;
+    --parch-mute:#a99b73;
+    --safe-t:env(safe-area-inset-top);
+    --safe-b:env(safe-area-inset-bottom);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #123a33 0%, var(--ink) 55%, #071b18 100%);
+    color:var(--parch);
+    min-height:100dvh;
+    padding:calc(var(--safe-t) + 8px) 14px calc(var(--safe-b) + 14px);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:520px;margin:0 auto}
+  .ar{font-family:'Amiri',serif;direction:rtl;unicode-bidi:isolate;line-height:1.7}
+  .disp{font-family:'Marcellus',serif}
+
+  /* ---- header ---- */
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .khatam{width:34px;height:34px;flex:none}
+  .brand h1{font-family:'Marcellus',serif;font-size:19px;letter-spacing:.5px;color:var(--gold-soft);font-weight:400}
+  .brand p{font-size:10.5px;color:var(--parch-mute);letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
+  .btn-back{background:rgba(246,239,221,.08);border:1px solid rgba(205,159,67,.35);color:var(--gold-soft);
+    font-size:13px;font-weight:600;padding:8px 13px;border-radius:12px;cursor:pointer;font-family:inherit}
+  .btn-back:active{transform:scale(.96)}
+
+  /* ---- generic screen ---- */
+  .screen{display:none;animation:rise .4s ease both}
+  .screen.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  /* ---- home ---- */
+  .hero{
+    background:linear-gradient(160deg,rgba(31,157,127,.16),rgba(205,159,67,.08));
+    border:1px solid rgba(205,159,67,.28);border-radius:22px;padding:20px 18px;margin-bottom:16px;
+    position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;background:
+    repeating-linear-gradient(45deg,rgba(205,159,67,.05) 0 2px,transparent 2px 16px);pointer-events:none}
+  .hero .big{font-family:'Amiri',serif;font-size:15px;color:var(--gold-soft);direction:rtl;margin-bottom:6px}
+  .hero h2{font-family:'Marcellus',serif;font-weight:400;font-size:22px;line-height:1.25;color:var(--parch)}
+  .hero p{font-size:13px;color:var(--parch-mute);margin-top:8px;line-height:1.5}
+  .hero .stat{display:inline-flex;align-items:baseline;gap:6px;margin-top:12px;
+    background:rgba(10,37,33,.5);border:1px solid rgba(205,159,67,.3);padding:6px 12px;border-radius:999px}
+  .hero .stat b{font-family:'Marcellus',serif;font-size:18px;color:var(--gold)}
+  .hero .stat span{font-size:11px;color:var(--parch-mute)}
+
+  .label{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--parch-mute);
+    margin:18px 2px 10px;font-weight:600}
+
+  /* scope selector */
+  .scope-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin:0 -14px;padding-left:14px;padding-right:14px;scrollbar-width:none}
+  .scope-bar::-webkit-scrollbar{display:none}
+  .chip{flex:none;background:rgba(246,239,221,.06);border:1px solid rgba(246,239,221,.14);
+    color:var(--parch);font-size:12.5px;font-weight:600;padding:9px 14px;border-radius:999px;cursor:pointer;
+    font-family:inherit;white-space:nowrap;transition:.15s}
+  .chip .n{font-size:10px;color:var(--parch-mute);margin-left:5px}
+  .chip.sel{background:linear-gradient(160deg,var(--emerald),var(--emerald-d));border-color:var(--gold);color:#fff}
+  .chip.sel .n{color:rgba(255,255,255,.75)}
+  .chip:active{transform:scale(.96)}
+
+  /* mode cards */
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .mode{background:var(--parch);border-radius:18px;padding:16px 14px;cursor:pointer;position:relative;
+    color:var(--ink-text);border:1px solid var(--parch2);text-align:left;overflow:hidden;transition:.15s}
+  .mode:active{transform:scale(.97)}
+  .mode .ico{width:38px;height:38px;margin-bottom:10px}
+  .mode h3{font-family:'Marcellus',serif;font-weight:400;font-size:17px;margin-bottom:3px}
+  .mode small{font-size:11.5px;color:var(--ink-mute);line-height:1.35;display:block}
+  .mode .tag{position:absolute;top:12px;right:12px;font-size:9.5px;font-weight:700;letter-spacing:.5px;
+    background:rgba(205,159,67,.18);color:#9a7420;padding:3px 7px;border-radius:6px;text-transform:uppercase}
+
+  /* ---- generic play top ---- */
+  .playtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px}
+  .pill{background:rgba(246,239,221,.07);border:1px solid rgba(246,239,221,.16);border-radius:12px;
+    padding:8px 12px;font-size:12px;color:var(--parch);display:flex;flex-direction:column;line-height:1.1;min-width:0}
+  .pill b{font-family:'Marcellus',serif;font-size:18px;color:var(--gold-soft)}
+  .pill span{font-size:9.5px;color:var(--parch-mute);letter-spacing:.5px;text-transform:uppercase;margin-top:2px}
+  .pbar{height:6px;background:rgba(246,239,221,.1);border-radius:999px;overflow:hidden;margin-bottom:16px}
+  .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--emerald),var(--gold));border-radius:999px;transition:width .4s ease;width:0}
+
+  /* ---- flashcard ---- */
+  .flip{perspective:1400px;margin-bottom:16px}
+  .flip-inner{position:relative;width:100%;min-height:320px;transition:transform .6s cubic-bezier(.4,.15,.2,1);
+    transform-style:preserve-3d;cursor:pointer}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:var(--parch);border-radius:24px;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:26px;text-align:center;border:1px solid var(--parch2);
+    box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}
+  .face.back{transform:rotateY(180deg);background:linear-gradient(165deg,#12403a,#0c2c28);border:1px solid rgba(205,159,67,.4)}
+  .face .arabic{font-family:'Amiri',serif;font-size:64px;color:var(--ink-text);direction:rtl;font-weight:700}
+  .face .hint{font-size:12px;color:var(--parch-mute);margin-top:18px;letter-spacing:.5px}
+  .face.back .mean{font-family:'Marcellus',serif;font-size:34px;color:var(--parch);line-height:1.2}
+  .face.back .translit{font-size:14px;color:var(--gold-soft);font-style:italic;margin-top:8px;letter-spacing:.5px}
+  .freq-badge{margin-top:20px;display:inline-flex;align-items:baseline;gap:6px;
+    background:rgba(205,159,67,.16);border:1px solid rgba(205,159,67,.4);padding:7px 14px;border-radius:999px}
+  .freq-badge b{font-family:'Marcellus',serif;font-size:20px;color:var(--gold-soft)}
+  .freq-badge span{font-size:10.5px;color:var(--parch-mute)}
+  .card-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ---- buttons ---- */
+  .big-btn{border:none;border-radius:16px;padding:16px;font-family:inherit;font-size:15px;font-weight:700;
+    cursor:pointer;transition:.12s;letter-spacing:.3px}
+  .big-btn:active{transform:scale(.97)}
+  .b-emerald{background:linear-gradient(160deg,var(--emerald),var(--emerald-d));color:#fff}
+  .b-gold{background:linear-gradient(160deg,var(--gold),#a9802f);color:#1a1207}
+  .b-ghost{background:rgba(246,239,221,.07);border:1px solid rgba(246,239,221,.18);color:var(--parch)}
+
+  /* ---- quiz ---- */
+  .q-stem{background:var(--parch);border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:16px;
+    border:1px solid var(--parch2);box-shadow:0 18px 40px -22px rgba(0,0,0,.6);min-height:150px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .q-stem .arabic{font-family:'Amiri',serif;font-size:56px;color:var(--ink-text);direction:rtl;font-weight:700}
+  .q-stem .latin{font-family:'Marcellus',serif;font-size:30px;color:var(--ink-text)}
+  .q-stem small{font-size:11px;color:var(--parch-mute);letter-spacing:1px;text-transform:uppercase;margin-top:12px}
+  .opts{display:grid;gap:10px}
+  .opt{background:rgba(246,239,221,.07);border:1.5px solid rgba(246,239,221,.16);border-radius:15px;
+    padding:15px 16px;font-family:inherit;font-size:15.5px;font-weight:600;color:var(--parch);cursor:pointer;
+    text-align:left;transition:.14s;display:flex;align-items:center;gap:10px}
+  .opt .ar{font-size:26px;font-weight:700}
+  .opt:active{transform:scale(.98)}
+  .opt.correct{background:linear-gradient(160deg,var(--green),#2a8455);border-color:#7ee0aa;color:#fff}
+  .opt.wrong{background:linear-gradient(160deg,var(--coral),#b24d3d);border-color:#f0a99d;color:#fff}
+  .opt.dim{opacity:.4}
+  .q-freq{text-align:center;margin-top:14px;font-size:13px;color:var(--gold-soft);min-height:22px;
+    font-weight:600;opacity:0;transition:.3s}
+  .q-freq.show{opacity:1}
+  .q-freq b{font-family:'Marcellus',serif}
+
+  .dir-toggle{display:flex;background:rgba(246,239,221,.06);border:1px solid rgba(246,239,221,.14);
+    border-radius:12px;padding:3px;margin-bottom:14px;font-size:12px}
+  .dir-toggle button{flex:1;background:none;border:none;color:var(--parch-mute);padding:8px;border-radius:9px;
+    font-family:inherit;font-weight:600;cursor:pointer;font-size:12px}
+  .dir-toggle button.on{background:rgba(205,159,67,.22);color:var(--gold-soft)}
+
+  /* ---- matching ---- */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
+  .m-col-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--parch-mute);
+    text-align:center;font-weight:700;padding-bottom:2px}
+  .m-cell{background:var(--parch);color:var(--ink-text);border-radius:14px;padding:15px 8px;text-align:center;
+    cursor:pointer;border:2px solid var(--parch2);transition:.14s;min-height:60px;display:flex;
+    align-items:center;justify-content:center;font-weight:600;font-size:14.5px}
+  .m-cell.ar{font-family:'Amiri',serif;font-size:30px;font-weight:700;direction:rtl}
+  .m-cell.sel{border-color:var(--gold);background:var(--gold-soft);transform:scale(1.03)}
+  .m-cell.done{opacity:0;pointer-events:none;transform:scale(.8);transition:.35s}
+  .m-cell.miss{border-color:var(--coral);animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* ---- result ---- */
+  .result{background:var(--parch);border-radius:24px;padding:30px 22px;text-align:center;color:var(--ink-text);
+    border:1px solid var(--parch2)}
+  .result .star{width:70px;height:70px;margin:0 auto 8px}
+  .result h2{font-family:'Marcellus',serif;font-weight:400;font-size:26px;margin-bottom:4px}
+  .result .score{font-family:'Marcellus',serif;font-size:52px;color:var(--emerald-d);line-height:1}
+  .result .score small{font-size:20px;color:var(--ink-mute)}
+  .result p{font-size:13.5px;color:var(--ink-mute);margin:10px 0 20px;line-height:1.5}
+  .result .btns{display:grid;gap:10px}
+
+  footer{text-align:center;margin-top:22px;font-size:11px;color:var(--parch-mute);letter-spacing:.4px}
+  footer b{color:var(--gold-soft);font-weight:600}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media(max-width:360px){.face .arabic{font-size:54px}.q-stem .arabic{font-size:46px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <svg class="khatam" viewBox="0 0 100 100" fill="none">
+        <g stroke="var(--gold)" stroke-width="3">
+          <rect x="24" y="24" width="52" height="52" transform="rotate(45 50 50)"/>
+          <rect x="24" y="24" width="52" height="52"/>
+          <circle cx="50" cy="50" r="14" fill="rgba(205,159,67,.25)"/>
+        </g>
+      </svg>
+      <div>
+        <h1>Rihlah Kata</h1>
+        <p>Kosakata Al-Qur'an · Sholat</p>
+      </div>
+    </div>
+    <button class="btn-back" id="backBtn" style="display:none" onclick="goHome()">‹ Menu</button>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen on" id="home">
+    <div class="hero">
+      <div class="big">وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ</div>
+      <h2>Hafalkan arti kata, satu ayat sholat setiap hari.</h2>
+      <p>125+ kata inti dari bacaan sholat — kata-kata yang muncul puluhan ribu kali di dalam Al-Qur'an. Kuasai ini, kuasai separuh kosakata Al-Qur'an.</p>
+      <div class="stat"><b>~50%</b><span>kosakata Al-Qur'an</span></div>
+    </div>
+
+    <div class="label">Pilih bagian</div>
+    <div class="scope-bar" id="scopeBar"></div>
+
+    <div class="label">Pilih permainan</div>
+    <div class="modes">
+      <button class="mode" onclick="startMode('kartu')">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><rect x="8" y="12" width="28" height="24" rx="4" fill="#1f9d7f"/><rect x="14" y="8" width="28" height="24" rx="4" fill="#cd9f43"/></svg>
+        <h3>Kartu</h3><small>Balik kartu, kenali artinya sendiri</small>
+      </button>
+      <button class="mode" onclick="startMode('kuis')">
+        <span class="tag">Skor</span>
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" fill="#1f9d7f"/><path d="M17 24l5 5 9-11" stroke="#f6efdd" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Kuis</h3><small>Pilih arti yang tepat dari 4 pilihan</small>
+      </button>
+      <button class="mode" onclick="startMode('jodoh')">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><rect x="7" y="10" width="14" height="12" rx="3" fill="#cd9f43"/><rect x="27" y="10" width="14" height="12" rx="3" fill="#1f9d7f"/><rect x="7" y="26" width="14" height="12" rx="3" fill="#1f9d7f"/><rect x="27" y="26" width="14" height="12" rx="3" fill="#cd9f43"/></svg>
+        <h3>Jodohkan</h3><small>Pasangkan kata Arab dengan artinya</small>
+      </button>
+      <button class="mode" onclick="startMode('cepat')">
+        <span class="tag">60 dtk</span>
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="26" r="16" fill="#cd9f43"/><path d="M24 26V16" stroke="#0a2521" stroke-width="3.5" stroke-linecap="round"/><rect x="20" y="4" width="8" height="4" rx="2" fill="#cd9f43"/></svg>
+        <h3>Adu Cepat</h3><small>Sebanyak mungkin dalam 60 detik</small>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ KARTU ============ -->
+  <section class="screen" id="kartu">
+    <div class="playtop">
+      <div class="pill"><b id="k-pos">1</b><span>dari <span id="k-total">0</span></span></div>
+      <div class="pill"><b id="k-known">0</b><span>ditandai hafal</span></div>
+    </div>
+    <div class="pbar"><i id="k-bar"></i></div>
+    <div class="flip" id="flip" onclick="flipCard()">
+      <div class="flip-inner">
+        <div class="face front">
+          <div class="arabic" id="k-ar">—</div>
+          <div class="hint">ketuk untuk lihat arti</div>
+        </div>
+        <div class="face back">
+          <div class="mean" id="k-mean">—</div>
+          <div class="translit" id="k-tr">—</div>
+          <div class="freq-badge" id="k-freq"><b>—</b><span>kali di Al-Qur'an</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="big-btn b-ghost" onclick="cardNext(false)">Ulangi lagi</button>
+      <button class="big-btn b-emerald" onclick="cardNext(true)">Sudah hafal ✓</button>
+    </div>
+  </section>
+
+  <!-- ============ KUIS ============ -->
+  <section class="screen" id="kuis">
+    <div class="playtop">
+      <div class="pill"><b id="q-score">0</b><span>benar</span></div>
+      <div class="pill"><b id="q-streak">0</b><span>beruntun 🔥</span></div>
+      <div class="pill"><b id="q-pos">1</b><span>dari <span id="q-total">0</span></span></div>
+    </div>
+    <div class="pbar"><i id="q-bar"></i></div>
+    <div class="dir-toggle">
+      <button id="dir-a2i" class="on" onclick="setDir('a2i')">Arab → Arti</button>
+      <button id="dir-i2a" onclick="setDir('i2a')">Arti → Arab</button>
+    </div>
+    <div class="q-stem"><div id="q-stem-in"></div><small id="q-sub"></small></div>
+    <div class="opts" id="q-opts"></div>
+    <div class="q-freq" id="q-freq"></div>
+  </section>
+
+  <!-- ============ JODOH ============ -->
+  <section class="screen" id="jodoh">
+    <div class="playtop">
+      <div class="pill"><b id="j-pairs">0</b><span>pasangan cocok</span></div>
+      <div class="pill"><b id="j-miss">0</b><span>salah</span></div>
+      <div class="pill"><b id="j-round">1</b><span>ronde</span></div>
+    </div>
+    <div class="pbar"><i id="j-bar"></i></div>
+    <div class="match-grid" style="grid-template-columns:1fr 1fr;margin-bottom:4px">
+      <div class="m-col-label">Kata Arab</div>
+      <div class="m-col-label">Arti</div>
+    </div>
+    <div class="match-grid" id="j-grid"></div>
+  </section>
+
+  <!-- ============ CEPAT ============ -->
+  <section class="screen" id="cepat">
+    <div class="playtop">
+      <div class="pill"><b id="c-score">0</b><span>benar</span></div>
+      <div class="pill" style="flex:1;align-items:center"><b id="c-time">60</b><span>detik tersisa</span></div>
+    </div>
+    <div class="pbar"><i id="c-bar" style="background:linear-gradient(90deg,var(--gold),var(--coral))"></i></div>
+    <div class="q-stem"><div id="c-stem-in"></div></div>
+    <div class="opts" id="c-opts"></div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section class="screen" id="result">
+    <div class="result">
+      <svg class="star" viewBox="0 0 100 100" fill="none">
+        <path id="r-star" d="M50 8l11 24 26 3-19 18 5 26-23-13-23 13 5-26-19-18 26-3z" fill="#cd9f43" stroke="#a9802f" stroke-width="2"/>
+      </svg>
+      <h2 id="r-title">Masyaa Allah!</h2>
+      <div class="score"><span id="r-score">0</span><small id="r-of"></small></div>
+      <p id="r-msg"></p>
+      <div class="btns">
+        <button class="big-btn b-emerald" id="r-again">Main lagi</button>
+        <button class="big-btn b-ghost" onclick="goHome()">Ganti bagian / permainan</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA — 125+ kosakata inti dari bacaan sholat
+   ar=arab, tr=transliterasi, id=arti, n=jumlah di Al-Qur'an
+============================================================ */
+const SECTIONS = [
+ {id:1, name:"Taawudz", words:[
+   {ar:"اَعُوْذُ",tr:"a'ūdzu",id:"Aku berlindung",n:7},
+   {ar:"بِاللّٰهِ",tr:"billāhi",id:"Kepada Allah",n:2550},
+   {ar:"مِنْ",tr:"min",id:"Dari",n:2471},
+   {ar:"شَيْطٰن",tr:"syaithān",id:"Syaithan",n:88},
+   {ar:"اَلرَّجِيْم",tr:"ar-rajīm",id:"Terkutuk",n:6},
+   {ar:"هُوَ",tr:"huwa",id:"Dia (lk)",n:481},
+   {ar:"هُمْ",tr:"hum",id:"Mereka",n:444},
+   {ar:"أَنْتَ",tr:"anta",id:"Kamu (lk)",n:81},
+   {ar:"أَنَا",tr:"anā",id:"Saya",n:135},
+   {ar:"أَنْتُمْ",tr:"antum",id:"Kalian",n:68},
+   {ar:"نَحْنُ",tr:"naḥnu",id:"Kami",n:86},
+   {ar:"مَنْ",tr:"man",id:"Siapa?",n:831},
+ ]},
+ {id:2, name:"Al-Fatihah 1–3", words:[
+   {ar:"اِسْم",tr:"ism",id:"Nama",n:39},
+   {ar:"اَلرَّحْمٰن",tr:"ar-raḥmān",id:"Maha Pengasih",n:57},
+   {ar:"اَلرَّحِيْم",tr:"ar-raḥīm",id:"Maha Penyayang",n:115},
+   {ar:"كَرِيْم",tr:"karīm",id:"Mulia",n:27},
+   {ar:"اَلْحَمْد",tr:"al-ḥamd",id:"Segala puji",n:43},
+   {ar:"لِلّٰهِ",tr:"lillāhi",id:"Bagi Allah",n:149},
+   {ar:"رَبّ",tr:"rabb",id:"Tuhan",n:199},
+   {ar:"اَلْعٰلَمِيْن",tr:"al-'ālamīn",id:"Semesta alam",n:73},
+   {ar:"مُؤْمِن",tr:"mu'min",id:"Orang beriman",n:230},
+   {ar:"مُشْرِك",tr:"musyrik",id:"Orang musyrik",n:49},
+   {ar:"كَافِر",tr:"kāfir",id:"Orang kafir",n:134},
+   {ar:"صَالِح",tr:"ṣāliḥ",id:"Orang sholeh",n:136},
+ ]},
+ {id:3, name:"Al-Fatihah 4–5", words:[
+   {ar:"مٰلِك",tr:"mālik",id:"Penguasa / Raja",n:3},
+   {ar:"يَوْم",tr:"yaum",id:"Hari",n:405},
+   {ar:"اَلدِّيْن",tr:"ad-dīn",id:"Pembalasan",n:92},
+   {ar:"اِيَّاكَ",tr:"iyyāka",id:"Hanya kepada-Mu",n:24},
+   {ar:"نَعْبُدُ",tr:"na'budu",id:"Kami menyembah",n:null},
+   {ar:"نَسْتَعِيْن",tr:"nasta'īn",id:"Kami mohon pertolongan",n:1},
+   {ar:"مَا",tr:"mā",id:"Apa?",n:2154},
+ ]},
+ {id:4, name:"Al-Fatihah 6–7", words:[
+   {ar:"اِهْدِنَا",tr:"ihdinā",id:"Tunjukilah kami",n:2},
+   {ar:"اَلصِّرَاط",tr:"aṣ-ṣirāṭ",id:"Jalan",n:45},
+   {ar:"اَلْمُسْتَقِيْم",tr:"al-mustaqīm",id:"Yang lurus",n:37},
+   {ar:"اَلَّذِيْنَ",tr:"alladzīna",id:"Orang-orang yang",n:1080},
+   {ar:"أَنْعَمْتَ",tr:"an'amta",id:"Engkau beri nikmat",n:5},
+   {ar:"عَلَيْهِمْ",tr:"'alaihim",id:"Atas mereka",n:216},
+   {ar:"غَيْر",tr:"ghair",id:"Bukan / Selain",n:147},
+   {ar:"اَلْمَغْضُوْب",tr:"al-maghḍūb",id:"Yang dimurkai",n:1},
+   {ar:"وَلَا",tr:"walā",id:"Dan bukan",n:1687},
+   {ar:"اَلضَّآلِّيْن",tr:"aḍ-ḍāllīn",id:"Orang-orang sesat",n:14},
+   {ar:"هِيَ",tr:"hiya",id:"Dia (pr)",n:64},
+   {ar:"مُسْلِمَة",tr:"muslimah",id:"Wanita muslim",n:null},
+ ]},
+ {id:5, name:"Adzan", words:[
+   {ar:"أَكْبَر",tr:"akbar",id:"Maha Besar",n:23},
+   {ar:"أَشْهَدُ",tr:"asyhadu",id:"Aku bersaksi",n:1},
+   {ar:"أَنْ",tr:"an",id:"Bahwa",n:571},
+   {ar:"مُحَمَّد",tr:"muḥammad",id:"Muhammad ﷺ",n:4},
+   {ar:"رَسُوْل",tr:"rasūl",id:"Utusan",n:332},
+   {ar:"حَيَّ",tr:"ḥayya",id:"Marilah!",n:null},
+   {ar:"اَلصَّلٰوة",tr:"aṣ-ṣalāh",id:"Sholat",n:83},
+   {ar:"اَلْفَلَاح",tr:"al-falāḥ",id:"Keberuntungan",n:null},
+   {ar:"كَبِيْر",tr:"kabīr",id:"Besar",n:39},
+   {ar:"كَثِيْر",tr:"katsīr",id:"Banyak",n:63},
+   {ar:"أَكْثَر",tr:"aktsar",id:"Lebih banyak",n:88},
+ ]},
+ {id:6, name:"Iqamah", words:[
+   {ar:"خَيْر",tr:"khair",id:"Lebih baik",n:176},
+   {ar:"نَوْم",tr:"naum",id:"Tidur",n:3},
+   {ar:"قَدْ",tr:"qad",id:"Sungguh",n:null},
+   {ar:"شَرِيْك",tr:"syarīk",id:"Sekutu",n:40},
+   {ar:"سَبِيْل",tr:"sabīl",id:"Jalan",n:176},
+ ]},
+ {id:7, name:"Ruku & Sujud", words:[
+   {ar:"سُبْحٰنَ",tr:"subḥāna",id:"Maha Suci",n:41},
+   {ar:"اَلْعَظِيْم",tr:"al-'aẓīm",id:"Maha Agung",n:107},
+   {ar:"مِلْءَ",tr:"mil'a",id:"Sepenuh / seisi",n:1},
+   {ar:"أَرْض",tr:"arḍ",id:"Bumi",n:461},
+   {ar:"سَمَاء",tr:"samā'",id:"Langit",n:310},
+   {ar:"بَيْنَ",tr:"baina",id:"Di antara",n:266},
+   {ar:"شِئْتَ",tr:"syi'ta",id:"Engkau kehendaki",n:3},
+   {ar:"شَيْء",tr:"syai'",id:"Sesuatu",n:283},
+   {ar:"بَعْد",tr:"ba'd",id:"Setelah",n:198},
+   {ar:"عَلِيّ",tr:"'aliyy",id:"Tinggi",n:11},
+   {ar:"أَعْلٰى",tr:"a'lā",id:"Paling tinggi",n:9},
+   {ar:"كَمْ",tr:"kam",id:"Berapa?",n:21},
+ ]},
+ {id:8, name:"Tasyahud", words:[
+   {ar:"اَلتَّحِيّات",tr:"at-taḥiyyāt",id:"Penghormatan",n:6},
+   {ar:"اَلطَّيِّبَات",tr:"aṭ-ṭayyibāt",id:"Yang baik",n:46},
+   {ar:"اَلسَّلٰم",tr:"as-salām",id:"Keselamatan",n:42},
+   {ar:"اَلنَّبِى",tr:"an-nabiyy",id:"Nabi",n:75},
+   {ar:"رَحْمَة",tr:"raḥmah",id:"Kasih sayang",n:114},
+   {ar:"بَرَكَات",tr:"barakāt",id:"Keberkahan",n:3},
+   {ar:"عَبْد",tr:"'abd",id:"Hamba",n:125},
+   {ar:"هٰذَا",tr:"hādzā",id:"Ini (lk)",n:255},
+   {ar:"هٰذِهِ",tr:"hādzihi",id:"Ini (pr)",n:47},
+   {ar:"ذٰلِكَ",tr:"dzālika",id:"Itu (lk)",n:478},
+   {ar:"تِلْكَ",tr:"tilka",id:"Itu (pr)",n:43},
+   {ar:"هٰؤُلَاءِ",tr:"hā'ulā'i",id:"Ini (jamak)",n:46},
+   {ar:"أُولٰئِكَ",tr:"ulā'ika",id:"Itu (jamak)",n:204},
+ ]},
+ {id:9, name:"Sholawat", words:[
+   {ar:"اَللّٰهُمَّ",tr:"allāhumma",id:"Ya Allah!",n:5},
+   {ar:"صَلِّ",tr:"ṣalli",id:"Limpahkan rahmat!",n:2},
+   {ar:"اٰل",tr:"āl",id:"Keluarga / pengikut",n:26},
+   {ar:"كَمَا",tr:"kamā",id:"Sebagaimana",n:null},
+   {ar:"إِبْرَاهِيْم",tr:"ibrāhīm",id:"Nabi Ibrahim",n:69},
+   {ar:"حَمِيْد",tr:"ḥamīd",id:"Maha Terpuji",n:17},
+   {ar:"مَجِيْد",tr:"majīd",id:"Maha Mulia",n:4},
+   {ar:"بَارِكْ",tr:"bārik",id:"Berkahilah!",n:null},
+   {ar:"جَعَلَ",tr:"ja'ala",id:"Dia telah menjadikan",n:233},
+   {ar:"فَتَحَ",tr:"fataḥa",id:"Dia telah membuka",n:8},
+ ]},
+ {id:10, name:"Doa Setelah Sholat", words:[
+   {ar:"اٰتِ",tr:"āti",id:"Berikanlah!",n:9},
+   {ar:"اَلدُّنْيَا",tr:"ad-dunyā",id:"Dunia",n:115},
+   {ar:"حَسَنَة",tr:"ḥasanah",id:"Kebaikan",n:31},
+   {ar:"الْأٰخِرَة",tr:"al-ākhirah",id:"Akhirat",n:115},
+   {ar:"قِ",tr:"qi",id:"Lindungilah!",n:5},
+   {ar:"عَذَاب",tr:"'adzāb",id:"Siksaan / azab",n:322},
+   {ar:"اَلنَّار",tr:"an-nār",id:"Api / neraka",n:145},
+   {ar:"حُسْن",tr:"ḥusn",id:"Kebaikan / terbaik",n:13},
+   {ar:"نَصَرَ",tr:"naṣara",id:"Dia telah menolong",n:10},
+   {ar:"خَلَقَ",tr:"khalaqa",id:"Dia telah menciptakan",n:150},
+   {ar:"ذَكَرَ",tr:"dzakara",id:"Dia telah mengingat",n:7},
+   {ar:"عَبَدَ",tr:"'abada",id:"Dia telah menyembah",n:46},
+ ]},
+ {id:11, name:"Al-Ikhlas", words:[
+   {ar:"قُلْ",tr:"qul",id:"Katakanlah!",n:332},
+   {ar:"أَحَد",tr:"aḥad",id:"Satu / Esa",n:74},
+   {ar:"اَلصَّمَد",tr:"aṣ-ṣamad",id:"Maha Dibutuhkan",n:1},
+   {ar:"لَمْ",tr:"lam",id:"Tidak",n:348},
+   {ar:"يَلِدْ",tr:"yalid",id:"Beranak",n:1},
+   {ar:"يُوْلَدْ",tr:"yūlad",id:"Diperanakkan",n:1},
+   {ar:"يَكُنْ",tr:"yakun",id:"Ada",n:31},
+   {ar:"كُفُوًا",tr:"kufuwan",id:"Setara / sebanding",n:1},
+   {ar:"قَالَ",tr:"qāla",id:"Dia telah berkata",n:530},
+   {ar:"لَنْ",tr:"lan",id:"Tidak akan",n:106},
+   {ar:"ضَرَبَ",tr:"ḍaraba",id:"Dia telah memukul",n:22},
+   {ar:"سَمِعَ",tr:"sami'a",id:"Dia telah mendengar",n:30},
+   {ar:"عَلِمَ",tr:"'alima",id:"Dia telah mengetahui",n:35},
+   {ar:"عَمِلَ",tr:"'amila",id:"Dia telah mengerjakan",n:99},
+ ]},
+ {id:12, name:"Al-Falaq", words:[
+   {ar:"اَلْفَلَق",tr:"al-falaq",id:"Waktu subuh",n:1},
+   {ar:"شَرّ",tr:"syarr",id:"Kejahatan",n:30},
+   {ar:"غَاسِق",tr:"ghāsiq",id:"Kegelapan malam",n:1},
+   {ar:"إِذَا",tr:"idzā",id:"Apabila",n:423},
+   {ar:"وَقَبَ",tr:"waqaba",id:"Bertambah gelap",n:1},
+   {ar:"اَلْعُقَد",tr:"al-'uqad",id:"Simpul tali",n:4},
+   {ar:"حَاسِد",tr:"ḥāsid",id:"Pendengki",n:1},
+   {ar:"حَسَدَ",tr:"ḥasada",id:"Dia telah dengki",n:1},
+ ]},
+ {id:13, name:"An-Naas", words:[
+   {ar:"مَلِك",tr:"malik",id:"Raja",n:13},
+   {ar:"إِلٰه",tr:"ilāh",id:"Sembahan / Tuhan",n:145},
+   {ar:"اَلْوَسْوَاس",tr:"al-waswās",id:"Pembisik",n:1},
+   {ar:"صَدْر",tr:"ṣadr",id:"Dada",n:44},
+   {ar:"اَلْخَنَّاس",tr:"al-khannās",id:"Yang bersembunyi",n:1},
+   {ar:"اَلْجِنَّة",tr:"al-jinnah",id:"Golongan jin",n:32},
+ ]},
+ {id:14, name:"Al-'Ashr", words:[
+   {ar:"اَلْعَصْر",tr:"al-'aṣr",id:"Masa / waktu",n:1},
+   {ar:"إِنَّ",tr:"inna",id:"Sesungguhnya",n:1534},
+   {ar:"اَلْإِنْسَان",tr:"al-insān",id:"Manusia",n:65},
+   {ar:"خُسْر",tr:"khusr",id:"Kerugian",n:2},
+   {ar:"إِلَّا",tr:"illā",id:"Kecuali",n:664},
+   {ar:"اٰمَنُوْا",tr:"āmanū",id:"Mereka telah beriman",n:258},
+   {ar:"تَوَاصَوْا",tr:"tawāṣau",id:"Saling menasehati",n:258},
+   {ar:"اَلْحَقّ",tr:"al-ḥaqq",id:"Kebenaran",n:247},
+   {ar:"اَلصَّبْر",tr:"aṣ-ṣabr",id:"Kesabaran",n:15},
+   {ar:"إِنْ",tr:"in",id:"Jika",n:691},
+   {ar:"شَاءَ",tr:"syā'a",id:"Dia berkehendak",n:56},
+   {ar:"أَوْ",tr:"au",id:"Atau",n:280},
+ ]},
+ {id:15, name:"An-Nashr", words:[
+   {ar:"جَاءَ",tr:"jā'a",id:"Dia telah datang",n:171},
+   {ar:"اَلْفَتْح",tr:"al-fatḥ",id:"Kemenangan",n:null},
+   {ar:"رَأَيْتَ",tr:"ra'aita",id:"Kamu telah melihat",n:25},
+   {ar:"اَلنَّاس",tr:"an-nās",id:"Manusia",n:241},
+   {ar:"يَدْخُلُوْنَ",tr:"yadkhulūna",id:"Mereka masuk",n:13},
+   {ar:"فَوْج",tr:"fauj",id:"Rombongan / ramai",n:7},
+   {ar:"سَبِّحْ",tr:"sabbiḥ",id:"Sucikanlah!",n:16},
+   {ar:"اسْتَغْفِرْ",tr:"istaghfir",id:"Mohon ampunlah!",n:10},
+   {ar:"كَانَ",tr:"kāna",id:"Adalah",n:422},
+   {ar:"تَوَّاب",tr:"tawwāb",id:"Maha Penerima taubat",n:12},
+ ]},
+ {id:16, name:"Al-Kafirun", words:[
+   {ar:"يَا",tr:"yā",id:"Wahai",n:361},
+   {ar:"أَيُّهَا",tr:"ayyuhā",id:"Wahai (kalian)",n:153},
+   {ar:"أَعْبُدُ",tr:"a'budu",id:"Aku menyembah",n:null},
+   {ar:"عَابِد",tr:"'ābid",id:"Penyembah",n:null},
+   {ar:"قَوْم",tr:"qaum",id:"Kaum",n:383},
+ ]},
+ {id:17, name:"Tujuan Wahyu", words:[
+   {ar:"كِتَاب",tr:"kitāb",id:"Kitab",n:261},
+   {ar:"أَنْزَلْنَا",tr:"anzalnā",id:"Kami telah turunkan",n:55},
+   {ar:"مُبَارَك",tr:"mubārak",id:"Penuh berkah",n:12},
+   {ar:"اٰيَة",tr:"āyah",id:"Ayat / tanda",n:382},
+   {ar:"أُولُوْا",tr:"ulū",id:"Orang yang memiliki",n:43},
+   {ar:"اَلْأَلْبَاب",tr:"al-albāb",id:"Akal pikiran",n:16},
+   {ar:"بَلِّغُوْا",tr:"ballighū",id:"Sampaikanlah!",n:null},
+   {ar:"لَوْ",tr:"lau",id:"Seandainya / walaupun",n:201},
+ ]},
+ {id:18, name:"Al-Qur'an itu Mudah", words:[
+   {ar:"يَسَّرْنَا",tr:"yassarnā",id:"Kami telah mudahkan",n:6},
+   {ar:"اَلْقُرْآن",tr:"al-qur'ān",id:"Al-Qur'an",n:70},
+   {ar:"تَعَلَّمَ",tr:"ta'allama",id:"Dia telah belajar",n:2},
+   {ar:"عَلَّمَ",tr:"'allama",id:"Dia telah mengajarkan",n:14},
+   {ar:"إِنَّمَا",tr:"innamā",id:"Hanya saja",n:145},
+   {ar:"أَعْمَال",tr:"a'māl",id:"Perbuatan / amal",n:41},
+   {ar:"نِيَّة",tr:"niyyah",id:"Niat",n:null},
+ ]},
+ {id:19, name:"Cara Belajar", words:[
+   {ar:"زِدْ",tr:"zid",id:"Tambahkanlah!",n:3},
+   {ar:"اَلَّذِي",tr:"alladzī",id:"Orang yang",n:304},
+   {ar:"قَلَم",tr:"qalam",id:"Pena",n:null},
+   {ar:"أَيُّكُمْ",tr:"ayyukum",id:"Siapa di antara kalian",n:59},
+   {ar:"حَسَن",tr:"ḥasan",id:"Baik",n:19},
+   {ar:"أَحْسَن",tr:"aḥsan",id:"Terbaik",n:36},
+   {ar:"عَمَل",tr:"'amal",id:"Perbuatan / amal",n:42},
+ ]},
+];
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+const ALL=SECTIONS.flatMap(s=>s.words);
+
+let scope='all';      // 'all' or section id
+let pool=[];
+let curMode='';
+
+/* ---------- scope chips ---------- */
+function buildScope(){
+  const bar=$('scopeBar');
+  let html=`<button class="chip sel" data-s="all" onclick="pickScope('all',this)">Semua<span class="n">${ALL.length}</span></button>`;
+  SECTIONS.forEach(s=>{
+    html+=`<button class="chip" data-s="${s.id}" onclick="pickScope(${s.id},this)">${s.name}<span class="n">${s.words.length}</span></button>`;
+  });
+  bar.innerHTML=html;
+}
+function pickScope(s,el){
+  scope=s;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  buzz(6);
+}
+function getPool(){
+  return scope==='all'?ALL:SECTIONS.find(s=>s.id===scope).words;
+}
+
+/* ---------- navigation ---------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $(id).classList.add('on');
+  $('backBtn').style.display = id==='home' ? 'none' : 'block';
+  window.scrollTo(0,0);
+}
+function goHome(){ if(timer)clearInterval(timer); show('home'); }
+
+function startMode(m){
+  curMode=m;
+  pool=getPool();
+  if(pool.length<4 && (m==='kuis'||m==='cepat'||m==='jodoh')){
+    alert('Pilih "Semua" atau bagian dengan minimal 4 kata untuk permainan ini.');
+    return;
+  }
+  buzz(10);
+  if(m==='kartu') initKartu();
+  if(m==='kuis')  initKuis();
+  if(m==='jodoh') initJodoh();
+  if(m==='cepat') initCepat();
+}
+
+/* ===================== KARTU ===================== */
+let kList=[], kIdx=0, kKnown=0;
+function initKartu(){
+  kList=shuffle(pool); kIdx=0; kKnown=0;
+  $('k-total').textContent=kList.length;
+  $('k-known').textContent=0;
+  show('kartu'); renderKartu();
+}
+function renderKartu(){
+  $('flip').classList.remove('flipped');
+  const w=kList[kIdx];
+  $('k-ar').textContent=w.ar;
+  $('k-mean').textContent=w.id;
+  $('k-tr').textContent=w.tr;
+  const fb=$('k-freq');
+  fb.style.display = w.n?'inline-flex':'none';
+  if(w.n) fb.querySelector('b').textContent=w.n.toLocaleString('id-ID');
+  $('k-pos').textContent=kIdx+1;
+  $('k-bar').style.width=((kIdx)/kList.length*100)+'%';
+}
+function flipCard(){ $('flip').classList.toggle('flipped'); buzz(5); }
+function cardNext(known){
+  if(known){kKnown++; $('k-known').textContent=kKnown;}
+  buzz(8);
+  kIdx++;
+  if(kIdx>=kList.length){
+    $('k-bar').style.width='100%';
+    showResult('kartu',kKnown,kList.length);
+    return;
+  }
+  renderKartu();
+}
+
+/* ===================== KUIS ===================== */
+let qList=[], qIdx=0, qScore=0, qStreak=0, qDir='a2i', qLock=false;
+function setDir(d){
+  qDir=d;
+  $('dir-a2i').classList.toggle('on',d==='a2i');
+  $('dir-i2a').classList.toggle('on',d==='i2a');
+  buzz(5);
+  if(curMode==='kuis'){ renderKuis(); }
+}
+function initKuis(){
+  qList=shuffle(pool).slice(0,Math.min(15,pool.length));
+  qIdx=0; qScore=0; qStreak=0; qLock=false;
+  $('q-total').textContent=qList.length;
+  $('q-score').textContent=0; $('q-streak').textContent=0;
+  show('kuis'); renderKuis();
+}
+function renderKuis(){
+  qLock=false;
+  const w=qList[qIdx];
+  $('q-freq').classList.remove('show'); $('q-freq').textContent='';
+  $('q-pos').textContent=qIdx+1;
+  $('q-bar').style.width=(qIdx/qList.length*100)+'%';
+
+  const stem=$('q-stem-in'), sub=$('q-sub'), optsBox=$('q-opts');
+  let correctText, options;
+  if(qDir==='a2i'){
+    stem.innerHTML=`<div class="ar arabic">${w.ar}</div>`;
+    sub.textContent='Apa artinya?';
+    correctText=w.id;
+    options=buildOptions(w,'id');
+    optsBox.innerHTML=options.map(o=>`<button class="opt" onclick="answerKuis(this,${o===correctText})">${o}</button>`).join('');
+  }else{
+    stem.innerHTML=`<div class="latin">${w.id}</div>`;
+    sub.textContent='Kata Arab mana?';
+    correctText=w.ar;
+    options=buildOptions(w,'ar');
+    optsBox.innerHTML=options.map(o=>`<button class="opt" onclick="answerKuis(this,${o===correctText})"><span class="ar">${o}</span></button>`).join('');
+  }
+}
+function buildOptions(w,key){
+  const wrong=shuffle(pool.filter(x=>x[key]!==w[key])).slice(0,3).map(x=>x[key]);
+  return shuffle([w[key],...wrong]);
+}
+function answerKuis(el,correct){
+  if(qLock)return; qLock=true;
+  const w=qList[qIdx];
+  const btns=$('q-opts').querySelectorAll('.opt');
+  const correctVal = qDir==='a2i'?w.id:w.ar;
+  btns.forEach(b=>{
+    const t=(b.textContent||'').trim();
+    const bAr=b.querySelector('.ar');
+    const val=bAr?bAr.textContent.trim():t;
+    if(val===correctVal) b.classList.add('correct');
+    else b.classList.add('dim');
+  });
+  if(correct){
+    qScore++; qStreak++; buzz(12);
+    $('q-score').textContent=qScore;
+  }else{
+    el.classList.remove('dim'); el.classList.add('wrong');
+    qStreak=0; buzz([20,40,20]);
+  }
+  $('q-streak').textContent=qStreak;
+  if(w.n){
+    $('q-freq').innerHTML=`Kata ini muncul <b>${w.n.toLocaleString('id-ID')}</b> kali di Al-Qur'an`;
+    $('q-freq').classList.add('show');
+  }
+  setTimeout(()=>{
+    qIdx++;
+    if(qIdx>=qList.length){ $('q-bar').style.width='100%'; showResult('kuis',qScore,qList.length); }
+    else renderKuis();
+  }, w.n?1150:850);
+}
+
+/* ===================== JODOH ===================== */
+let jRound=1, jPairs=0, jMiss=0, jSel=null, jActive=[], jDone=0;
+const J_PER=5, J_ROUNDS=3;
+function initJodoh(){
+  jRound=1; jPairs=0; jMiss=0;
+  $('j-pairs').textContent=0; $('j-miss').textContent=0;
+  show('jodoh'); buildJodohRound();
+}
+function buildJodohRound(){
+  $('j-round').textContent=jRound;
+  jSel=null; jDone=0;
+  jActive=shuffle(pool).slice(0,Math.min(J_PER,pool.length));
+  // pasangkan lewat indeks (bukan teks), agar aman dari tanda petik pada transliterasi/arti
+  const idx=jActive.map((_,i)=>i);
+  const left=shuffle(idx), right=shuffle(idx);
+  const grid=$('j-grid');
+  let h='';
+  const n=jActive.length;
+  for(let i=0;i<n;i++){
+    h+=`<div class="m-cell ar" data-pair="${left[i]}" data-side="ar">${jActive[left[i]].ar}</div>`
+     + `<div class="m-cell" data-pair="${right[i]}" data-side="id">${jActive[right[i]].id}</div>`;
+  }
+  grid.innerHTML=h;
+  grid.querySelectorAll('.m-cell').forEach(c=>c.addEventListener('click',()=>jTap(c)));
+  $('j-bar').style.width=((jRound-1)/J_ROUNDS*100)+'%';
+}
+function jTap(el){
+  if(el.classList.contains('done'))return;
+  const key=el.dataset.pair, side=el.dataset.side;
+  buzz(5);
+  if(!jSel){ jSel={el,key,side}; el.classList.add('sel'); return; }
+  if(jSel.el===el){ el.classList.remove('sel'); jSel=null; return; }
+  if(jSel.side===side){ // same column, switch selection
+    jSel.el.classList.remove('sel'); jSel={el,key,side}; el.classList.add('sel'); return;
+  }
+  // match attempt
+  if(jSel.key===key){
+    jSel.el.classList.add('done'); el.classList.add('done');
+    jSel=null; jPairs++; jDone++; buzz(12);
+    $('j-pairs').textContent=jPairs;
+    if(jDone>=jActive.length){
+      setTimeout(()=>{
+        if(jRound>=J_ROUNDS){ $('j-bar').style.width='100%'; showResult('jodoh',jPairs,J_ROUNDS*J_PER); }
+        else{ jRound++; buildJodohRound(); }
+      },420);
+    }
+  }else{
+    const a=jSel.el, b=el;
+    a.classList.add('miss'); b.classList.add('miss');
+    jMiss++; $('j-miss').textContent=jMiss; buzz([20,40,20]);
+    setTimeout(()=>{a.classList.remove('miss','sel'); b.classList.remove('miss')},380);
+    jSel=null;
+  }
+}
+
+/* ===================== ADU CEPAT ===================== */
+let timer=null, cTime=60, cScore=0, cLock=false;
+function initCepat(){
+  cTime=60; cScore=0; cLock=false;
+  $('c-time').textContent=60; $('c-score').textContent=0;
+  $('c-bar').style.width='100%';
+  show('cepat'); nextCepat();
+  timer=setInterval(()=>{
+    cTime--; $('c-time').textContent=cTime;
+    $('c-bar').style.width=(cTime/60*100)+'%';
+    if(cTime<=0){ clearInterval(timer); showResult('cepat',cScore,null); }
+  },1000);
+}
+function nextCepat(){
+  cLock=false;
+  const w=pool[Math.random()*pool.length|0];
+  $('c-stem-in').innerHTML=`<div class="ar arabic">${w.ar}</div>`;
+  const wrong=shuffle(pool.filter(x=>x.id!==w.id)).slice(0,3).map(x=>x.id);
+  const opts=shuffle([w.id,...wrong]);
+  $('c-opts').innerHTML=opts.map(o=>`<button class="opt" onclick="answerCepat(this,${o===w.id})">${o}</button>`).join('');
+  $('c-cur')&&($('c-cur').w=w);
+  cCur=w;
+}
+let cCur=null;
+function answerCepat(el,correct){
+  if(cLock)return; cLock=true;
+  if(correct){ cScore++; $('c-score').textContent=cScore; el.classList.add('correct'); buzz(10); }
+  else{
+    el.classList.add('wrong'); buzz([20,30,20]);
+    $('c-opts').querySelectorAll('.opt').forEach(b=>{if(b.textContent.trim()===cCur.id)b.classList.add('correct')});
+  }
+  setTimeout(nextCepat, correct?200:600);
+}
+
+/* ===================== RESULT ===================== */
+function showResult(mode, score, total){
+  buzz([12,60,12,60,12]);
+  const t=$('r-title'), sc=$('r-score'), of=$('r-of'), msg=$('r-msg'), star=$('r-star');
+  sc.textContent=score;
+  if(total){ of.textContent=' / '+total; } else { of.textContent=''; }
+
+  let pct = total? score/total : 1;
+  let title, message, color;
+  if(mode==='cepat'){
+    title = score>=15?'Luar biasa cepat!':score>=8?'Mantap!':'Terus berlatih!';
+    message = `Kamu menjawab benar <b>${score}</b> kata dalam 60 detik. Ulangi untuk mengalahkan skormu.`;
+    color = score>=15?'#1f9d7f':score>=8?'#cd9f43':'#a9802f';
+  } else if(mode==='kartu'){
+    title='Selesai satu putaran';
+    message=`Kamu menandai <b>${score}</b> dari <b>${total}</b> kata sudah hafal. Ulangi bagian ini besok untuk memperkuat ingatan (metode spaced repetition).`;
+    color=pct>=0.8?'#1f9d7f':'#cd9f43';
+  } else {
+    title = pct>=0.9?'Masyaa Allah!':pct>=0.6?'Bagus, lanjutkan!':'Belum apa-apa, ayo ulangi!';
+    message = pct>=0.9
+      ? `Nyaris sempurna — <b>${score}/${total}</b> benar. Coba mode "Arti → Arab" untuk tantangan berikutnya.`
+      : `<b>${score}/${total}</b> benar. Kata yang keliru paling bagus diulang lewat mode Kartu dulu.`;
+    color = pct>=0.9?'#1f9d7f':pct>=0.6?'#cd9f43':'#a9802f';
+  }
+  t.textContent=title; msg.innerHTML=message; star.setAttribute('fill',color);
+  $('r-again').onclick=()=>startMode(mode);
+  show('result');
+}
+
+/* ---------- init ---------- */
+buildScope();
+</script>
+</body>
+</html>

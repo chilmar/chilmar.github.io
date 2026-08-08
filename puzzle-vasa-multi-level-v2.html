@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puzzle Kapal Vasa — 3x3 / 4x4 / 5x5</title>
+<style>
+  :root{ --bg:#faf6ee; --ink:#2c2418; --muted:#7a6c58; --line:#d8cbb2; --accent:#1d9e75; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}
+  .wrap{max-width:560px;margin:0 auto}
+  h1{font-size:20px;font-weight:600;margin:0 0 4px}
+  p.sub{margin:0 0 16px;color:var(--muted);font-size:14px}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .label{font-size:13px;color:var(--muted);margin-right:2px}
+  button{font:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--line);
+         background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
+  button:hover{background:#f1ead9}
+  button.lvl.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .stats{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin-bottom:8px}
+  .stats b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  #track{height:8px;background:#e6dcc7;border-radius:99px;overflow:hidden;margin-bottom:14px}
+  #fill{height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .25s ease}
+  #grid{display:grid;gap:2px;width:100%;background:var(--line);border:1px solid var(--line);
+        border-radius:10px;overflow:hidden;aspect-ratio:1/1}
+  #grid div{cursor:pointer;transition:box-shadow .15s}
+  #msg{font-size:13px;color:var(--muted);margin-top:12px;min-height:20px}
+  #win{display:none;margin-top:14px;padding:14px 16px;border:1px solid var(--accent);
+       background:#e9f7f1;border-radius:10px}
+  #win h2{margin:0 0 6px;font-size:16px;color:#147053}
+  #win p{margin:0;font-size:14px;color:#2c4f45;line-height:1.5}
+  #prev{width:100%;aspect-ratio:1/1;margin-top:14px;border-radius:10px;background-size:cover;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Puzzle Kapal Vasa</h1>
+  <p class="sub">Klik satu keping, lalu klik keping lain untuk menukar posisinya.</p>
+
+  <div class="row">
+    <span class="label">Tingkat:</span>
+    <button class="lvl" data-n="3">3&times;3 — Mudah</button>
+    <button class="lvl" data-n="4">4&times;4 — Sedang</button>
+    <button class="lvl on" data-n="5">5&times;5 — Sulit</button>
+    <button class="lvl" data-n="6">6&times;6 — Ahli</button>
+  </div>
+  <div class="row">
+    <button id="sh">Acak ulang</button>
+    <button id="pv">Lihat gambar asli</button>
+    <button id="sv">Selesaikan</button>
+  </div>
+
+  <div class="stats">
+    <span>Keping benar: <b id="ok">0</b> / <b id="tot">25</b> (<b id="pct">0</b>%)</span>
+    <span>Sisa: <b id="left">25</b></span>
+    <span>Langkah: <b id="mv">0</b></span>
+    <span>Waktu: <b id="tm">00:00</b></span>
+  </div>
+  <div id="track"><div id="fill"></div></div>
+
+  <div id="grid"></div>
+  <p id="msg">Selamat bermain!</p>
+
+  <div id="win"><h2 id="wt">Selesai!</h2><p id="wp"></p></div>
+  <div id="prev"></div>
+</div>
+<script>
+var art='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><rect width="600" height="600" fill="#e8ddc8"/><rect y="430" width="600" height="170" fill="#d3c4a6"/><rect x="0" y="0" width="600" height="120" fill="#f2e9d6"/><g stroke="#cbbb9c" stroke-width="3" fill="none"><path d="M60 0v120M180 0v120M300 0v120M420 0v120M540 0v120"/></g><g fill="#ffe9a8" opacity="0.5"><polygon points="80,0 200,0 300,430 140,430"/><polygon points="520,0 400,0 300,430 460,430"/></g><path d="M120 430 C160 470 440 470 480 430 L470 400 L130 400 Z" fill="#9c7a4e"/><path d="M130 400 C150 330 170 300 200 285 L410 285 C440 300 460 330 470 400 Z" fill="#c19a63"/><path d="M200 285 L410 285 C420 292 428 300 434 310 L176 310 C182 300 190 292 200 285 Z" fill="#d4ac72"/><g fill="#6e5230"><rect x="196" y="330" width="16" height="14" rx="2"/><rect x="236" y="330" width="16" height="14" rx="2"/><rect x="276" y="330" width="16" height="14" rx="2"/><rect x="316" y="330" width="16" height="14" rx="2"/><rect x="356" y="330" width="16" height="14" rx="2"/><rect x="396" y="330" width="16" height="14" rx="2"/><rect x="186" y="362" width="16" height="14" rx="2"/><rect x="226" y="362" width="16" height="14" rx="2"/><rect x="266" y="362" width="16" height="14" rx="2"/><rect x="306" y="362" width="16" height="14" rx="2"/><rect x="346" y="362" width="16" height="14" rx="2"/><rect x="386" y="362" width="16" height="14" rx="2"/><rect x="426" y="362" width="16" height="14" rx="2"/></g><path d="M410 285 C455 275 470 250 468 215 C466 190 452 178 430 176 L404 178 C398 210 400 250 410 285 Z" fill="#d0a765"/><g fill="#f3cf7e"><circle cx="432" cy="200" r="7"/><circle cx="432" cy="224" r="7"/><circle cx="432" cy="248" r="7"/><rect x="406" y="188" width="8" height="80" rx="4"/></g><path d="M200 285 C176 276 166 260 170 240 L196 236 C196 254 198 270 200 285 Z" fill="#c79c62"/><g stroke="#8a6a42" stroke-width="7" stroke-linecap="round"><path d="M232 300 V70"/><path d="M320 296 V40"/><path d="M406 292 V80"/></g><g stroke="#8a6a42" stroke-width="5" stroke-linecap="round"><path d="M188 140 H276M180 200 H284M270 110 H370M262 176 H378M364 148 H448M356 208 H456"/></g><g stroke="#a2865c" stroke-width="1.5" opacity="0.9" fill="none"><path d="M232 70 L188 142M232 70 L276 142M320 40 L270 112M320 40 L370 112M406 80 L364 150M406 80 L448 150M232 96 L180 200M320 66 L262 178M406 106 L356 210M176 246 L232 120M456 246 L406 130"/></g><polygon points="320,34 320,16 356,25" fill="#e0a93f"/><path d="M120 430 C160 468 440 468 480 430 L480 452 C440 486 160 486 120 452 Z" fill="#b09872" opacity="0.7"/><g fill="#5d4f3c"><rect x="40" y="470" width="14" height="52" rx="6"/><circle cx="47" cy="462" r="9"/><rect x="66" y="476" width="13" height="46" rx="6"/><circle cx="72" cy="468" r="8"/><rect x="520" y="472" width="14" height="50" rx="6"/><circle cx="527" cy="464" r="9"/><rect x="548" y="478" width="12" height="44" rx="6"/><circle cx="554" cy="470" r="8"/></g><g fill="#fff3cf" opacity="0.75"><circle cx="90" cy="60" r="26"/><circle cx="510" cy="60" r="26"/><circle cx="300" cy="30" r="22"/></g><rect y="560" width="600" height="40" fill="#c2b092"/></svg>';
+var url = 'url("data:image/svg+xml,' + encodeURIComponent(art) + '")';
+
+var g = document.getElementById('grid');
+var N = 5, T = 25, order = [], sel = -1, moves = 0, done = false, milestone = -1;
+var t0 = null, timer = null;
+var ok = document.getElementById('ok'), tot = document.getElementById('tot'),
+    pct = document.getElementById('pct'), left = document.getElementById('left'),
+    mv = document.getElementById('mv'), tm = document.getElementById('tm'),
+    fill = document.getElementById('fill'), msg = document.getElementById('msg'),
+    win = document.getElementById('win'), wt = document.getElementById('wt'), wp = document.getElementById('wp');
+var prev = document.getElementById('prev');
+prev.style.backgroundImage = url;
+
+function fmt(s){ var m = Math.floor(s/60), r = s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; }
+function elapsed(){ return t0 ? Math.floor((Date.now()-t0)/1000) : 0; }
+function startTimer(){
+  if (timer) clearInterval(timer);
+  t0 = Date.now();
+  timer = setInterval(function(){ if(!done) tm.textContent = fmt(elapsed()); }, 1000);
+}
+
+function build(){
+  g.style.gridTemplateColumns = 'repeat(' + N + ',1fr)';
+  g.innerHTML = '';
+  for (var i=0;i<T;i++){
+    var d = document.createElement('div');
+    d.dataset.pos = i;
+    d.style.backgroundImage = url;
+    d.style.backgroundSize = (N*100) + '% ' + (N*100) + '%';
+    g.appendChild(d);
+  }
+}
+
+function comment(c){
+  var f = c / T;
+  if (c === 0)      return 'Belum ada keping yang tepat — mulai dari sudut atau tiang kapal.';
+  if (c === T-1)    return 'Tinggal satu keping lagi!';
+  if (f < 0.25)     return 'Awal yang bagus, ' + c + ' keping sudah pada tempatnya.';
+  if (f < 0.5)      return 'Jalan terus — ' + c + ' keping benar, hampir separuh.';
+  if (f < 0.75)     return 'Lewat separuh! ' + c + ' keping benar, lambungnya mulai terbentuk.';
+  return 'Tinggal sedikit lagi, ' + (T-c) + ' keping tersisa.';
+}
+
+function finish(){
+  done = true;
+  if (timer) clearInterval(timer);
+  var secs = elapsed(), rasio = moves / T, nilai;
+  if (rasio <= 1.3)      nilai = 'Luar biasa efisien — nyaris tanpa langkah terbuang.';
+  else if (rasio <= 2)   nilai = 'Rapi sekali, jumlah langkahnya sangat hemat.';
+  else if (rasio <= 3.5) nilai = 'Solid, strategi menyusunnya sudah bagus.';
+  else                   nilai = 'Sabar dan tuntas — yang penting kapalnya utuh kembali.';
+  wt.textContent = 'Selamat, puzzle ' + N + '×' + N + ' selesai!';
+  wp.textContent = 'Semua ' + T + ' keping tersusun benar dalam ' + moves + ' langkah dan waktu ' +
+    fmt(secs) + '. ' + nilai +
+    (N < 6 ? ' Coba naik ke tingkat berikutnya untuk tantangan lebih besar.'
+           : ' Ini tingkat tertinggi, 36 keping — kapal Vasa kembali utuh di tangan Anda.');
+  win.style.display = 'block';
+  msg.textContent = 'Tekan "Acak ulang" untuk main lagi.';
+}
+
+function paint(){
+  var c = 0;
+  for (var i=0;i<T;i++){
+    var p = order[i], r = Math.floor(p/N), cl = p%N, el = g.children[i];
+    el.style.backgroundPosition = (cl*100/(N-1)) + '% ' + (r*100/(N-1)) + '%';
+    var good = (p === i); if (good) c++;
+    el.style.outline = (i === sel) ? '3px solid #1d9e75' : 'none';
+    el.style.outlineOffset = '-3px';
+    el.style.boxShadow = good ? 'inset 0 0 0 2px rgba(29,158,117,.9)' : 'none';
+  }
+  ok.textContent = c; tot.textContent = T; left.textContent = T - c;
+  pct.textContent = Math.round(c*100/T); mv.textContent = moves;
+  fill.style.width = (c*100/T) + '%';
+  if (c === T && !done) { finish(); return; }
+  if (!done && c !== milestone) { msg.textContent = comment(c); milestone = c; }
+}
+
+function shuffle(){
+  var same;
+  do {
+    order = [];
+    for (var i=0;i<T;i++) order.push(i);
+    for (var j=T-1;j>0;j--){ var k = Math.floor(Math.random()*(j+1)); var t = order[j]; order[j] = order[k]; order[k] = t; }
+    same = 0;
+    for (var i2=0;i2<T;i2++) if (order[i2] === i2) same++;
+  } while (same > Math.max(1, Math.floor(T/6)));
+  moves = 0; sel = -1; done = false; milestone = -1;
+  win.style.display = 'none';
+  tm.textContent = '00:00';
+  startTimer();
+  paint();
+}
+
+function setLevel(n){
+  N = n; T = n*n;
+  document.querySelectorAll('.lvl').forEach(function(b){
+    b.classList.toggle('on', +b.dataset.n === n);
+  });
+  build(); shuffle();
+}
+
+g.addEventListener('click', function(e){
+  if (done) return;
+  var el = e.target.closest('div[data-pos]'); if (!el) return;
+  var i = +el.dataset.pos;
+  if (sel < 0) { sel = i; }
+  else if (sel === i) { sel = -1; }
+  else { var t = order[sel]; order[sel] = order[i]; order[i] = t; sel = -1; moves++; }
+  paint();
+});
+
+document.querySelectorAll('.lvl').forEach(function(b){
+  b.onclick = function(){ setLevel(+this.dataset.n); };
+});
+document.getElementById('sh').onclick = shuffle;
+document.getElementById('sv').onclick = function(){
+  order = []; for (var i=0;i<T;i++) order.push(i);
+  sel = -1; paint();
+};
+document.getElementById('pv').onclick = function(){
+  var show = prev.style.display !== 'block';
+  prev.style.display = show ? 'block' : 'none';
+  this.textContent = show ? 'Sembunyikan gambar' : 'Lihat gambar asli';
+};
+
+setLevel(3);
+</script>
+</body>
+</html>

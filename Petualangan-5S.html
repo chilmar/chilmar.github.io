@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Petualangan 5S">
+<meta name="theme-color" content="#0E1424">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjM4IiBmaWxsPSIjMEUxNDI0Ii8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTAsODgpIj48cG9seWdvbiBwb2ludHM9IjAsLTU1IDUyLC0xNyAzMiw0NCAtMzIsNDQgLTUyLC0xNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRjVDNTE4IiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L2c+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+NVM8L3RleHQ+PC9zdmc+">
+<title>Petualangan 5S</title>
+<style>
+  :root{
+    --bg:#0E1424; --panel:#182036; --panel2:#1F2A45; --ink:#F5F7FB; --muted:#93A0BE;
+    --line:#2B3757; --gold:#F5C518; --good:#22C08A; --bad:#F0576B;
+    --seiri:#E23B4E; --seiton:#2E86E4; --seiso:#22A65B; --seiketsu:#F5A524; --shitsuke:#8B5CF6;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--ink);
+    overflow:hidden; -webkit-user-select:none; user-select:none;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    max-width:520px; margin:0 auto;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background:radial-gradient(120% 60% at 50% -10%, #16203a 0%, var(--bg) 60%);
+  }
+  .screen{flex:1; display:flex; flex-direction:column; min-height:0; padding:14px 18px; animation:fade .35s ease}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+
+  /* ---- header ---- */
+  .top{display:flex; align-items:center; gap:10px; min-height:34px}
+  .top .back{width:40px; height:40px; border:none; border-radius:12px; background:var(--panel); color:var(--ink);
+    font-size:19px; display:flex; align-items:center; justify-content:center}
+  .top .ttl{flex:1; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  .top .snd{width:40px; height:40px; border:none; border-radius:12px; background:var(--panel); color:var(--ink); font-size:17px}
+  .pbar{height:8px; border-radius:99px; background:var(--panel); margin:10px 0 4px; overflow:hidden}
+  .pbar > i{display:block; height:100%; width:0; border-radius:99px;
+    background:linear-gradient(90deg,var(--gold),#ffe37a); transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+  /* ---- home ---- */
+  .hero{display:flex; flex-direction:column; align-items:center; padding-top:6px}
+  .kicker{font-size:11px; letter-spacing:.34em; color:var(--gold); font-weight:800; text-transform:uppercase}
+  .htitle{font-size:30px; font-weight:850; line-height:1; text-align:center; margin-top:6px; letter-spacing:-.02em}
+  .htitle small{display:block; font-size:13px; font-weight:600; color:var(--muted); letter-spacing:.02em; margin-top:8px}
+  .tape{height:8px; width:150px; margin:12px auto 0; border-radius:4px;
+    background:repeating-linear-gradient(45deg,var(--gold) 0 11px,#12182a 11px 22px)}
+  #wheelWrap{width:min(58vw,220px); aspect-ratio:1; margin:8px auto 4px}
+  svg{display:block; width:100%; height:100%; overflow:visible}
+  .petalLbl{font-size:9.5px; font-weight:800; fill:#fff; letter-spacing:.02em}
+  .petalKanji{font-size:15px; font-weight:700}
+  .wheelCenter{font-size:26px; font-weight:850; fill:#fff}
+  .wheelSub{font-size:8.5px; font-weight:700; fill:var(--muted); letter-spacing:.18em}
+
+  .path{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px 2px 8px; min-height:0}
+  .path::-webkit-scrollbar{display:none}
+  .tier{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); font-weight:800;
+    margin:12px 4px 8px; display:flex; align-items:center; gap:8px}
+  .tier b{color:var(--gold)}
+  .tier::after{content:""; flex:1; height:1px; background:var(--line)}
+  .node{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+    background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:13px 14px; margin-bottom:10px;
+    color:var(--ink); position:relative; overflow:hidden}
+  .node:disabled{opacity:.5}
+  .node .num{width:42px; height:42px; flex:none; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:800; background:var(--panel2)}
+  .node .body{flex:1; min-width:0}
+  .node .body h4{font-size:15px; font-weight:750; letter-spacing:-.01em}
+  .node .body p{font-size:12px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .node .stars{font-size:12px; letter-spacing:1px; color:var(--gold); flex:none}
+  .node.done{border-color:#3a4a2f}
+  .node.done .num{background:linear-gradient(135deg,#2f7d4e,#22A65B)}
+
+  /* ---- generic stage ---- */
+  .stageHead{text-align:center; padding:6px 4px 0}
+  .stageHead .stag{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    padding:5px 12px; border-radius:99px; color:#0E1424}
+  .stageHead h2{font-size:21px; font-weight:820; margin-top:10px; letter-spacing:-.01em}
+  .stageHead p{font-size:13px; color:var(--muted); margin-top:6px; line-height:1.4}
+  .play{flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; gap:12px; padding:8px 0}
+  .counter{text-align:center; font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.05em}
+
+  /* item card (sort) */
+  .card{background:linear-gradient(160deg,var(--panel2),var(--panel)); border:1px solid var(--line);
+    border-radius:22px; padding:22px 18px; text-align:center; box-shadow:0 16px 40px rgba(0,0,0,.35)}
+  .card .emo{font-size:58px; line-height:1}
+  .card .lab{font-size:17px; font-weight:750; margin-top:12px; line-height:1.3}
+  .card.shake{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+  /* choice buttons */
+  .choices{display:flex; flex-direction:column; gap:11px}
+  .choices.two{display:grid; grid-template-columns:1fr 1fr}
+  .btn{width:100%; border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    border-radius:16px; padding:15px 14px; font-size:15px; font-weight:700; text-align:left;
+    display:flex; align-items:center; gap:11px; min-height:56px; transition:transform .08s, background .15s}
+  .btn:active{transform:scale(.97)}
+  .btn .bi{font-size:22px; flex:none}
+  .btn .bt{flex:1}
+  .btn .bs{font-size:11px; color:var(--muted); font-weight:600; display:block; margin-top:2px}
+  .btn.center{justify-content:center; text-align:center}
+  .btn.correct{background:linear-gradient(135deg,#1f7d55,#22C08A); border-color:transparent; color:#fff}
+  .btn.wrong{background:linear-gradient(135deg,#a13143,#F0576B); border-color:transparent; color:#fff}
+  .btn.dim{opacity:.4}
+
+  /* matching */
+  .matchGrid{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .mcol{display:flex; flex-direction:column; gap:9px}
+  .chip{border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:14px;
+    padding:11px 10px; font-size:13px; font-weight:700; text-align:center; min-height:52px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.2; transition:transform .08s}
+  .chip .k{font-size:15px; font-weight:800}
+  .chip .r{font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.04em}
+  .chip:active{transform:scale(.96)}
+  .chip.sel{outline:3px solid var(--gold); outline-offset:-1px}
+  .chip.locked{opacity:.32}
+  .chip.matched{border-color:transparent; color:#fff}
+
+  /* why chain */
+  .chain{display:flex; flex-direction:column; gap:6px; margin-bottom:6px; overflow-y:auto; max-height:34vh}
+  .chain::-webkit-scrollbar{display:none}
+  .chain .link{background:var(--panel); border-left:3px solid var(--gold); border-radius:0 10px 10px 0;
+    padding:8px 11px; font-size:12.5px; line-height:1.35; animation:fade .3s}
+  .chain .link b{color:var(--gold); font-weight:800}
+  .chain .link.how{border-color:var(--good)} .chain .link.how b{color:var(--good)}
+
+  /* feedback banner */
+  .fb{border-radius:14px; padding:12px 14px; font-size:13px; line-height:1.4; font-weight:600; animation:fade .25s}
+  .fb.ok{background:rgba(34,192,138,.14); color:#8ff0c8; border:1px solid rgba(34,192,138,.35)}
+  .fb.no{background:rgba(240,87,107,.14); color:#ffb3bd; border:1px solid rgba(240,87,107,.35)}
+  .fb b{font-weight:800}
+
+  /* footer / cta */
+  .foot{padding-top:10px}
+  .cta{width:100%; border:none; border-radius:16px; padding:17px; font-size:16px; font-weight:800;
+    background:linear-gradient(135deg,var(--gold),#ffd94a); color:#0E1424; min-height:58px; letter-spacing:.01em}
+  .cta:active{transform:scale(.98)}
+  .cta.ghost{background:var(--panel); color:var(--ink); border:1px solid var(--line)}
+  .credit{text-align:center; font-size:10.5px; color:var(--muted); letter-spacing:.05em; padding:8px 0 2px}
+  .credit b{color:#c7d0e6; font-weight:700}
+
+  /* finish */
+  .finish{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:4px}
+  .finish .big{font-size:26px; font-weight:850; letter-spacing:-.01em}
+  .finish .scorebox{background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px 26px; margin-top:6px}
+  .finish .scorebox .s1{font-size:40px; font-weight:850; color:var(--gold)}
+  .finish .scorebox .s2{font-size:12px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; font-weight:700}
+
+  /* confetti */
+  #confetti{position:fixed; inset:0; pointer-events:none; z-index:50}
+  .conf{position:absolute; width:9px; height:14px; opacity:.95; will-change:transform}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="confetti"></div>
+<script>
+(function(){
+"use strict";
+
+/* ============ DATA 5S ============ */
+var S = {
+  seiri:   {kanji:"整理", romaji:"Seiri",   id:"Ringkas", color:"#E23B4E"},
+  seiton:  {kanji:"整頓", romaji:"Seiton",  id:"Rapi",    color:"#2E86E4"},
+  seiso:   {kanji:"清掃", romaji:"Seiso",   id:"Resik",   color:"#22A65B"},
+  seiketsu:{kanji:"清潔", romaji:"Seiketsu",id:"Rawat",   color:"#F5A524"},
+  shitsuke:{kanji:"躾",   romaji:"Shitsuke",id:"Rajin",   color:"#8B5CF6"}
+};
+var ORDER = ["seiri","seiton","seiso","seiketsu","shitsuke"];
+
+/* Each stage: id, tier, title, tag(color), intro, type, data */
+var STAGES = [
+  /* ---------- TIER 1: DASAR ---------- */
+  {
+    tier:"Dasar", title:"Kenali 5S", color:"#F5C518", tag:"5S",
+    intro:"Cocokkan tiap istilah Jepang dengan arti Indonesianya. Ketuk istilah, lalu ketuk artinya.",
+    type:"match",
+    pairs:[
+      {key:"seiri",  meaning:"Memilah &amp; buang yang tak perlu"},
+      {key:"seiton", meaning:"Tata rapi, mudah diambil"},
+      {key:"seiso",  meaning:"Bersihkan = memeriksa"},
+      {key:"seiketsu",meaning:"Jaga standar 3S konsisten"},
+      {key:"shitsuke",meaning:"Biasakan &amp; disiplin diri"}
+    ]
+  },
+  {
+    tier:"Dasar", title:"Untuk Apa 5S?", color:"#F5C518", tag:"Konsep",
+    intro:"5S bukan sekadar bersih-bersih. Uji pemahaman dasar tujuan 5S.",
+    type:"quiz",
+    questions:[
+      {q:"Inti sebenarnya dari 5S adalah…", o:["Menghias ruangan agar cantik","Menghilangkan pemborosan &amp; masalah","Sekadar bersih-bersih rutin","Menambah rak penyimpanan"], a:1,
+       why:"5S membuat pemborosan (waste) mudah terlihat sehingga bisa dihilangkan — bukan sekadar bersih-bersih."},
+      {q:"5S dianggap berhasil ketika…", o:["Lantai mengkilap","Barang bertambah banyak","Masalah &amp; pemborosan mudah terlihat","Semua barang disembunyikan"], a:2,
+       why:"Tempat kerja yang ber-5S membuat kondisi tidak normal langsung tampak."},
+      {q:"5S berpengaruh langsung terhadap…", o:["Warna dinding","Produktivitas","Jumlah karyawan","Harga bahan baku"], a:1,
+       why:"5S berdampak langsung ke produktivitas, mutu, dan keselamatan kerja."},
+      {q:"Urutan makna 5S yang benar…", o:["Ringkas–Rapi–Resik–Rawat–Rajin","Rapi–Ringkas–Rajin–Resik–Rawat","Resik–Rawat–Rapi–Rajin–Ringkas","Rajin–Rawat–Resik–Rapi–Ringkas"], a:0,
+       why:"Seiri–Seiton–Seiso–Seiketsu–Shitsuke = Ringkas–Rapi–Resik–Rawat–Rajin."}
+    ]
+  },
+  /* ---------- TIER 2: MENENGAH ---------- */
+  {
+    tier:"Menengah", title:"Pilah! (Seiri)", color:"#E23B4E", tag:"Ringkas",
+    intro:"Seiri = memisahkan yang perlu dari yang tak perlu. Putuskan tiap barang: Simpan, beri Label Merah (ragu), atau Buang.",
+    type:"sort",
+    buckets:[
+      {id:"simpan",label:"Simpan", sub:"Jelas dipakai", color:"#22A65B"},
+      {id:"merah", label:"Label Merah", sub:"Ragu / karantina", color:"#E23B4E"},
+      {id:"buang", label:"Buang", sub:"Sampah tak bernilai", color:"#6B7590"}
+    ],
+    items:[
+      {emo:"🔧", lab:"Kunci pas dipakai setiap hari", b:"simpan", why:"Jelas diperlukan &amp; sering dipakai → simpan di tempatnya."},
+      {emo:"🗑️", lab:"Bungkus makanan bekas di meja", b:"buang", why:"Sampah tak bernilai → langsung buang."},
+      {emo:"🖨️", lab:"Printer rusak, 6 bulan tak dipakai", b:"merah", why:"Belum jelas nasibnya → beri label merah untuk diputuskan."},
+      {emo:"📁", lab:"Arsip tahun ini, sering dibuka", b:"simpan", why:"Masih aktif dipakai → simpan."},
+      {emo:"🧴", lab:"Cairan tanpa label, tak dikenal", b:"merah", why:"Identitas tak jelas → karantina dengan label merah, jangan asal buang."},
+      {emo:"📦", lab:"Kardus kosong menumpuk", b:"buang", why:"Menghabiskan ruang tanpa nilai → buang."}
+    ]
+  },
+  {
+    tier:"Menengah", title:"3T &amp; Tata Letak (Seiton)", color:"#2E86E4", tag:"Rapi",
+    intro:"Seiton menempatkan barang sesuai frekuensi pakai. Makin sering dipakai, makin dekat. Tentukan lokasi tiap alat.",
+    type:"sort",
+    buckets:[
+      {id:"dekat", label:"Dekat", sub:"Puluhan kali/hari", color:"#2E86E4"},
+      {id:"jauh",  label:"Jauh", sub:"± 1 kali/hari", color:"#F5A524"},
+      {id:"common",label:"Di-common-kan", sub:"≤1× per 2 hari", color:"#8B5CF6"}
+    ],
+    items:[
+      {emo:"🖊️", lab:"Pulpen — dipakai puluhan kali sehari", b:"dekat", why:"Sangat sering → taruh dalam jangkauan tangan."},
+      {emo:"🔩", lab:"Obeng khusus — ± 1 kali sehari", b:"jauh", why:"Sesekali → boleh beberapa langkah dari tempat kerja."},
+      {emo:"📐", lab:"Alat ukur khusus — 1× per 2 hari", b:"common", why:"Jarang → cukup di-common-kan (dipakai bersama)."},
+      {emo:"✂️", lab:"Gunting — dipakai berkali-kali sehari", b:"dekat", why:"Sering → letakkan dekat, mudah diraih."},
+      {emo:"🔨", lab:"Palu besar — sesekali dalam sehari", b:"jauh", why:"Frekuensi rendah → posisi agak jauh."},
+      {emo:"🧰", lab:"Set kalibrasi — seminggu sekali", b:"common", why:"Sangat jarang → simpan bersama untuk banyak orang."}
+    ]
+  },
+  {
+    tier:"Menengah", title:"Resik &amp; Rawat", color:"#22A65B", tag:"Resik · Rawat",
+    intro:"Seiso membuat kebersihan jadi pemeriksaan. Seiketsu menjaga 3S tetap konsisten dan mencegah kotor.",
+    type:"quiz",
+    questions:[
+      {q:"Dalam Seiso, membersihkan juga berarti…", o:["Menyembunyikan kotoran","Memeriksa (inspeksi) mesin","Mengecat ulang","Menambah alat"], a:1,
+       why:"Prinsip Seiso: \"membersihkan berarti memeriksa\" — sambil membersihkan, temukan masalah kecil."},
+      {q:"Seiketsu (Rawat) pada dasarnya adalah…", o:["Membersihkan sekali lalu selesai","Menjaga 3S tetap konsisten","Membeli rak baru","Menata agar enak dipandang"], a:1,
+       why:"Seiketsu = mempertahankan Seiri, Seiton, Seiso secara konsisten dengan standar."},
+      {q:"Seiketsu tingkat lanjut mengarah pada…", o:["Sistem agar tidak mengotori","Membersihkan lebih sering","Menyuruh orang lain","Menutup area kerja"], a:0,
+       why:"Reformasi dari \"bersihkan setelah kotor\" menjadi \"sistem yang tidak mengotori\" — inti pencegahan."},
+      {q:"Tujuan manajemen visual adalah agar…", o:["Ruangan lebih ramai","Ketidaknormalan langsung terlihat","Barang tersembunyi","Warna seragam"], a:1,
+       why:"Manajemen visual membuat kondisi abnormal tampak sekali pandang."}
+    ]
+  },
+  /* ---------- TIER 3: TINGKAT TINGGI ---------- */
+  {
+    tier:"Tingkat Tinggi", title:"Tiga Langkah Hirano", color:"#8B5CF6", tag:"Perencanaan",
+    intro:"Penerapan 5S naik bertingkat: (I) Aktif — siapkan sekarang, (II) Efektif — budayakan &amp; kendalikan, (III) Pencegahan — cegah berulang. Golongkan tiap kegiatan.",
+    type:"sort",
+    buckets:[
+      {id:"aktif",  label:"I · Aktif", sub:"Siapkan dahulu", color:"#2E86E4"},
+      {id:"efektif",label:"II · Efektif", sub:"Budayakan", color:"#F5A524"},
+      {id:"cegah",  label:"III · Pencegahan", sub:"Cegah berulang", color:"#8B5CF6"}
+    ],
+    items:[
+      {emo:"📸", lab:"Merekam keadaan awal &amp; pasang label merah pertama", b:"aktif", why:"Langkah I: menyiapkan &amp; membuat 5S aktif dari kondisi sekarang."},
+      {emo:"🗺️", lab:"Membuat denah &amp; garis pemisah penyimpanan", b:"aktif", why:"Langkah I: membenahi tempat kerja secara aktif."},
+      {emo:"📊", lab:"Mengendalikan tingkat persediaan barang", b:"efektif", why:"Langkah II: 5S efektif — mengendalikan, bukan sekadar merapikan."},
+      {emo:"🔍", lab:"Menyatukan Seiso dengan inspeksi harian mesin", b:"efektif", why:"Langkah II: membudayakan \"membersihkan = memeriksa\"."},
+      {emo:"♻️", lab:"Membuat sistem tanpa limbah agar barang tak perlu tak muncul lagi", b:"cegah", why:"Langkah III: Ringkas pencegahan — menghilangkan sumber masalah."},
+      {emo:"🎓", lab:"Mensistematiskan pelatihan agar disiplin jalan tanpa diawasi", b:"cegah", why:"Langkah III: Rajin pencegahan — sistem melampaui peraturan."}
+    ]
+  },
+  {
+    tier:"Tingkat Tinggi", title:"5 Why → 1 How", color:"#8B5CF6", tag:"Pencegahan",
+    intro:"Akar masalah dikejar dengan bertanya \"mengapa\" lima kali, lalu satu \"bagaimana\" untuk mencegahnya berulang. Pilih jawaban yang benar tiap langkah.",
+    type:"why",
+    scenario:"🧩 Ada benda tak penting tergeletak di area kerja.",
+    steps:[
+      {q:"Why 1 — Mengapa benda ini ada di sini?", o:["Karena dikirim dari proses sebelumnya","Karena operator malas","Karena ruangan sempit"], a:0,
+       text:"Karena <b>dikirim dari proses sebelumnya.</b>"},
+      {q:"Why 2 — Mengapa proses sebelumnya mengirimnya?", o:["Karena lupa","Karena proses itu memang memproduksinya","Karena tak ada rak"], a:1,
+       text:"Karena <b>proses sebelumnya memproduksinya.</b>"},
+      {q:"Why 3 — Mengapa proses itu memproduksinya?", o:["Karena kebiasaan","Karena ada order dari perencana produksi","Karena mesin menyala terus"], a:1,
+       text:"Karena <b>ada order dari perencana produksi.</b>"},
+      {q:"Why 4 — Mengapa perencana memberi order itu?", o:["Karena ada perubahan rencana","Karena salah hitung stok","Karena permintaan operator"], a:0,
+       text:"Karena <b>ada perubahan rencana produksi.</b>"},
+      {q:"Why 5 — Mengapa ada perubahan rencana?", o:["Karena cuaca","Karena mesin rusak","Karena pemasaran mengeluarkan order yang salah"], a:2,
+       text:"Karena <b>pemasaran mengeluarkan order salah</b> tanpa meninjau kapasitas produksi."}
+    ],
+    how:{q:"How — Bagaimana mencegahnya berulang?", o:["Menyuruh operator lebih rajin membuang","Membuat checklist review order pemasaran + konfirmasi ke perencana sebelum ke pelanggan","Menambah tempat sampah"], a:1,
+       text:"Buat <b>checklist review order pemasaran</b> untuk konfirmasi kapasitas ke perencana sebelum sampai ke pelanggan."}
+  }
+];
+
+/* ============ STATE ============ */
+var st = { done:[], stars:[], sound:true, i:0 };
+STAGES.forEach(function(){ st.done.push(false); st.stars.push(0); });
+
+/* ============ AUDIO ============ */
+var actx=null;
+function beep(freq,dur,type){
+  if(!st.sound) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    var o=actx.createOscillator(), g=actx.createGain();
+    o.type=type||"sine"; o.frequency.value=freq;
+    g.gain.value=.06; o.connect(g); g.connect(actx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime+dur);
+    o.stop(actx.currentTime+dur+.02);
+  }catch(e){}
+}
+function sGood(){ beep(660,.1); setTimeout(function(){beep(880,.14);},90); }
+function sBad(){ beep(180,.18,"square"); }
+function sWin(){ [523,659,784,1046].forEach(function(f,k){ setTimeout(function(){beep(f,.16);},k*110); }); }
+
+/* ============ HELPERS ============ */
+var app = document.getElementById("app");
+function el(html){ var d=document.createElement("div"); d.innerHTML=html; return d.firstElementChild; }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t;} return a; }
+function progressPct(){ var d=st.done.filter(Boolean).length; return Math.round(d/STAGES.length*100); }
+function starStr(n){ return "★★★".slice(0,n)+"☆☆☆".slice(0,3-n); }
+
+/* pentagon wheel svg. lit = number of petals glowing (0..5) */
+function wheelSVG(lit){
+  var cx=100, cy=102, R=84, rin=30;
+  var angs=[-90,-18,54,126,198].map(function(d){return d*Math.PI/180;});
+  var v=angs.map(function(a){return [cx+R*Math.cos(a), cy+R*Math.sin(a)];});
+  var parts="";
+  for(var i=0;i<5;i++){
+    var a=v[i], b=v[(i+1)%5];
+    var on = i<lit;
+    var s=S[ORDER[i]];
+    var mx=(cx+a[0]+b[0])/3, my=(cy+a[1]+b[1])/3;
+    parts+='<polygon points="'+cx+','+cy+' '+a[0]+','+a[1]+' '+b[0]+','+b[1]+'" '+
+      'fill="'+s.color+'" opacity="'+(on?1:0.16)+'" '+(on?'filter="url(#glow)"':'')+'/>';
+    parts+='<text class="petalKanji" x="'+mx+'" y="'+(my-2)+'" text-anchor="middle" '+
+      'fill="'+(on?'#fff':'#5a678a')+'">'+s.kanji+'</text>';
+    parts+='<text class="petalLbl" x="'+mx+'" y="'+(my+12)+'" text-anchor="middle" '+
+      'fill="'+(on?'#fff':'#5a678a')+'">'+s.id+'</text>';
+  }
+  var full = lit>=5;
+  return '<svg viewBox="0 0 200 200">'+
+    '<defs><filter id="glow" x="-30%" y="-30%" width="160%" height="160%">'+
+    '<feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+    parts+
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+rin+'" fill="#0E1424" stroke="'+(full?'#F5C518':'#2B3757')+'" stroke-width="2.5"/>'+
+    '<text class="wheelCenter" x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle">'+(full?'✓':'5S')+'</text>'+
+    '<text class="wheelSub" x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle">KAIZEN</text>'+
+    '</svg>';
+}
+
+/* confetti */
+function confetti(){
+  var box=document.getElementById("confetti");
+  var cols=["#E23B4E","#2E86E4","#22A65B","#F5A524","#8B5CF6","#F5C518"];
+  for(var i=0;i<70;i++){
+    (function(){
+      var c=document.createElement("div"); c.className="conf";
+      var x=Math.random()*100; c.style.left=x+"vw"; c.style.top="-20px";
+      c.style.background=cols[i%cols.length];
+      c.style.transform="rotate("+(Math.random()*360)+"deg)";
+      box.appendChild(c);
+      var dur=1200+Math.random()*1400, drift=(Math.random()-.5)*160;
+      c.animate([{transform:c.style.transform+" translateY(0)"},
+        {transform:"translate("+drift+"px,110vh) rotate("+(Math.random()*720)+"deg)"}],
+        {duration:dur, easing:"cubic-bezier(.2,.6,.4,1)"});
+      setTimeout(function(){ c.remove(); }, dur);
+    })();
+  }
+}
+
+/* header block */
+function header(title){
+  return '<div class="top">'+
+    '<button class="back" data-act="home">‹</button>'+
+    '<div class="ttl">'+title+'</div>'+
+    '<button class="snd" data-act="sound">'+(st.sound?'🔊':'🔇')+'</button></div>';
+}
+
+/* ============ SCREENS ============ */
+function render(){
+  if(st.screen==="home") return renderHome();
+  if(st.screen==="intro") return renderIntro();
+  if(st.screen==="stage") return renderStage();
+  if(st.screen==="finish") return renderFinish();
+}
+
+function renderHome(){
+  var doneCount=st.done.filter(Boolean).length;
+  var lit=Math.round(doneCount/STAGES.length*5);
+  var allDone=doneCount===STAGES.length;
+  var html='<div class="screen">'+
+    '<div class="top"><div class="ttl">Petualangan 5S</div>'+
+      '<button class="snd" data-act="sound">'+(st.sound?'🔊':'🔇')+'</button></div>'+
+    '<div class="hero">'+
+      '<div class="kicker">Ringkas · Rapi · Resik · Rawat · Rajin</div>'+
+      '<div id="wheelWrap">'+wheelSVG(lit)+'</div>'+
+      '<div class="tape"></div>'+
+    '</div>'+
+    '<div class="pbar"><i style="width:'+progressPct()+'%"></i></div>'+
+    '<div class="path" id="path">';
+
+  var curTier=null;
+  var firstOpen = st.done.indexOf(false); // next to play
+  STAGES.forEach(function(s,idx){
+    if(s.tier!==curTier){ curTier=s.tier;
+      var tierNum = curTier==="Dasar"?"01":curTier==="Menengah"?"02":"03";
+      html+='<div class="tier"><b>'+tierNum+'</b> '+curTier+'</div>';
+    }
+    var unlocked = idx===0 || st.done[idx-1] || st.done[idx];
+    var done=st.done[idx];
+    html+='<button class="node '+(done?'done':'')+'" data-act="open" data-i="'+idx+'" '+(unlocked?'':'disabled')+'>'+
+      '<div class="num" style="'+(done?'':'color:'+s.color)+'">'+(done?'✓':(unlocked?(idx+1):'🔒'))+'</div>'+
+      '<div class="body"><h4>'+s.title+'</h4><p>'+s.tag+' · '+(s.type==='match'?'Pasangkan':s.type==='quiz'?'Kuis':s.type==='sort'?'Golongkan':'Rantai sebab')+'</p></div>'+
+      (done?'<div class="stars">'+starStr(st.stars[idx])+'</div>':(unlocked?'<div class="stars" style="color:var(--muted)">›</div>':''))+
+    '</button>';
+  });
+  html+='</div>'+
+    '<div class="foot">'+
+      '<button class="cta" data-act="'+(allDone?'finish':'open')+'" '+(allDone?'':'data-i="'+(firstOpen<0?0:firstOpen)+'"')+'>'+
+        (allDone?'🏅 Lihat Hasil Akhir':(doneCount>0?'Lanjutkan Belajar':'Mulai Belajar'))+'</button>'+
+      '<div class="credit">Ide: <b>Chilmar</b> • Creator: <b>Claude</b></div>'+
+    '</div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+
+function renderIntro(){
+  var s=STAGES[st.i];
+  var html='<div class="screen">'+header(s.tier)+
+    '<div class="play" style="justify-content:flex-start; padding-top:22px">'+
+      '<div class="stageHead">'+
+        '<span class="stag" style="background:'+s.color+'">'+s.tag+'</span>'+
+        '<h2>'+s.title+'</h2>'+
+        '<p>'+s.intro+'</p>'+
+      '</div>'+
+      '<div style="margin:26px auto 0"><div style="width:130px">'+miniIcon(s)+'</div></div>'+
+    '</div>'+
+    '<div class="foot"><button class="cta" data-act="play">Mulai</button></div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+function miniIcon(s){
+  // simple emblem per type
+  var e = s.type==='match'?'🔗': s.type==='quiz'?'💡': s.type==='sort'?'🗂️':'🧭';
+  return '<div style="font-size:82px; text-align:center; filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))">'+e+'</div>';
+}
+
+/* dispatch stage play */
+function renderStage(){
+  var s=STAGES[st.i];
+  if(s.type==="match") return playMatch();
+  if(s.type==="quiz") return playQuiz();
+  if(s.type==="sort") return playSort();
+  if(s.type==="why") return playWhy();
+}
+
+/* ---- MATCH ---- */
+var mstate;
+function playMatch(){
+  var s=STAGES[st.i];
+  mstate={sel:null, matched:{}, mistakes:0, right:shuffle(s.pairs.slice())};
+  drawMatch();
+}
+function drawMatch(){
+  var s=STAGES[st.i];
+  var left=s.pairs, right=mstate.right;
+  var html='<div class="screen">'+header(s.title)+
+    '<div class="stageHead"><h2 style="font-size:18px; margin-top:8px">Pasangkan istilah &amp; artinya</h2></div>'+
+    '<div class="play"><div class="matchGrid">';
+  html+='<div class="mcol">';
+  left.forEach(function(p){
+    var m=mstate.matched[p.key]; var d=S[p.key];
+    html+='<button class="chip '+(m?'matched':'')+' '+(mstate.sel===p.key?'sel':'')+'" '+
+      (m?'style="background:'+d.color+'; border-color:transparent" disabled':'')+
+      ' data-act="mL" data-k="'+p.key+'">'+
+      '<span class="k">'+d.kanji+' '+d.romaji+'</span><span class="r">'+d.id+'</span></button>';
+  });
+  html+='</div><div class="mcol">';
+  right.forEach(function(p){
+    var m=mstate.matched[p.key]; var d=S[p.key];
+    html+='<button class="chip '+(m?'matched':'')+'" '+
+      (m?'style="background:'+d.color+'; border-color:transparent" disabled':'')+
+      ' data-act="mR" data-k="'+p.key+'">'+p.meaning+'</button>';
+  });
+  html+='</div></div></div>'+
+    '<div class="foot"><div class="counter">'+Object.keys(mstate.matched).length+' / '+left.length+' cocok</div></div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+function mPickLeft(k){ if(mstate.matched[k]) return; mstate.sel = (mstate.sel===k?null:k); drawMatch(); }
+function mPickRight(k){
+  if(mstate.matched[k]) return;
+  if(!mstate.sel){ return; }
+  if(mstate.sel===k){ mstate.matched[k]=true; mstate.sel=null; sGood();
+    if(Object.keys(mstate.matched).length===STAGES[st.i].pairs.length){ finishStage(mstate.mistakes); return; }
+    drawMatch();
+  } else {
+    mstate.mistakes++; sBad();
+    var nodes=app.querySelectorAll('.chip'); nodes.forEach(function(n){ n.classList.add('shake'); });
+    setTimeout(function(){ mstate.sel=null; drawMatch(); }, 420);
+  }
+}
+
+/* ---- QUIZ ---- */
+var qstate;
+function playQuiz(){ qstate={idx:0, mistakes:0, answered:false}; drawQuiz(); }
+function drawQuiz(){
+  var s=STAGES[st.i], q=s.questions[qstate.idx];
+  var html='<div class="screen">'+header(s.title)+
+    '<div class="counter" style="margin-top:8px">Soal '+(qstate.idx+1)+' / '+s.questions.length+'</div>'+
+    '<div class="play">'+
+      '<div class="card" style="padding:20px 18px"><div class="lab" style="margin-top:0; font-size:18px">'+q.q+'</div></div>'+
+      '<div class="choices" id="qchoices">';
+  q.o.forEach(function(opt,k){
+    html+='<button class="btn center" data-act="qA" data-k="'+k+'"><span class="bt">'+opt+'</span></button>';
+  });
+  html+='</div>';
+  if(qstate.answered){
+    html+='<div class="fb '+(qstate.correct?'ok':'no')+'"><b>'+(qstate.correct?'Tepat! ':'Kurang tepat. ')+'</b>'+q.why+'</div>';
+  }
+  html+='</div>'+
+    '<div class="foot">'+
+      (qstate.answered?'<button class="cta" data-act="qNext">'+(qstate.idx+1<s.questions.length?'Soal Berikutnya':'Selesai')+'</button>':'<div class="counter">Pilih salah satu jawaban</div>')+
+    '</div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+function qAnswer(k){
+  if(qstate.answered) return;
+  var q=STAGES[st.i].questions[qstate.idx];
+  qstate.answered=true; qstate.correct=(k===q.a);
+  if(!qstate.correct) qstate.mistakes++;
+  qstate.correct?sGood():sBad();
+  drawQuiz();
+  // color buttons
+  var btns=app.querySelectorAll('#qchoices .btn');
+  btns.forEach(function(b,ix){
+    if(ix===q.a) b.classList.add('correct');
+    else if(ix===k) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+}
+function qNext(){
+  var s=STAGES[st.i];
+  if(qstate.idx+1<s.questions.length){ qstate.idx++; qstate.answered=false; drawQuiz(); }
+  else finishStage(qstate.mistakes);
+}
+
+/* ---- SORT ---- */
+var sortState;
+function playSort(){ sortState={idx:0, mistakes:0, answered:false, items:shuffle(STAGES[st.i].items)}; drawSort(); }
+function drawSort(){
+  var s=STAGES[st.i], it=sortState.items[sortState.idx];
+  var html='<div class="screen">'+header(s.title)+
+    '<div class="counter" style="margin-top:8px">Barang '+(sortState.idx+1)+' / '+sortState.items.length+'</div>'+
+    '<div class="play">'+
+      '<div class="card '+(sortState.shake?'shake':'')+'"><div class="emo">'+it.emo+'</div><div class="lab">'+it.lab+'</div></div>';
+  if(sortState.answered){
+    html+='<div class="fb '+(sortState.correct?'ok':'no')+'"><b>'+(sortState.correct?'Benar! ':'Belum tepat. ')+'</b>'+it.why+'</div>';
+  }
+  html+='<div class="choices" id="buckets">';
+  s.buckets.forEach(function(b){
+    html+='<button class="btn" data-act="sA" data-b="'+b.id+'">'+
+      '<span class="bi" style="width:16px;height:16px;border-radius:5px;background:'+b.color+'"></span>'+
+      '<span class="bt">'+b.label+'<span class="bs">'+b.sub+'</span></span></button>';
+  });
+  html+='</div></div>'+
+    '<div class="foot">'+
+      (sortState.answered?'<button class="cta" data-act="sNext">'+(sortState.idx+1<sortState.items.length?'Barang Berikutnya':'Selesai')+'</button>':'<div class="counter">Golongkan barang di atas</div>')+
+    '</div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+function sAnswer(b){
+  if(sortState.answered) return;
+  var it=sortState.items[sortState.idx];
+  sortState.correct=(b===it.b); sortState.answered=true;
+  if(!sortState.correct){ sortState.mistakes++; sBad();
+    var c=app.querySelector('.card'); if(c){ c.classList.add('shake'); }
+  } else sGood();
+  drawSort();
+  var btns=app.querySelectorAll('#buckets .btn');
+  var s=STAGES[st.i];
+  btns.forEach(function(btn){
+    var id=btn.getAttribute('data-b');
+    if(id===it.b) btn.classList.add('correct');
+    else if(id===b) btn.classList.add('wrong');
+    else btn.classList.add('dim');
+  });
+}
+function sNext(){
+  if(sortState.idx+1<sortState.items.length){ sortState.idx++; sortState.answered=false; drawSort(); }
+  else finishStage(sortState.mistakes);
+}
+
+/* ---- WHY ---- */
+var wstate;
+function playWhy(){ wstate={idx:0, mistakes:0, chain:[], phase:"why", answered:false}; drawWhy(); }
+function drawWhy(){
+  var s=STAGES[st.i];
+  var cur = wstate.phase==="why" ? s.steps[wstate.idx] : s.how;
+  var html='<div class="screen">'+header(s.title)+
+    '<div class="play" style="justify-content:flex-start; padding-top:6px">'+
+      '<div class="card" style="padding:12px 14px; margin-bottom:4px"><div class="lab" style="margin-top:0; font-size:15px">'+s.scenario+'</div></div>'+
+      '<div class="chain">';
+  wstate.chain.forEach(function(c){
+    html+='<div class="link '+(c.how?'how':'')+'"><b>'+c.tag+'</b> '+c.text+'</div>';
+  });
+  html+='</div>';
+  if(!wstate.answered){
+    html+='<div style="font-size:14px; font-weight:750; margin:4px 2px 8px">'+cur.q+'</div><div class="choices" id="wc">';
+    cur.o.forEach(function(opt,k){
+      html+='<button class="btn" data-act="wA" data-k="'+k+'"><span class="bt">'+opt+'</span></button>';
+    });
+    html+='</div>';
+  }
+  html+='</div><div class="foot"><div class="counter">'+
+    (wstate.phase==="why"?('Mengapa ke-'+(wstate.idx+1)+' dari 5'):'Langkah terakhir: solusi')+
+    '</div></div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+function wAnswer(k){
+  if(wstate.answered) return;
+  var s=STAGES[st.i];
+  var cur = wstate.phase==="why" ? s.steps[wstate.idx] : s.how;
+  if(k!==cur.a){ wstate.mistakes++; sBad();
+    var btns=app.querySelectorAll('#wc .btn'); if(btns[k]){ btns[k].classList.add('wrong'); }
+    setTimeout(function(){ var b=app.querySelectorAll('#wc .btn'); if(b[k]) b[k].classList.remove('wrong'); }, 450);
+    return; // must pick correct to keep chain intact
+  }
+  sGood();
+  if(wstate.phase==="why"){
+    wstate.chain.push({tag:"Why "+(wstate.idx+1)+":", text:cur.text});
+    if(wstate.idx+1<s.steps.length){ wstate.idx++; }
+    else { wstate.phase="how"; }
+    drawWhy();
+  } else {
+    wstate.chain.push({tag:"How:", text:cur.text, how:true});
+    wstate.answered=true; drawWhy();
+    setTimeout(function(){ finishStage(wstate.mistakes); }, 1100);
+  }
+}
+
+/* ---- finish a stage ---- */
+function finishStage(mistakes){
+  var stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  var idx=st.i;
+  st.done[idx]=true;
+  if(stars>st.stars[idx]) st.stars[idx]=stars;
+  sWin(); confetti();
+  var allDone = st.done.filter(Boolean).length===STAGES.length;
+  var s=STAGES[idx];
+  var next = idx+1<STAGES.length ? idx+1 : -1;
+  var html='<div class="screen"><div class="finish">'+
+    '<div style="font-size:56px">🎉</div>'+
+    '<div class="big">'+s.title+' selesai!</div>'+
+    '<div style="font-size:26px; letter-spacing:3px; color:var(--gold); margin-top:2px">'+starStr(stars)+'</div>'+
+    '<p style="color:var(--muted); font-size:13px; margin-top:8px; max-width:280px">'+
+      (mistakes===0?'Sempurna, tanpa kesalahan!':'Bagus — teruskan ke tahap berikutnya.')+'</p>'+
+    '</div>'+
+    '<div class="foot">';
+  if(allDone){
+    html+='<button class="cta" data-act="finish">🏅 Lihat Hasil Akhir</button>';
+  } else {
+    html+='<button class="cta" data-act="open" data-i="'+next+'">Lanjut: '+STAGES[next].title.replace(/&amp;/g,'&')+'</button>'+
+          '<button class="cta ghost" data-act="home" style="margin-top:10px">Kembali ke Peta</button>';
+  }
+  html+='</div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+
+/* ---- final screen ---- */
+function renderFinish(){
+  var totalStars=st.stars.reduce(function(a,b){return a+b;},0);
+  var max=STAGES.length*3;
+  confetti(); sWin();
+  var html='<div class="screen">'+
+    '<div class="top"><div class="ttl">Selesai</div><button class="snd" data-act="sound">'+(st.sound?'🔊':'🔇')+'</button></div>'+
+    '<div class="finish">'+
+      '<div class="kicker">Sertifikat Kaizen</div>'+
+      '<div id="wheelWrap" style="width:min(52vw,190px)">'+wheelSVG(5)+'</div>'+
+      '<div class="big">5S Dikuasai!</div>'+
+      '<p style="color:var(--muted); font-size:13px; max-width:290px; margin-top:6px">'+
+        'Dari dasar, penerapan tiap S, tiga langkah Hirano, hingga pencegahan lewat 5 Why — lengkap.</p>'+
+      '<div class="scorebox"><div class="s1">'+totalStars+' / '+max+'</div><div class="s2">Bintang</div></div>'+
+    '</div>'+
+    '<div class="foot">'+
+      '<button class="cta ghost" data-act="reset">Main Lagi</button>'+
+      '<div class="credit">Ide: <b>Chilmar</b> • Creator: <b>Claude</b></div>'+
+    '</div></div>';
+  app.innerHTML=""; app.appendChild(el(html));
+}
+
+/* ============ EVENTS ============ */
+app.addEventListener("click", function(e){
+  var t=e.target.closest("[data-act]"); if(!t) return;
+  var act=t.getAttribute("data-act");
+  if(act==="sound"){ st.sound=!st.sound; if(st.sound) beep(660,.08);
+    var b=app.querySelector('.snd'); if(b) b.textContent=st.sound?'🔊':'🔇'; return; }
+  if(act==="home"){ st.screen="home"; render(); return; }
+  if(act==="open"){ st.i=parseInt(t.getAttribute("data-i"),10); st.screen="intro"; render(); return; }
+  if(act==="play"){ st.screen="stage"; render(); return; }
+  if(act==="finish"){ st.screen="finish"; render(); return; }
+  if(act==="reset"){ st.done=st.done.map(function(){return false;}); st.stars=st.stars.map(function(){return 0;}); st.screen="home"; render(); return; }
+  // in-stage
+  if(act==="mL"){ mPickLeft(t.getAttribute("data-k")); return; }
+  if(act==="mR"){ mPickRight(t.getAttribute("data-k")); return; }
+  if(act==="qA"){ qAnswer(parseInt(t.getAttribute("data-k"),10)); return; }
+  if(act==="qNext"){ qNext(); return; }
+  if(act==="sA"){ sAnswer(t.getAttribute("data-b")); return; }
+  if(act==="sNext"){ sNext(); return; }
+  if(act==="wA"){ wAnswer(parseInt(t.getAttribute("data-k"),10)); return; }
+});
+
+/* init */
+st.screen="home"; render();
+})();
+</script>
+</body>
+</html>
