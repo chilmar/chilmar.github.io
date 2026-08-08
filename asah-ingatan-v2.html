@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Asah Ingatan — Cocokkan Kartu</title>
+<style>
+  :root{
+    --pine:#1F3A2E;
+    --sage:#EDF3E8;
+    --leaf:#5B8266;
+    --marigold:#E8A33D;
+    --cream:#FFFDF7;
+    --ink:#22312A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:var(--sage);
+    color:var(--ink);
+    height:100dvh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    max-width:430px;margin:0 auto;
+  }
+  header{text-align:center;flex:0 0 auto;}
+  h1{font-size:1.3rem;color:var(--pine);letter-spacing:.5px;}
+  h1 .daun{color:var(--marigold);}
+  .subjudul{font-family:'Segoe UI',Arial,sans-serif;font-size:.8rem;color:#4a5a50;margin-top:1px;line-height:1.3;}
+
+  /* ===== Menu level ===== */
+  #menu{
+    flex:1;display:flex;flex-direction:column;justify-content:center;
+    width:100%;min-height:0;
+  }
+  .panel{
+    background:var(--cream);
+    border:2px solid var(--pine);
+    border-radius:14px;
+    padding:12px 14px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 4px 0 rgba(31,58,46,.15);
+  }
+  .panel h2{font-size:1.05rem;color:var(--pine);margin-bottom:3px;}
+  .panel p{font-family:'Segoe UI',Arial,sans-serif;font-size:.82rem;line-height:1.35;margin-bottom:8px;}
+  .tombol-level{
+    display:block;width:100%;
+    font-family:Georgia,serif;font-size:1rem;
+    padding:8px;margin:5px 0;
+    border-radius:11px;border:2px solid var(--pine);
+    background:#fff;color:var(--pine);
+    cursor:pointer;transition:transform .1s, background .2s;
+  }
+  .tombol-level small{display:block;font-family:'Segoe UI',Arial,sans-serif;font-size:.75rem;color:#5a6a60;margin-top:1px;}
+  .tombol-level:active,.tombol-level:focus-visible{background:var(--marigold);color:var(--pine);}
+  .tombol-level:focus-visible{outline:3px solid var(--pine);outline-offset:2px;}
+  .pesan-kecil{font-family:'Segoe UI',Arial,sans-serif;color:#4a5a50;margin-top:7px;font-size:.75rem;text-align:center;line-height:1.35;}
+
+  /* ===== Arena permainan ===== */
+  #arena{
+    flex:1;width:100%;min-height:0;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .info-bar{
+    display:flex;gap:8px;justify-content:center;
+    font-family:'Segoe UI',Arial,sans-serif;
+    margin:6px 0 10px;flex:0 0 auto;width:100%;
+  }
+  .info{
+    background:var(--cream);border:2px solid var(--pine);
+    border-radius:10px;padding:5px 8px;
+    font-size:.8rem;color:var(--pine);flex:1;text-align:center;
+  }
+  .info b{font-size:1.05rem;display:block;}
+  #wadahPapan{
+    flex:1;min-height:0;width:100%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #papan{
+    display:grid;gap:8px;
+    perspective:900px;
+  }
+  .kartu{
+    border:none;background:transparent;cursor:pointer;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .45s;
+    border-radius:12px;
+    width:var(--uk);height:var(--uk);
+  }
+  .kartu:focus-visible{outline:3px solid var(--marigold);outline-offset:2px;border-radius:12px;}
+  .kartu.terbuka{transform:rotateY(180deg);}
+  .muka{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:12px;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+  }
+  .muka.belakang{
+    background:var(--pine);
+    color:var(--sage);
+    font-size:1.4rem;
+    background-image:radial-gradient(circle at 30% 30%, rgba(255,255,255,.12) 0 6px, transparent 7px),
+                     radial-gradient(circle at 70% 70%, rgba(255,255,255,.12) 0 6px, transparent 7px);
+    border:2px solid #16281f;
+  }
+  .muka.depan{
+    background:var(--cream);
+    border:2px solid var(--pine);
+    font-size:calc(var(--uk)*.55);
+    transform:rotateY(180deg);
+  }
+  .kartu.cocok .muka.depan{
+    background:var(--marigold);
+    animation:senang .5s ease;
+  }
+  .kartu.cocok{cursor:default;}
+  @keyframes senang{
+    0%{transform:rotateY(180deg) scale(1);}
+    50%{transform:rotateY(180deg) scale(1.12);}
+    100%{transform:rotateY(180deg) scale(1);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .kartu{transition:none;}
+    .kartu.cocok .muka.depan{animation:none;}
+  }
+  #kembali{
+    flex:0 0 auto;margin-top:8px;
+    font-family:Georgia,serif;font-size:.95rem;
+    padding:9px 18px;border-radius:10px;
+    border:2px solid var(--pine);background:transparent;color:var(--pine);cursor:pointer;
+  }
+
+  /* ===== Layar selesai ===== */
+  #layarSelesai{
+    flex:1;width:100%;min-height:0;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .selesai-kotak{
+    background:var(--pine);color:var(--cream);
+    border-radius:16px;padding:22px 18px;
+    width:100%;text-align:center;
+  }
+  .selesai-kotak h2{font-size:1.4rem;margin-bottom:8px;color:var(--marigold);}
+  .selesai-kotak p{font-family:'Segoe UI',Arial,sans-serif;font-size:.95rem;line-height:1.5;margin-bottom:14px;}
+  .aksi{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .tombol{
+    font-family:Georgia,serif;font-size:1rem;
+    padding:11px 18px;border-radius:10px;
+    border:2px solid var(--marigold);
+    background:var(--marigold);color:var(--pine);cursor:pointer;
+  }
+  .tombol.sekunder{background:transparent;color:var(--cream);border-color:var(--cream);}
+  .tombol:focus-visible{outline:3px solid #fff;outline-offset:2px;}
+  .tersembunyi{display:none !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="daun">✿</span> Asah Ingatan <span class="daun">✿</span></h1>
+  <p class="subjudul">Temukan pasangan kartu yang sama.</p>
+</header>
+
+<!-- Pilihan level -->
+<section id="menu">
+  <div class="panel">
+    <h2>Pilih Tingkat Permainan</h2>
+    <p>Mulai dari yang mudah, lalu naikkan bertahap.</p>
+    <button class="tombol-level" data-pasang="4" data-kolom="2">
+      🌱 Mudah
+      <small>8 kartu — pemanasan ringan</small>
+    </button>
+    <button class="tombol-level" data-pasang="6" data-kolom="3">
+      🌿 Sedang
+      <small>12 kartu — mulai menantang</small>
+    </button>
+    <button class="tombol-level" data-pasang="8" data-kolom="4">
+      🌳 Mahir
+      <small>16 kartu — latihan penuh</small>
+    </button>
+    <button class="tombol-level" data-pasang="12" data-kolom="5" data-joker="1">
+      🏔️ Ahli
+      <small>25 kartu (5×5) — tantangan tertinggi</small>
+    </button>
+    <button class="tombol-level" data-pasang="18" data-kolom="6">
+      🏆 Juara
+      <small>36 kartu (6×6) — uji ingatan maksimal</small>
+    </button>
+  </div>
+  <p class="pesan-kecil">💡 Mainkan 5–10 menit setiap hari agar ingatan tetap segar.</p>
+  <p class="pesan-kecil" style="margin-top:4px;color:#6b7a70;">Ide: Chilmar &nbsp;•&nbsp; Creator: Claude</p>
+</section>
+
+<!-- Area permainan -->
+<section id="arena" class="tersembunyi">
+  <div class="info-bar">
+    <div class="info">Langkah<b id="langkah">0</b></div>
+    <div class="info">Waktu<b id="waktu">0:00</b></div>
+    <div class="info">Pasangan<b id="skor">0/0</b></div>
+  </div>
+  <div id="wadahPapan"><div id="papan" role="grid" aria-label="Papan kartu ingatan"></div></div>
+  <button id="kembali">← Ganti tingkat</button>
+</section>
+
+<!-- Layar selesai -->
+<section id="layarSelesai" class="tersembunyi">
+  <div class="selesai-kotak">
+    <h2 id="judulSelesai">Hebat! 🎉</h2>
+    <p id="pesanSelesai"></p>
+    <div class="aksi">
+      <button id="mainLagi" class="tombol">Main lagi</button>
+      <button id="gantiLevel" class="tombol sekunder">Ganti tingkat</button>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const SIMBOL = ['🍎','🌻','🐟','☕','🏠','🚲','🎵','🌙','🍵','🐦','⛱️','🔑','🌶️','📖','🕰️','🪴','🍇','🚗','🎈','🐢'];
+  const menu = document.getElementById('menu');
+  const arena = document.getElementById('arena');
+  const papan = document.getElementById('papan');
+  const wadah = document.getElementById('wadahPapan');
+  const layarSelesai = document.getElementById('layarSelesai');
+  const elLangkah = document.getElementById('langkah');
+  const elWaktu = document.getElementById('waktu');
+  const elSkor = document.getElementById('skor');
+
+  let pertama = null, kunci = false, langkah = 0, cocok = 0, totalPasang = 0;
+  let detik = 0, timer = null, levelTerakhir = null;
+
+  function formatWaktu(s){
+    const m = Math.floor(s/60), d = s%60;
+    return m + ':' + (d<10?'0':'') + d;
+  }
+  function mulaiTimer(){
+    hentikanTimer();
+    detik = 0;
+    elWaktu.textContent = '0:00';
+    timer = setInterval(()=>{ detik++; elWaktu.textContent = formatWaktu(detik); },1000);
+  }
+  function hentikanTimer(){ if(timer){clearInterval(timer); timer=null;} }
+
+  function acak(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // Menghitung ukuran kartu agar seluruh papan muat di layar tanpa scroll
+  function aturUkuran(kolom, baris){
+    const gap = 8;
+    const lebar = wadah.clientWidth;
+    const tinggi = wadah.clientHeight;
+    const ukLebar = (lebar - gap*(kolom-1)) / kolom;
+    const ukTinggi = (tinggi - gap*(baris-1)) / baris;
+    const uk = Math.floor(Math.min(ukLebar, ukTinggi, 110));
+    papan.style.setProperty('--uk', uk + 'px');
+    papan.style.gridTemplateColumns = 'repeat(' + kolom + ',' + uk + 'px)';
+  }
+
+  function mulaiPermainan(pasang, kolom, pakaiJoker){
+    levelTerakhir = {pasang, kolom, pakaiJoker};
+    pertama = null; kunci = false; langkah = 0; cocok = 0; totalPasang = pasang;
+    elLangkah.textContent = '0';
+    elSkor.textContent = '0/' + pasang;
+
+    const pilihan = acak(SIMBOL.slice()).slice(0, pasang);
+    const kartuData = acak(pilihan.concat(pilihan));
+    const jumlahKartu = pasang*2 + (pakaiJoker ? 1 : 0);
+    const baris = Math.ceil(jumlahKartu/kolom);
+
+    // Sisipkan kartu bintang bonus di tengah papan (untuk 5x5)
+    if(pakaiJoker){
+      kartuData.splice(Math.floor(jumlahKartu/2), 0, '⭐');
+    }
+
+    papan.innerHTML = '';
+    kartuData.forEach((simbol)=>{
+      const btn = document.createElement('button');
+      btn.className = 'kartu';
+      if(simbol === '⭐'){
+        btn.classList.add('terbuka','cocok');
+        btn.setAttribute('aria-label','Kartu bintang bonus');
+      } else {
+        btn.setAttribute('aria-label','Kartu tertutup');
+      }
+      btn.innerHTML =
+        '<span class="muka belakang">❀</span>' +
+        '<span class="muka depan">' + simbol + '</span>';
+      btn.dataset.simbol = simbol;
+      btn.addEventListener('click', ()=>buka(btn));
+      papan.appendChild(btn);
+    });
+
+    menu.classList.add('tersembunyi');
+    layarSelesai.classList.add('tersembunyi');
+    arena.classList.remove('tersembunyi');
+
+    requestAnimationFrame(()=>aturUkuran(kolom, baris));
+    window.onresize = ()=>aturUkuran(kolom, baris);
+    mulaiTimer();
+  }
+
+  function buka(kartu){
+    if(kunci || kartu.classList.contains('terbuka') || kartu.classList.contains('cocok')) return;
+    kartu.classList.add('terbuka');
+    kartu.setAttribute('aria-label','Kartu ' + kartu.dataset.simbol);
+
+    if(!pertama){ pertama = kartu; return; }
+
+    langkah++;
+    elLangkah.textContent = langkah;
+
+    if(pertama.dataset.simbol === kartu.dataset.simbol){
+      pertama.classList.add('cocok');
+      kartu.classList.add('cocok');
+      pertama = null;
+      cocok++;
+      elSkor.textContent = cocok + '/' + totalPasang;
+      if(cocok === totalPasang) selesai();
+    } else {
+      kunci = true;
+      const k1 = pertama, k2 = kartu;
+      setTimeout(()=>{
+        k1.classList.remove('terbuka');
+        k2.classList.remove('terbuka');
+        k1.setAttribute('aria-label','Kartu tertutup');
+        k2.setAttribute('aria-label','Kartu tertutup');
+        pertama = null;
+        kunci = false;
+      }, 900);
+    }
+  }
+
+  function selesai(){
+    hentikanTimer();
+    const judul = document.getElementById('judulSelesai');
+    const pesan = document.getElementById('pesanSelesai');
+    const rasio = langkah / totalPasang;
+
+    let pujian;
+    if(rasio <= 1.5) pujian = 'Luar biasa! Ingatan Anda sangat tajam. 🌟';
+    else if(rasio <= 2.2) pujian = 'Bagus sekali! Otak Anda bekerja dengan baik. 👏';
+    else pujian = 'Selesai dengan baik! Setiap latihan membuat ingatan makin kuat. 💪';
+
+    judul.textContent = 'Selamat, Anda berhasil! 🎉';
+    pesan.textContent = pujian + ' Anda menemukan ' + totalPasang + ' pasangan dalam ' +
+      langkah + ' langkah dan waktu ' + formatWaktu(detik) + '.';
+
+    setTimeout(()=>{
+      arena.classList.add('tersembunyi');
+      layarSelesai.classList.remove('tersembunyi');
+    }, 700);
+  }
+
+  document.querySelectorAll('.tombol-level').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      mulaiPermainan(parseInt(btn.dataset.pasang,10), parseInt(btn.dataset.kolom,10), btn.dataset.joker === '1');
+    });
+  });
+  document.getElementById('mainLagi').addEventListener('click', ()=>{
+    if(levelTerakhir) mulaiPermainan(levelTerakhir.pasang, levelTerakhir.kolom, levelTerakhir.pakaiJoker);
+  });
+  document.getElementById('gantiLevel').addEventListener('click', kembaliKeMenu);
+  document.getElementById('kembali').addEventListener('click', kembaliKeMenu);
+
+  function kembaliKeMenu(){
+    hentikanTimer();
+    arena.classList.add('tersembunyi');
+    layarSelesai.classList.add('tersembunyi');
+    menu.classList.remove('tersembunyi');
+  }
+})();
+</script>
+</body>
+</html>

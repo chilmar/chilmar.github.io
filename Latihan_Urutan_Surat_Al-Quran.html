@@ -1,0 +1,674 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Latihan Urutan Surat Al-Qur'an</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d2436;
+  --ink-2:#14384f;
+  --teal:#1f6f6b;
+  --teal-soft:#dbeceb;
+  --gold:#b8862b;
+  --gold-soft:#f6ecd6;
+  --paper:#f3f1ea;
+  --card:#ffffff;
+  --line:#d6dde1;
+  --muted:#5f7382;
+  --wrong:#a33a2c;
+  --wrong-soft:#f7e3df;
+  --r:10px;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px 64px}
+
+/* ---------- header ---------- */
+header{background:var(--ink);color:#eef3f6;padding:18px 0 14px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#7fb0ab;margin:0 0 5px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(21px,4.2vw,38px);line-height:1.08;margin:0 0 5px}
+.lede{color:#a9c0cd;max-width:52ch;margin:0 0 14px;font-size:13.5px;line-height:1.45}
+
+/* kunci angka — collapsible, muat satu baris */
+.keybox{margin:0}
+.keybox > summary{
+  list-style:none;cursor:pointer;font-family:var(--mono);font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;color:#7fb0ab;
+  padding:6px 0;display:inline-flex;align-items:center;gap:8px;
+}
+.keybox > summary::-webkit-details-marker{display:none}
+.keybox > summary::after{content:"›";font-size:16px;transform:rotate(90deg);transition:.2s;color:#7fb0ab}
+.keybox[open] > summary::after{transform:rotate(-90deg)}
+.keystrip{display:flex;gap:4px;margin:8px 0 4px}
+.keycell{flex:1 1 0;min-width:0;text-align:center;background:#16374d;border-radius:6px;padding:6px 1px}
+.keycell b{display:block;font-family:var(--mono);font-size:16px;color:var(--gold);line-height:1.15}
+.keycell span{display:block;font-family:var(--mono);font-size:11px;color:#8fb3c2}
+
+/* tab bar — menempel di atas saat digulir */
+.tabbar{position:sticky;top:0;z-index:20;background:var(--ink);
+  box-shadow:0 2px 10px rgba(0,0,0,.14)}
+.tabrow{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 18px}
+.tabrow::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;border:0;background:transparent;color:#9db8c7;
+  font-family:var(--sans);font-size:14px;font-weight:500;
+  padding:12px 14px;cursor:pointer;white-space:nowrap;
+  border-bottom:2.5px solid transparent;
+}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{color:#fff;font-weight:600;border-bottom-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+
+/* ---------- generic ---------- */
+h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:26px 0 4px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px;max-width:60ch}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{
+  appearance:none;font-family:var(--sans);font-size:14px;font-weight:500;
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:8px;padding:9px 15px;cursor:pointer;transition:.14s;
+}
+.btn:hover{border-color:var(--ink);}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:var(--ink-2)}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.chip{
+  font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);
+  background:#fff;border-radius:99px;padding:5px 12px;cursor:pointer;color:var(--muted);
+}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+label.fld{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+select,input[type=number],input[type=text]{
+  font-family:var(--sans);font-size:14px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:8px;background:#fff;color:var(--ink);
+}
+.hidden{display:none !important}
+
+/* ---------- peta ---------- */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.mosaic{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+.cell{
+  aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;
+  font-family:var(--mono);font-size:13px;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;transition:.12s;
+}
+.cell:hover{transform:translateY(-2px);border-color:var(--ink)}
+.cell:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cell.belajar{background:var(--gold-soft);border-color:#e3cf9e;color:#7a5a14}
+.cell.hafal{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+.cell.active{box-shadow:0 0 0 2px var(--ink)}
+
+/* ---------- kartu ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:26px 22px;min-height:230px;display:flex;flex-direction:column;justify-content:center;
+}
+.card .no{font-family:var(--mono);font-size:13px;color:var(--teal);letter-spacing:.1em}
+.card .kode{font-family:var(--mono);font-size:34px;font-weight:600;color:var(--gold);letter-spacing:.08em;margin:2px 0 2px}
+.card .kata{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 2px}
+.card .surat{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--ink);margin:0}
+.card .arti{color:var(--muted);font-size:15px;margin:2px 0 0}
+.card .kalimat{
+  margin:16px 0 0;padding:13px 15px;background:var(--teal-soft);border-radius:8px;
+  font-family:var(--serif);font-size:16.5px;line-height:1.5;color:#123f3d;
+}
+.faceback{text-align:center}
+.tap{color:var(--muted);font-size:13px;text-align:center;margin:14px 0 0}
+.progressbar{height:4px;background:var(--line);border-radius:99px;overflow:hidden;margin:14px 0 0}
+.progressbar > i{display:block;height:100%;background:var(--teal);transition:width .3s}
+
+/* ---------- kuis ---------- */
+.qprompt{font-family:var(--serif);font-size:clamp(20px,3.4vw,28px);font-weight:600;line-height:1.25;margin:4px 0 4px}
+.qmeta{font-family:var(--mono);font-size:12px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{
+  text-align:left;font-family:var(--sans);font-size:15px;padding:13px 15px;
+  border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;
+  display:flex;gap:10px;align-items:baseline;transition:.12s;color:var(--ink);
+}
+.opt span.k{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:14px}
+.opt:hover:not([disabled]){border-color:var(--ink)}
+.opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.opt.correct{background:var(--teal-soft);border-color:var(--teal);color:#123f3d;font-weight:600}
+.opt.wrong{background:var(--wrong-soft);border-color:var(--wrong);color:var(--wrong)}
+.opt[disabled]{cursor:default}
+.feedback{margin-top:14px;font-size:14.5px;padding:12px 14px;border-radius:8px;background:var(--gold-soft);color:#6b4f13;font-family:var(--serif);font-size:16px}
+.scorebar{display:flex;gap:18px;font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.scorebar b{color:var(--ink)}
+.bigscore{font-family:var(--serif);font-size:52px;font-weight:600;line-height:1;margin:0}
+.misslist{margin:14px 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.misslist li{border-bottom:1px solid var(--line);padding:9px 0;font-size:14px}
+.misslist b{font-family:var(--mono);color:var(--teal)}
+
+/* ---------- rantai ---------- */
+.chain{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--serif);font-size:19px}
+.chain .done{color:var(--teal);font-weight:600}
+.chain .arrow{color:var(--line)}
+.timer{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--ink)}
+.timer.low{color:var(--wrong)}
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding:30px 18px;border-top:1px solid var(--line);margin-top:40px}
+
+/* ---------- layar kecil ---------- */
+@media(max-width:640px){
+  body{font-size:14.5px}
+  .wrap{padding:0 14px 44px}
+  main.wrap{padding-top:2px}
+  h2{font-size:20px;margin:16px 0 3px}
+  .sub{font-size:13px;margin-bottom:12px}
+  .panel{padding:14px}
+  .row{gap:7px}
+  .btn{padding:9px 13px;font-size:13.5px}
+  /* kontrol select penuh selebar layar biar jempol enak */
+  .panel .row > div{flex:1 1 46%}
+  select{width:100%}
+  .mosaic{grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:4px}
+  .cell{font-size:12px}
+  .card{min-height:0;padding:20px 16px}
+  .card .kode{font-size:30px}
+  .card .kata{font-size:22px}
+  .card .surat{font-size:25px}
+  .card .kalimat{font-size:15px;padding:11px 13px}
+  .opts{grid-template-columns:1fr;gap:8px}
+  .opt{padding:12px 13px}
+  .qprompt{font-size:19px}
+  .bigscore{font-size:44px}
+  .timer{font-size:26px}
+  /* baris tombol kartu jadi rata biar tak terpotong */
+  #view-kartu .row .btn{flex:1 1 auto}
+}
+@media(min-width:641px){ .keybox{margin-top:2px} }
+html{scroll-padding-top:52px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Sistem Fonetik Angka</p>
+    <h1>Latihan Urutan Surat Al-Qur'an</h1>
+    <p class="lede">Angka jadi huruf, huruf jadi kata, kata jadi kalimat. Latih bolak-balik sampai 114 kotak berubah hijau.</p>
+    <details class="keybox" id="keybox">
+      <summary>Kunci angka 0&ndash;9</summary>
+      <div class="keystrip" id="keystrip"></div>
+    </details>
+  </div>
+</header>
+<nav class="tabbar" role="tablist" id="nav">
+  <div class="wrap tabrow">
+    <button class="tab" role="tab" data-view="peta" aria-selected="true">Peta</button>
+    <button class="tab" role="tab" data-view="kartu" aria-selected="false">Kartu</button>
+    <button class="tab" role="tab" data-view="kuis" aria-selected="false">Kuis</button>
+    <button class="tab" role="tab" data-view="rantai" aria-selected="false">Rantai</button>
+    <button class="tab" role="tab" data-view="cepat" aria-selected="false">Adu cepat</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- PETA -->
+  <section id="view-peta">
+    <h2>Peta hafalan</h2>
+    <p class="sub">Klik kotak mana pun untuk melihat kartunya. Warna berubah sendiri mengikuti hasil kuis: kuning berarti pernah salah, hijau berarti sudah dua kali benar.</p>
+    <div class="legend">
+      <span><i style="background:#fff;border:1px solid var(--line)"></i>Belum dilatih</span>
+      <span><i style="background:var(--gold-soft);border:1px solid #e3cf9e"></i>Sedang dipelajari</span>
+      <span><i style="background:var(--teal)"></i>Sudah hafal</span>
+    </div>
+    <div class="mosaic" id="mosaic"></div>
+    <div id="petaCard" style="margin-top:18px"></div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn ghost" id="resetPeta">Kosongkan peta</button>
+      <span class="qmeta" id="petaStat"></span>
+    </div>
+  </section>
+
+  <!-- KARTU -->
+  <section id="view-kartu" class="hidden">
+    <h2>Kartu</h2>
+    <p class="sub">Tebak dulu di kepala, baru buka jawabannya. Spasi untuk membuka, panah kiri/kanan untuk pindah kartu.</p>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="row">
+        <div>
+          <label class="fld" for="kBlok">Rentang</label>
+          <select id="kBlok"></select>
+        </div>
+        <div>
+          <label class="fld" for="kArah">Sisi depan</label>
+          <select id="kArah">
+            <option value="no">Nomor surat</option>
+            <option value="surat">Nama surat</option>
+            <option value="kata">Kata pengingat</option>
+          </select>
+        </div>
+        <div style="align-self:flex-end">
+          <button class="btn" id="kAcak">Acak urutan</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="kartuBox"></div>
+    <div class="progressbar"><i id="kBar" style="width:0"></i></div>
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <div class="row">
+        <button class="btn" id="kPrev">&larr; Sebelumnya</button>
+        <button class="btn primary" id="kFlip">Buka jawaban</button>
+        <button class="btn" id="kNext">Berikutnya &rarr;</button>
+      </div>
+      <span class="qmeta" id="kPos"></span>
+    </div>
+  </section>
+
+  <!-- KUIS -->
+  <section id="view-kuis" class="hidden">
+    <h2>Kuis</h2>
+    <p class="sub">Pilih arah soal dan rentangnya. Jawaban benar dua kali berturut-turut menghijaukan kotak di peta.</p>
+    <div class="panel" id="kuisSetup">
+      <div class="row" style="margin-bottom:14px">
+        <div>
+          <label class="fld" for="qBlok">Rentang</label>
+          <select id="qBlok"></select>
+        </div>
+        <div>
+          <label class="fld" for="qJml">Jumlah soal</label>
+          <select id="qJml">
+            <option>10</option><option selected>15</option><option>25</option><option>40</option>
+          </select>
+        </div>
+      </div>
+      <label class="fld">Jenis soal</label>
+      <div class="row" id="qTipe" style="margin-bottom:18px">
+        <button class="chip" data-t="no2surat" aria-pressed="true">Nomor &rarr; surat</button>
+        <button class="chip" data-t="surat2no" aria-pressed="true">Surat &rarr; nomor</button>
+        <button class="chip" data-t="no2kata" aria-pressed="false">Nomor &rarr; kata pengingat</button>
+        <button class="chip" data-t="surat2arti" aria-pressed="false">Surat &rarr; arti</button>
+        <button class="chip" data-t="arti2surat" aria-pressed="false">Arti &rarr; surat</button>
+      </div>
+      <button class="btn primary" id="qStart">Mulai kuis</button>
+    </div>
+
+    <div class="panel hidden" id="kuisPlay">
+      <div class="scorebar">
+        <span>Soal <b id="qIdx">1</b>/<b id="qTot">15</b></span>
+        <span>Benar <b id="qBenar">0</b></span>
+        <span>Salah <b id="qSalah">0</b></span>
+      </div>
+      <p class="qmeta" id="qKind"></p>
+      <p class="qprompt" id="qText"></p>
+      <div class="opts" id="qOpts"></div>
+      <div class="feedback hidden" id="qFeed"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn primary hidden" id="qNext">Lanjut</button>
+        <button class="btn ghost" id="qStop">Sudahi</button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="kuisDone"></div>
+  </section>
+
+  <!-- RANTAI -->
+  <section id="view-rantai" class="hidden">
+    <h2>Rantai urutan</h2>
+    <p class="sub">Latihan yang paling mirip membuka mushaf: diberi satu surat, sebutkan surat sesudahnya, terus menyambung sampai lima mata rantai.</p>
+    <div class="panel">
+      <div class="row" style="margin-bottom:16px">
+        <div>
+          <label class="fld" for="rBlok">Rentang</label>
+          <select id="rBlok"></select>
+        </div>
+        <div>
+          <label class="fld" for="rArah">Arah</label>
+          <select id="rArah">
+            <option value="maju">Surat sesudahnya</option>
+            <option value="mundur">Surat sebelumnya</option>
+          </select>
+        </div>
+        <div style="align-self:flex-end"><button class="btn primary" id="rStart">Mulai rantai</button></div>
+      </div>
+      <div id="rBody"></div>
+    </div>
+  </section>
+
+  <!-- ADU CEPAT -->
+  <section id="view-cepat" class="hidden">
+    <h2>Adu cepat</h2>
+    <p class="sub">Enam puluh detik, soal campur, tanpa jeda. Untuk mengukur seberapa otomatis hafalannya, bukan untuk belajar hal baru.</p>
+    <div class="panel" id="cIntro">
+      <div class="row" style="margin-bottom:16px">
+        <div>
+          <label class="fld" for="cBlok">Rentang</label>
+          <select id="cBlok"></select>
+        </div>
+        <div style="align-self:flex-end"><button class="btn primary" id="cStart">Mulai 60 detik</button></div>
+      </div>
+      <p class="sub" style="margin:0">Rekor sesi ini: <b id="cRekor">belum ada</b></p>
+    </div>
+    <div class="panel hidden" id="cPlay">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <span class="timer" id="cTimer">60</span>
+        <span class="scorebar" style="margin:0">Benar <b id="cSkor">0</b> &nbsp; Beruntun <b id="cStreak">0</b></span>
+      </div>
+      <p class="qmeta" id="cKind"></p>
+      <p class="qprompt" id="cText"></p>
+      <div class="opts" id="cOpts"></div>
+    </div>
+    <div class="panel hidden" id="cDone"></div>
+  </section>
+
+</main>
+
+<footer>
+  Disusun dari materi <b>Cara Menghafal Urutan Surat Al-Qur'an</b> oleh Chilmar Buchari.<br>
+  Kemajuan hanya tersimpan selama halaman ini terbuka.
+</footer>
+
+<script>
+const DATA = [{"no": 1,"kode": "CD","kata": "Cadar","surat": "Al Fatihah","arti": "Pembuka","kalimat": "Suaminya MEMBUKA CADAR istrinya"},{"no": 2,"kode": "CN","kata": "Cina","surat": "Al Baqarah","arti": "Sapi Betina","kalimat": "Orang itu pergi ke CINA untuk membeli SAPI BETINA"},{"no": 3,"kode": "CM","kata": "Cumi","surat": "Ali Imran","arti": "Keluarga Imran","kalimat": "KELUARGA IMRAN sangat menyukai CUMI"},{"no": 4,"kode": "CP","kata": "Caping","surat": "An Nisa","arti": "Wanita","kalimat": "WANITA yang memakai CAPING sedang membajak sawahnya"},{"no": 5,"kode": "CS","kata": "Customer Service","surat": "Al Maidah","arti": "Hidangan","kalimat": "Orang itu ke CUSTOMER SERVICE untuk memesan HIDANGAN"},{"no": 6,"kode": "CL","kata": "Cula","surat": "Al An'am","arti": "Binatang Ternak","kalimat": "BINATANG TERNAK yang berCULA adalah badak"},{"no": 7,"kode": "CT","kata": "Cita-cita","surat": "Al A'raf","arti": "Tempat Tertinggi","kalimat": "CITA-CITA mu harus ditaruh di TEMPAT TINGGI"},{"no": 8,"kode": "CB","kata": "Cabe","surat": "Al Anfal","arti": "Harta Rampasan Perang","kalimat": "Mereka kecewa karena HARTA RAMPASAN PERANGnya hanya CABE"},{"no": 9,"kode": "CG","kata": "Cagak","surat": "At Taubah","arti": "Pengampunan / Tobat","kalimat": "Pencuri yang mengambil CAGAK berTOBAT diberikan PENGAMPUNAN"},{"no": 10,"kode": "DC","kata": "Diskon","surat": "Yunus","arti": "Nabi Yunus","kalimat": "YUNUS pendiri bank sangat suka DISKON"},{"no": 11,"kode": "DD","kata": "Dadah","surat": "Hud","arti": "Nabi Hud","kalimat": "Kaum HUD melambai “DADAH” ke kerabatnya yang pergi"},{"no": 12,"kode": "DN","kata": "Dino","surat": "Yusuf","arti": "Nabi Yusuf","kalimat": "DINOsaurus yang disukai YUSUF bisa terbang"},{"no": 13,"kode": "DM","kata": "Demo","surat": "Ar Ra'd","arti": "Guruh / Gemuruh","kalimat": "DEMO buruh bersuara GEMURUH sampai radius 5 km"},{"no": 14,"kode": "DP","kata": "Dupa","surat": "Ibrahim","arti": "Nabi Ibrahim","kalimat": "IBRAHIM membuang DUPA yang berserakan"},{"no": 15,"kode": "DS","kata": "Dasi","surat": "Al Hijr","arti": "Daerah Al Hijr","kalimat": "Orang itu menaiki gunung AL HIJR untuk mencari DASI"},{"no": 16,"kode": "DL","kata": "Dolar","surat": "An Nahl","arti": "Lebah","kalimat": "LEBAH-LEBAH dari Amerika dibeli dengan DOLAR"},{"no": 17,"kode": "DT","kata": "Data","surat": "Al Isra","arti": "Perjalanan Malam","kalimat": "DATA sejarah menunjukkan adanya PERJALANAN MALAM"},{"no": 18,"kode": "DB","kata": "Debu","surat": "Al Kahfi","arti": "Gua","kalimat": "GUA di padang pasir sangat berDEBU"},{"no": 19,"kode": "DG","kata": "Dagu","surat": "Maryam","arti": "Ibu Nabi Isa","kalimat": "MARYAM berDAGU lancip"},{"no": 20,"kode": "NC","kata": "Nancap","surat": "Thaha","arti": "Huruf Nuroniah","kalimat": "THAHA meNANCAPkan paku ke pohon anggur"},{"no": 21,"kode": "ND","kata": "Noda","surat": "Al Anbiya","arti": "Para Nabi","kalimat": "PARA NABI memakai pakaian bersih tidak berNODA"},{"no": 22,"kode": "NN","kata": "Nanang","surat": "Al Hajj","arti": "Haji","kalimat": "NANANG naik HAJI setiap tahun"},{"no": 23,"kode": "NM","kata": "Nama","surat": "Al Mu'minun","arti": "Orang-orang Beriman","kalimat": "NAMA MU'MIN untuk sebutan ORANG BERIMAN"},{"no": 24,"kode": "NP","kata": "Nampan","surat": "An Nur","arti": "Cahaya","kalimat": "NAMPAN itu memantulkan CAHAYA karena terbuat dari logam"},{"no": 25,"kode": "NS","kata": "Nusa","surat": "Al Furqan","arti": "Pembeda","kalimat": "NUSA Dua di Bali PEMBEDA daerah wisata"},{"no": 26,"kode": "NL","kata": "Nilai","surat": "Asy Syu'ara","arti": "Para Penyair","kalimat": "PARA PENYAIR memberikan NILAI pada kontes musik"},{"no": 27,"kode": "NT","kata": "Natto","surat": "An Naml","arti": "Semut","kalimat": "SEMUT tidak suka NATTO karena sudah difermentasi"},{"no": 28,"kode": "NB","kata": "Not Balok","surat": "Al Qasas","arti": "Kisah-kisah","kalimat": "KISAH-KISAH Mozart ditemukan dari NOT BALOK yang dibuatnya"},{"no": 29,"kode": "NG","kata": "Ngung-ngung","surat": "Al Ankabut","arti": "Laba-laba","kalimat": "LABA-LABA aneh membuat sarang sambil berbunyi “NGUNG-NGUNG”"},{"no": 30,"kode": "MC","kata": "Micin","surat": "Ar Rum","arti": "Bangsa Romawi","kalimat": "BANGSA ROMAWI suka bakso yang banyak MICIN"},{"no": 31,"kode": "MD","kata": "Mc D","surat": "Luqman","arti": "Keluarga Luqman","kalimat": "KELUARGA LUQMAN selalu membeli ayam original di Mc D"},{"no": 32,"kode": "MN","kata": "Menang","surat": "As Sajdah","arti": "Sujud","kalimat": "Atlet itu berSUJUD syukur setelah MENANG bertanding"},{"no": 33,"kode": "MM","kata": "Mama","surat": "Al Ahzab","arti": "Golongan yang Bersekutu","kalimat": "MAMA BERSEKUTU dengan Papa untuk mengajari anaknya"},{"no": 34,"kode": "MP","kata": "Mampang Prapatan","surat": "Saba'","arti": "Kaum Saba'","kalimat": "Pergi makan ikan SABA di daerah MAMPANG PRAPATAN"},{"no": 35,"kode": "MS","kata": "Masak","surat": "Fatir","arti": "Pencipta","kalimat": "Fatir seorang PENCIPTA cara MASAK rendang tanpa api"},{"no": 36,"kode": "ML","kata": "Malang","surat": "Ya Sin","arti": "Huruf Nuroniah","kalimat": "MALANG si Yasin terkena musibah"},{"no": 37,"kode": "MT","kata": "Mata","surat": "As Saffat","arti": "Berbaris-baris","kalimat": "Banyak MATA BERBARIS (saf) seperti serigala melihat mangsanya"},{"no": 38,"kode": "MB","kata": "Mobil","surat": "Sad","arti": "Huruf Nuroniah","kalimat": "MOBIL sedan (SAD) berlari kencang di gang sempit"},{"no": 39,"kode": "MG","kata": "Mangga","surat": "Az Zumar","arti": "Rombongan-rombongan","kalimat": "ROMBONGAN Az Zumar mencari MANGGA di Pasuruan"},{"no": 40,"kode": "PC","kata": "Poci","surat": "Al Mu'min (Gafir)","arti": "Orang yang Beriman","kalimat": "Mu'min yang BERIMAN sedang minum teh POCI"},{"no": 41,"kode": "PD","kata": "Padang","surat": "Fussilat","arti": "Yang Dijelaskan","kalimat": "Cara silat seperti itu DIJELASKAN dari PADANG"},{"no": 42,"kode": "PN","kata": "Panen","surat": "Asy Syura","arti": "Musyawarah","kalimat": "Mereka BERMUSYAWARAH bagaimana cara PANEN yang efektif"},{"no": 43,"kode": "PM","kata": "Paman","surat": "Az Zukhruf","arti": "Perhiasan","kalimat": "PAMAN menemukan PERHIASAN di tempat yang tersembunyi"},{"no": 44,"kode": "PP","kata": "Papa","surat": "Ad Dukhan","arti": "Asap / Kabut","kalimat": "PAPA menemui KABUT di tengah jalan, jadi terlambat sampai di tempat"},{"no": 45,"kode": "PS","kata": "Pisang","surat": "Al Jasiyah","arti": "Yang Berlutut","kalimat": "Pohon PISANG itu pendek, sehingga perlu BERLUTUT untuk mengambil buahnya"},{"no": 46,"kode": "PL","kata": "Palu","surat": "Al Ahqaf","arti": "Bukit Pasir","kalimat": "Di BUKIT PASIR itu dia meninggalkan PALU-nya, sehingga sulit mencarinya"},{"no": 47,"kode": "PT","kata": "Pita","surat": "Muhammad","arti": "Nabi Muhammad","kalimat": "MUHAMMAD mengenakan PITA hitam tanda berkabung"},{"no": 48,"kode": "PB","kata": "Pulo Buaran","surat": "Al Fath","arti": "Kemenangan","kalimat": "KEMENANGAN Persija dirayakan di PULO BUARAN"},{"no": 49,"kode": "PG","kata": "Pulo Gadung","surat": "Al Hujurat","arti": "Kamar-kamar","kalimat": "Banyak KAMAR-KAMAR di PULO GADUNG, tempat kos para pekerja"},{"no": 50,"kode": "SC","kata": "Suka Cita","surat": "Qaf","arti": "Huruf Nuroniah","kalimat": "Qafe (café) banyak didatangi untuk ber-SUKA CITA"},{"no": 51,"kode": "SD","kata": "Sekolah Dasar","surat": "Az Zariyat","arti": "Angin yang Menerbangkan","kalimat": "ANGIN MENERBANGKAN bola hingga masuk ke SEKOLAH DASAR"},{"no": 52,"kode": "SN","kata": "Senayan","surat": "At Tur","arti": "Bukit","kalimat": "SENAYAN dulu dikenal sebagai daerah berBUKIT yang banyak turunannya"},{"no": 53,"kode": "SM","kata": "Semarang","surat": "An Najm","arti": "Bintang","kalimat": "Di SEMARANG atas, kita bisa melihat BINTANG dengan tajam"},{"no": 54,"kode": "SP","kata": "Surat Peringatan","surat": "Al Qamar","arti": "Bulan","kalimat": "Karena Komar sudah 3 BULAN berturut-turut diberi SURAT PERINGATAN, dia diberhentikan"},{"no": 55,"kode": "SS","kata": "Susu","surat": "Ar Rahman","arti": "Yang Maha Pemurah","kalimat": "Sapi punya Rahman sangat PEMURAH, selalu memberi SUSU untuk anak sapi lainnya"},{"no": 56,"kode": "SL","kata": "Selamat","surat": "Al Waqi'ah","arti": "Hari Kiamat","kalimat": "Pada HARI KIAMAT tidak ada yang SELAMAT, termasuk Waqiah"},{"no": 57,"kode": "ST","kata": "Setang","surat": "Al Hadid","arti": "Besi","kalimat": "SETANG motor Ali terbuat dari kayu, bukan BESI"},{"no": 58,"kode": "SB","kata": "Sabtu","surat": "Al Mujadilah","arti": "Wanita yang Menggugat","kalimat": "WANITA itu MENGGUGAT, hari SABTU adalah hari liburnya"},{"no": 59,"kode": "SG","kata": "Sogok","surat": "Al Hasyr","arti": "Pengusiran","kalimat": "Penjual itu MENYOGOK polisi agar tidak diUSIR"},{"no": 60,"kode": "LC","kata": "Lancar","surat": "Al Mumtahanah","arti": "Wanita yang Diuji","kalimat": "WANITA yang ikut UJIAN mengendarai motor itu menjalaninya dengan LANCAR"},{"no": 61,"kode": "LD","kata": "Ladang","surat": "As Saff","arti": "Barisan","kalimat": "BARISAN LADANG di Jawa seperti saf pada waktu sholat"},{"no": 62,"kode": "LN","kata": "Luar Negeri","surat": "Al Jumu'ah","arti": "Hari Jum'at","kalimat": "Hari JUM'AT di LUAR NEGERI ada yang merupakan hari libur"},{"no": 63,"kode": "LM","kata": "Langgam","surat": "Al Munafiqun","arti": "Orang-orang Munafik","kalimat": "MUNAFIK kalau berLANGGAM sambil minum yang memabukkan"},{"no": 64,"kode": "LP","kata": "Lupa","surat": "At Tagabun","arti": "Hari Ditampakkan Kesalahan","kalimat": "Toga dan Buni LUPA bahwa perlu MENAMPAKKAN identitas"},{"no": 65,"kode": "LS","kata": "Lansia","surat": "At Talaq","arti": "Talak / Bercerai","kalimat": "Mereka tidak BERCERAI sampai LANSIA"},{"no": 66,"kode": "LL","kata": "Lalu Lintas","surat": "At Tahrim","arti": "Mengharamkan","kalimat": "LALU LINTAS searah MENGHARAMKAN untuk melawan arus"},{"no": 67,"kode": "LT","kata": "Lentera","surat": "Al Mulk","arti": "Kerajaan","kalimat": "KERAJAAN Mulk mempunyai simbol LENTERA (lampu)"},{"no": 68,"kode": "LB","kata": "Lubang","surat": "Al Qalam","arti": "Pena","kalimat": "LUBANG PENA tetap mengeluarkan tinta walau kecil sekali"},{"no": 69,"kode": "LG","kata": "Liga","surat": "Al Haqqah","arti": "Hari Kiamat","kalimat": "LIGA sepakbola mengalami KIAMAT karena kerusuhan penonton"},{"no": 70,"kode": "TC","kata": "Training Center","surat": "Al Ma'arij","arti": "Tempat-tempat Naik","kalimat": "TRAINING CENTER kita TEMPAT NAIK untuk bisa melihat ke kejauhan"},{"no": 71,"kode": "TD","kata": "Tudung","surat": "Nuh","arti": "Nabi Nuh","kalimat": "Perahu NUH mempunyai TUDUNG untuk menghindari hujan"},{"no": 72,"kode": "TN","kata": "Tandan","surat": "Al Jinn","arti": "Jin","kalimat": "TANDAN pisang berbentuk hati, seperti ada JIN yang membuatnya"},{"no": 73,"kode": "TM","kata": "Teman","surat": "Al Muzzammil","arti": "Orang yang Berselimut","kalimat": "Jamil suka BERSELIMUT dengan meminjam punya TEMANnya"},{"no": 74,"kode": "TP","kata": "Tempat Pembuangan","surat": "Al Muddassir","arti": "Orang yang Berkemul","kalimat": "TEMPAT PEMBUANGAN di dasar itu dilalui ORANG BERKEMUL saat meronda"},{"no": 75,"kode": "TS","kata": "Tandas","surat": "Al Qiyamah","arti": "Hari Kiamat","kalimat": "TANDAS tanpa bersisa semua yang dikumpulkan saat HARI KIAMAT"},{"no": 76,"kode": "TL","kata": "Tolong","surat": "Al Insan","arti": "Manusia","kalimat": "MANUSIA perlu saling TOLONG-menolong"},{"no": 77,"kode": "TT","kata": "Total","surat": "Al Mursalat","arti": "Malaikat yang Diutus","kalimat": "Tidak ada yang tahu berapa TOTAL MALAIKAT YANG DIUTUS"},{"no": 78,"kode": "TB","kata": "Tumbang","surat": "An Naba'","arti": "Berita Besar","kalimat": "Jadi BERITA BESAR saat petenis Nadal (mirip Naba) TUMBANG"},{"no": 79,"kode": "TG","kata": "Tonggak","surat": "An Nazi'at","arti": "Malaikat yang Mencabut","kalimat": "Malaikat MENCABUT TONGGAK yang menjulang ke luar angkasa"},{"no": 80,"kode": "BC","kata": "Bea Cukai","surat": "Abasa","arti": "Bermuka Masam","kalimat": "Sebaiknya tidak BERMUKA MASAM waktu petugas BEA CUKAI melakukan audit"},{"no": 81,"kode": "BD","kata": "Badang","surat": "At Takwir","arti": "Menggulung","kalimat": "Banjir BADANG MENGGULUNG desa di Jawa Tengah saat musim hujan"},{"no": 82,"kode": "BN","kata": "Badan","surat": "Al Infitar","arti": "Terbelah","kalimat": "BADAN mobil Infiniti itu TERBELAH saat menabrak pohon"},{"no": 83,"kode": "BM","kata": "Batam","surat": "Al Muthaffifin","arti": "Orang-orang yang Curang","kalimat": "Di BATAM, ORANG-ORANG YANG CURANG itu muntah karena salah makan"},{"no": 84,"kode": "BP","kata": "BP Migas","surat": "Al Insyiqaq","arti": "Terbelah","kalimat": "BP MIGAS TERBELAH dua menjadi gas dan minyak bumi"},{"no": 85,"kode": "BS","kata": "Bisa Ular","surat": "Al Buruj","arti": "Gugusan Bintang","kalimat": "GUGUSAN BINTANG Buruj membentuk seperti BISA ULAR"},{"no": 86,"kode": "BL","kata": "Bali","surat": "At Tariq","arti": "Yang Datang di Malam Hari","kalimat": "Mas Tariq DATANG DI MALAM HARI di BALI karena kondisi darurat"},{"no": 87,"kode": "BT","kata": "Bang Toyib","surat": "Al A'la","arti": "Yang Paling Tinggi","kalimat": "Karena bergaya ala koboi, BANG TOYIB kelihatan YANG PALING TINGGI"},{"no": 88,"kode": "BB","kata": "Bau Badan","surat": "Al Gasyiyah","arti": "Hari Pembalasan","kalimat": "Pada pertandingan HARI PEMBALASAN, mereka mengeluarkan gas seperti BAU BADAN"},{"no": 89,"kode": "BG","kata": "Bogor","surat": "Al Fajr","arti": "Fajar","kalimat": "FAJAR setiap minggu pergi ke BOGOR"},{"no": 90,"kode": "GC","kata": "Guci","surat": "Al Balad","arti": "Negeri","kalimat": "NEGERI penghasil GUCI selalu mengalami balada setiap 100 tahun sekali"},{"no": 91,"kode": "GD","kata": "Gudang","surat": "Asy Syams","arti": "Matahari","kalimat": "MATAHARI menjadi GUDANG panas untuk galaksi Bima Sakti"},{"no": 92,"kode": "GN","kata": "Genangan","surat": "Al Lail","arti": "Malam","kalimat": "Tadi MALAM hujan lebat di Jakarta, alhasil paginya banyak GENANGAN"},{"no": 93,"kode": "GM","kata": "Geram","surat": "Ad Duha","arti": "Waktu Duha (Matahari Sepenggalan Naik)","kalimat": "Setelah MATAHARI SEPENGGALAN NAIK tiba-tiba turun hujan, petani garam GERAM jadinya"},{"no": 94,"kode": "GP","kata": "Gapura","surat": "Al Insyirah","arti": "Melapangkan","kalimat": "Untuk MELAPANGKAN area pintu masuk perumahan, dibuat GAPURA"},{"no": 95,"kode": "GS","kata": "Gas","surat": "At Tin","arti": "Buah Tin","kalimat": "Untuk orang tertentu, setelah makan BUAH TIN mereka mengeluarkan banyak GAS"},{"no": 96,"kode": "GL","kata": "Galang","surat": "Al 'Alaq","arti": "Segumpal Darah","kalimat": "SEGUMPAL DARAH terbentuk waktu pengGALANGan donor darah"},{"no": 97,"kode": "GT","kata": "Gajah Tunggal","surat": "Al Qadr","arti": "Kemuliaan","kalimat": "KEMULIAAN kerajaan itu dilambangkan dengan simbol GAJAH TUNGGAL"},{"no": 98,"kode": "GB","kata": "Gabungan","surat": "Al Bayyinah","arti": "Bukti yang Nyata","kalimat": "BUKTI YANG NYATA adalah gunung merupakan GABUNGAN bukit-bukit yang berjejer"},{"no": 99,"kode": "GG","kata": "Gudang Garam","surat": "Az Zalzalah","arti": "Kegoncangan","kalimat": "Saham GUDANG GARAM terGONCANG oleh kebijakan cukai"},{"no": 100,"kode": "DCC","kata": "Dicocok","surat": "Al 'Adiyat","arti": "Kuda Berlari Kencang","kalimat": "Setelah hidungnya DICOCOK, KUDA Adiyat BERLARI KENCANG"},{"no": 101,"kode": "DCD","kata": "Dicederakan","surat": "Al Qari'ah","arti": "Hari Kiamat","kalimat": "Pada HARI KIAMAT, seluruh makhluk hidup DICEDERAKAN hingga kematiannya"},{"no": 102,"kode": "DCN","kata": "Di Cina","surat": "At Takasur","arti": "Bermegah-megahan","kalimat": "DI CINA, dengan melonjaknya ekonomi banyak orang yang BERMEGAH-MEGAHAN"},{"no": 103,"kode": "DCM","kata": "Dogma","surat": "Al 'Asr","arti": "Masa","kalimat": "Pada MASA pergolakan sejarah, banyak DOGMA yang digulirkan para tiran"},{"no": 104,"kode": "DCP","kata": "Dicap","surat": "Al Humazah","arti": "Pengumpat","kalimat": "Si Huma sering DICAP sebagai PENGUMPAT karena suka protes"},{"no": 105,"kode": "DCS","kata": "Daftar Calon Sementara","surat": "Al Fil","arti": "Gajah","kalimat": "Dalam DAFTAR CALON SEMENTARA partai, ada orang yang besarnya seperti GAJAH"},{"no": 106,"kode": "DCL","kata": "Dicela","surat": "Quraisy","arti": "Suku Quraisy","kalimat": "Zaman dulu banyak muslimin yang DICELA oleh SUKU QURAISY"},{"no": 107,"kode": "DCT","kata": "Ducati","surat": "Al Ma'un","arti": "Barang-barang yang Berguna","kalimat": "Di antara BARANG BERGUNA milik Ma'un adalah motor DUCATI"},{"no": 108,"kode": "DCB","kata": "Dicabangkan","surat": "Al Kausar","arti": "Nikmat yang Berlimpah","kalimat": "NIKMAT YANG BERLIMPAH dari Allah DICABANGKAN, sehingga datang dari berbagai arah"},{"no": 109,"kode": "DCG","kata": "Dicurangi","surat": "Al Kafirun","arti": "Orang-orang Kafir","kalimat": "Zaman Nabi, muslimin banyak DICURANGI oleh ORANG-ORANG KAFIR"},{"no": 110,"kode": "DDC","kata": "Didiskon","surat": "An Nasr","arti": "Pertolongan","kalimat": "Pembelian di Shopee banyak DIDISKON, sebagai PERTOLONGAN kepada pembeli"},{"no": 111,"kode": "DDD","kata": "Di Dada","surat": "Al Lahab","arti": "Gejolak Api","kalimat": "DI DADA pejuang bangsa selalu berGEJOLAK API untuk membangun negeri"},{"no": 112,"kode": "DDN","kata": "Didonasi","surat": "Al Ikhlas","arti": "Keesaan Allah","kalimat": "Untuk pembangunan masjid, DIDONASIkan penghasilan perusahaan secara IKHLAS"},{"no": 113,"kode": "DDM","kata": "Dendam","surat": "Al Falaq","arti": "Waktu Subuh","kalimat": "Pada WAKTU SUBUH kita baca Al Falaq untuk menghindari DENDAM orang yang dengki"},{"no": 114,"kode": "DDP","kata": "Dadap","surat": "An Nas","arti": "Manusia","kalimat": "Daun DADAP biasa digunakan MANUSIA untuk sayuran"}];
+const KEY = [["0","C"],["1","D"],["2","N"],["3","M"],["4","P"],["5","S"],["6","L"],["7","T"],["8","B"],["9","G"]];
+
+/* ---------- util ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const byNo = n => DATA[n-1];
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+
+/* status: 0 baru, 1 belajar, 2 hafal ; streak per surat */
+const status = {}, streak = {};
+DATA.forEach(d => { status[d.no]=0; streak[d.no]=0; });
+
+function markCorrect(no){
+  streak[no] = (streak[no]||0)+1;
+  status[no] = streak[no] >= 2 ? 2 : 1;
+  paintMosaic();
+}
+function markWrong(no){
+  streak[no] = 0;
+  status[no] = 1;
+  paintMosaic();
+}
+
+/* rentang blok */
+const BLOKS = [{v:"all",t:"Semua surat (1–114)"}];
+for(let s=1;s<=114;s+=10){ const e=Math.min(s+9,114); BLOKS.push({v:s+"-"+e,t:"Surat "+s+"–"+e}); }
+BLOKS.push({v:"1-30",t:"Surat 1–30"},{v:"31-60",t:"Surat 31–60"},{v:"61-90",t:"Surat 61–90"},{v:"91-114",t:"Surat 91–114"},{v:"lemah",t:"Yang belum hijau"});
+function fillBlok(sel){ sel.innerHTML = BLOKS.map(b=>`<option value="${b.v}">${b.t}</option>`).join(""); }
+function rangeOf(v){
+  if(v==="all") return DATA.slice();
+  if(v==="lemah"){ const r = DATA.filter(d=>status[d.no]<2); return r.length?r:DATA.slice(); }
+  const [a,b]=v.split("-").map(Number);
+  return DATA.filter(d=>d.no>=a&&d.no<=b);
+}
+
+/* ---------- header key ---------- */
+$("#keystrip").innerHTML = KEY.map(([n,l])=>`<div class="keycell"><b>${n}</b><span>${l}</span></div>`).join("");
+if(window.matchMedia("(min-width:641px)").matches) $("#keybox").open = true;
+
+/* ---------- tabs ---------- */
+$$("#nav .tab").forEach(t=>t.addEventListener("click",()=>{
+  $$("#nav .tab").forEach(x=>x.setAttribute("aria-selected", x===t));
+  $$("main > section").forEach(s=>s.classList.add("hidden"));
+  $("#view-"+t.dataset.view).classList.remove("hidden");
+  const nav = $("#nav");
+  if(nav.getBoundingClientRect().top < 0){
+    window.scrollTo({top:nav.offsetTop, behavior:"instant" in window ? "instant":"auto"});
+  }
+}));
+
+/* ---------- kartu markup ---------- */
+function cardHTML(d, showAnswer, front){
+  const kode = d.kode.split("").join(" ");
+  const head = `<p class="no">SURAT KE-${d.no} &nbsp;·&nbsp; ${String(d.no).padStart(2,"0").split("").join(" ")}</p>
+                <p class="kode">${kode}</p>`;
+  if(!showAnswer){
+    if(front==="surat") return `<div class="faceback"><p class="surat">${d.surat}</p><p class="tap">Surat ini nomor berapa?</p></div>`;
+    if(front==="kata")  return `<div class="faceback"><p class="kata">${d.kata}</p><p class="tap">Kata pengingat untuk surat apa?</p></div>`;
+    return `<div class="faceback"><p class="no">SURAT KE-</p><p class="kode" style="font-size:56px">${d.no}</p><p class="tap">Surat apa, dan apa kata pengingatnya?</p></div>`;
+  }
+  return `${head}
+    <p class="kata">${d.kata}</p>
+    <p class="surat">${d.surat}</p>
+    <p class="arti">${d.arti}</p>
+    <p class="kalimat">${d.kalimat}</p>`;
+}
+
+/* ---------- PETA ---------- */
+const mosaic = $("#mosaic");
+mosaic.innerHTML = DATA.map(d=>`<button class="cell" data-no="${d.no}" title="${d.surat}">${d.no}</button>`).join("");
+function paintMosaic(){
+  $$(".cell").forEach(c=>{
+    const s = status[+c.dataset.no];
+    c.classList.toggle("belajar", s===1);
+    c.classList.toggle("hafal", s===2);
+  });
+  const h = DATA.filter(d=>status[d.no]===2).length;
+  const b = DATA.filter(d=>status[d.no]===1).length;
+  $("#petaStat").textContent = `${h} hafal · ${b} sedang dipelajari · ${114-h-b} belum disentuh`;
+}
+mosaic.addEventListener("click",e=>{
+  const c = e.target.closest(".cell"); if(!c) return;
+  $$(".cell").forEach(x=>x.classList.remove("active"));
+  c.classList.add("active");
+  const d = byNo(+c.dataset.no);
+  $("#petaCard").innerHTML = `<div class="card">${cardHTML(d,true)}</div>`;
+});
+$("#resetPeta").addEventListener("click",()=>{
+  DATA.forEach(d=>{status[d.no]=0;streak[d.no]=0;}); paintMosaic(); $("#petaCard").innerHTML="";
+});
+paintMosaic();
+
+/* ---------- KARTU ---------- */
+let kDeck=[], kIdx=0, kOpen=false;
+fillBlok($("#kBlok"));
+function kBuild(shuffled){
+  kDeck = rangeOf($("#kBlok").value);
+  if(shuffled) kDeck = shuffle(kDeck);
+  kIdx=0; kOpen=false; kRender();
+}
+function kRender(){
+  const d = kDeck[kIdx];
+  if(!d){ $("#kartuBox").innerHTML = `<p class="tap">Tidak ada kartu di rentang ini.</p>`; return; }
+  $("#kartuBox").innerHTML = cardHTML(d, kOpen, $("#kArah").value);
+  $("#kFlip").textContent = kOpen ? "Tutup jawaban" : "Buka jawaban";
+  $("#kPos").textContent = `${kIdx+1} / ${kDeck.length}`;
+  $("#kBar").style.width = ((kIdx+1)/kDeck.length*100)+"%";
+}
+$("#kFlip").addEventListener("click",()=>{ kOpen=!kOpen; kRender(); });
+$("#kNext").addEventListener("click",()=>{ kIdx=(kIdx+1)%kDeck.length; kOpen=false; kRender(); });
+$("#kPrev").addEventListener("click",()=>{ kIdx=(kIdx-1+kDeck.length)%kDeck.length; kOpen=false; kRender(); });
+$("#kAcak").addEventListener("click",()=>kBuild(true));
+$("#kBlok").addEventListener("change",()=>kBuild(false));
+$("#kArah").addEventListener("change",()=>{kOpen=false;kRender();});
+document.addEventListener("keydown",e=>{
+  if($("#view-kartu").classList.contains("hidden")) return;
+  if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.code==="Space"){e.preventDefault();$("#kFlip").click();}
+  if(e.key==="ArrowRight")$("#kNext").click();
+  if(e.key==="ArrowLeft")$("#kPrev").click();
+});
+kBuild(false);
+
+/* ---------- generator soal ---------- */
+const KINDS = {
+  no2surat:{label:"Nomor → surat", ask:d=>`Surat nomor ${d.no} adalah…`, val:d=>d.surat},
+  surat2no:{label:"Surat → nomor", ask:d=>`${d.surat} adalah surat ke berapa?`, val:d=>String(d.no)},
+  no2kata :{label:"Nomor → kata pengingat", ask:d=>`Kata pengingat untuk nomor ${d.no}?`, val:d=>d.kata},
+  surat2arti:{label:"Surat → arti", ask:d=>`Apa arti ${d.surat}?`, val:d=>d.arti},
+  arti2surat:{label:"Arti → surat", ask:d=>`Surat yang berarti “${d.arti}”?`, val:d=>d.surat},
+};
+function makeQ(kind, pool){
+  const d = pick(pool);
+  const K = KINDS[kind];
+  const right = K.val(d);
+  const opts = new Set([right]);
+  const bank = shuffle(DATA);
+  for(const o of bank){ if(opts.size>=4) break; const v=K.val(o); if(v!==right) opts.add(v); }
+  return {d, kind, prompt:K.ask(d), right, opts:shuffle([...opts]), label:K.label};
+}
+
+/* ---------- KUIS ---------- */
+let qList=[], qi=0, qB=0, qS=0, qMiss=[];
+fillBlok($("#qBlok"));
+$("#qTipe").addEventListener("click",e=>{
+  const c=e.target.closest(".chip"); if(!c) return;
+  const on = c.getAttribute("aria-pressed")==="true";
+  if(on && $$('#qTipe .chip[aria-pressed="true"]').length===1) return;
+  c.setAttribute("aria-pressed", String(!on));
+});
+$("#qStart").addEventListener("click",()=>{
+  const kinds = $$('#qTipe .chip[aria-pressed="true"]').map(c=>c.dataset.t);
+  const pool = rangeOf($("#qBlok").value);
+  const n = Math.min(+$("#qJml").value, pool.length*kinds.length);
+  qList = Array.from({length:n},()=>makeQ(pick(kinds), pool));
+  qi=0;qB=0;qS=0;qMiss=[];
+  $("#kuisSetup").classList.add("hidden");
+  $("#kuisDone").classList.add("hidden");
+  $("#kuisPlay").classList.remove("hidden");
+  $("#qTot").textContent=n;
+  renderQ();
+});
+function renderQ(){
+  const q=qList[qi];
+  $("#qIdx").textContent=qi+1; $("#qBenar").textContent=qB; $("#qSalah").textContent=qS;
+  $("#qKind").textContent=q.label;
+  $("#qText").textContent=q.prompt;
+  $("#qFeed").classList.add("hidden");
+  $("#qNext").classList.add("hidden");
+  $("#qOpts").innerHTML=q.opts.map((o,i)=>
+    `<button class="opt" data-v="${encodeURIComponent(o)}"><span class="k">${"ABCD"[i]}</span><span>${o}</span></button>`).join("");
+}
+$("#qOpts").addEventListener("click",e=>{
+  const b=e.target.closest(".opt"); if(!b||b.disabled) return;
+  const q=qList[qi], chosen=decodeURIComponent(b.dataset.v);
+  $$("#qOpts .opt").forEach(o=>{
+    o.disabled=true;
+    const v=decodeURIComponent(o.dataset.v);
+    if(v===q.right)o.classList.add("correct");
+    else if(o===b)o.classList.add("wrong");
+  });
+  if(chosen===q.right){ qB++; markCorrect(q.d.no); }
+  else { qS++; markWrong(q.d.no); qMiss.push(q); }
+  $("#qFeed").innerHTML = q.d.kalimat;
+  $("#qFeed").classList.remove("hidden");
+  $("#qBenar").textContent=qB; $("#qSalah").textContent=qS;
+  $("#qNext").classList.remove("hidden");
+  $("#qNext").focus();
+});
+$("#qNext").addEventListener("click",()=>{ qi++; qi<qList.length ? renderQ() : finishQ(); });
+$("#qStop").addEventListener("click",finishQ);
+function finishQ(){
+  $("#kuisPlay").classList.add("hidden");
+  const total=qB+qS, pct= total? Math.round(qB/total*100):0;
+  const miss = qMiss.length
+    ? `<p class="sub" style="margin:18px 0 0">Yang perlu diulang:</p><ul class="misslist">${
+        qMiss.map(q=>`<li><b>${q.d.no}</b> &nbsp;${q.d.surat} — ${q.d.arti}<br><span style="color:var(--muted)">${q.d.kalimat}</span></li>`).join("")}</ul>`
+    : `<p class="sub" style="margin:18px 0 0">Tidak ada yang meleset.</p>`;
+  $("#kuisDone").innerHTML = `
+    <p class="qmeta">Hasil</p>
+    <p class="bigscore">${pct}<span style="font-size:22px">%</span></p>
+    <p class="sub">${qB} benar dari ${total} soal.</p>
+    ${miss}
+    <div class="row" style="margin-top:18px">
+      <button class="btn primary" id="qAgain">Kuis lagi</button>
+      <button class="btn" id="qWeak">Latih yang meleset</button>
+    </div>`;
+  $("#kuisDone").classList.remove("hidden");
+  $("#qAgain").onclick=()=>{ $("#kuisDone").classList.add("hidden"); $("#kuisSetup").classList.remove("hidden"); };
+  $("#qWeak").onclick=()=>{ $("#qBlok").value="lemah"; $("#kuisDone").classList.add("hidden"); $("#kuisSetup").classList.remove("hidden"); };
+}
+
+/* ---------- RANTAI ---------- */
+let rChain=[], rStep=0, rDir="maju", rPool=[];
+fillBlok($("#rBlok"));
+$("#rStart").addEventListener("click",()=>{
+  rDir=$("#rArah").value;
+  rPool=rangeOf($("#rBlok").value);
+  const cands = rPool.filter(d => rDir==="maju" ? d.no<=109 : d.no>=6);
+  if(!cands.length){ $("#rBody").innerHTML=`<p class="sub">Rentang ini terlalu sempit untuk membuat rantai.</p>`; return; }
+  const start = pick(cands);
+  rChain=[start.no]; rStep=0; rRender();
+});
+function rRender(){
+  const cur = rChain[rChain.length-1];
+  const target = rDir==="maju" ? cur+1 : cur-1;
+  if(rChain.length>5){
+    $("#rBody").innerHTML = `<p class="qmeta">Rantai selesai</p>
+      <p class="chain">${rChain.map(n=>`<span class="done">${byNo(n).surat}</span>`).join('<span class="arrow">→</span>')}</p>
+      <div class="row" style="margin-top:16px"><button class="btn primary" onclick="document.getElementById('rStart').click()">Rantai baru</button></div>`;
+    return;
+  }
+  const right = byNo(target).surat;
+  const opts = new Set([right]);
+  for(const o of shuffle(DATA)){ if(opts.size>=4)break; if(o.surat!==right) opts.add(o.surat); }
+  $("#rBody").innerHTML = `
+    <p class="qmeta">Mata rantai ${rChain.length} dari 5</p>
+    <p class="chain">${rChain.map(n=>`<span class="done">${byNo(n).surat}</span>`).join('<span class="arrow">→</span>')}<span class="arrow">→</span><span style="color:var(--muted)">?</span></p>
+    <p class="sub" style="margin:10px 0 0">Surat ${rDir==="maju"?"sesudah":"sebelum"} <b>${byNo(cur).surat}</b> (nomor ${cur}) adalah…</p>
+    <div class="opts" id="rOpts">${shuffle([...opts]).map((o,i)=>`<button class="opt" data-v="${encodeURIComponent(o)}"><span class="k">${"ABCD"[i]}</span><span>${o}</span></button>`).join("")}</div>
+    <div class="feedback hidden" id="rFeed"></div>`;
+  $("#rOpts").addEventListener("click",e=>{
+    const b=e.target.closest(".opt"); if(!b||b.disabled)return;
+    const chosen=decodeURIComponent(b.dataset.v);
+    $$("#rOpts .opt").forEach(o=>{o.disabled=true;
+      const v=decodeURIComponent(o.dataset.v);
+      if(v===right)o.classList.add("correct"); else if(o===b)o.classList.add("wrong");});
+    const ok = chosen===right;
+    ok ? markCorrect(target) : markWrong(target);
+    $("#rFeed").innerHTML = `${byNo(target).kalimat} <br><span style="font-family:var(--mono);font-size:12px">Nomor ${target} · ${byNo(target).kode}</span>`;
+    $("#rFeed").classList.remove("hidden");
+    setTimeout(()=>{ if(ok){ rChain.push(target); } rRender(); }, ok?1200:2600);
+  });
+}
+
+/* ---------- ADU CEPAT ---------- */
+let cTime=60, cSkor=0, cStreakN=0, cBest=0, cTimerId=null, cPool=[];
+fillBlok($("#cBlok"));
+$("#cStart").addEventListener("click",()=>{
+  cPool=rangeOf($("#cBlok").value); cTime=60; cSkor=0; cStreakN=0;
+  $("#cIntro").classList.add("hidden"); $("#cDone").classList.add("hidden");
+  $("#cPlay").classList.remove("hidden");
+  $("#cSkor").textContent=0; $("#cStreak").textContent=0;
+  tick(); cNext();
+  cTimerId=setInterval(()=>{ cTime--; tick(); if(cTime<=0) cFinish(); },1000);
+});
+function tick(){ const t=$("#cTimer"); t.textContent=cTime; t.classList.toggle("low", cTime<=10); }
+function cNext(){
+  const q = makeQ(pick(["no2surat","surat2no","no2kata","arti2surat"]), cPool);
+  $("#cKind").textContent=q.label;
+  $("#cText").textContent=q.prompt;
+  $("#cOpts").innerHTML=q.opts.map((o,i)=>`<button class="opt" data-v="${encodeURIComponent(o)}"><span class="k">${"ABCD"[i]}</span><span>${o}</span></button>`).join("");
+  $("#cOpts").onclick=e=>{
+    const b=e.target.closest(".opt"); if(!b)return;
+    const ok = decodeURIComponent(b.dataset.v)===q.right;
+    if(ok){ cSkor++; cStreakN++; markCorrect(q.d.no); }
+    else { cStreakN=0; markWrong(q.d.no); b.classList.add("wrong"); }
+    $("#cSkor").textContent=cSkor; $("#cStreak").textContent=cStreakN;
+    ok ? cNext() : setTimeout(cNext,650);
+  };
+}
+function cFinish(){
+  clearInterval(cTimerId);
+  $("#cPlay").classList.add("hidden");
+  cBest=Math.max(cBest,cSkor);
+  $("#cRekor").textContent = cBest+" jawaban benar";
+  $("#cDone").innerHTML=`<p class="qmeta">Waktu habis</p><p class="bigscore">${cSkor}</p>
+    <p class="sub">jawaban benar dalam 60 detik. Rekor sesi ini ${cBest}.</p>
+    <button class="btn primary" onclick="document.getElementById('cDone').classList.add('hidden');document.getElementById('cIntro').classList.remove('hidden')">Coba lagi</button>`;
+  $("#cDone").classList.remove("hidden");
+}
+</script>
