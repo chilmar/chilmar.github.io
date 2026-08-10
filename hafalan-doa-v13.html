@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Hafalan Doa — Enam Doa, Satu Pola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10142A;
+    --bg-elev:#181E3C;
+    --bg-elev-2:#212a4d;
+    --line: rgba(212,175,98,0.14);
+    --gold:#D8B876;
+    --gold-dim: rgba(216,184,118,0.16);
+    --text:#F1ECDD;
+    --text-dim:#9AA1C4;
+    --teal:#5AAE9F;
+    --rose:#C98468;
+    --blue:#7B8FC9;
+    --radius: 18px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background: radial-gradient(ellipse at top, #171C3A 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:520px;
+    min-height:100vh;
+    position:relative;
+    padding: 20px 18px 60px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    opacity:0.85;
+    margin-bottom:6px;
+  }
+  h1.display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:28px;
+    line-height:1.15;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--text-dim);
+    font-size:13.5px;
+    line-height:1.5;
+    margin:0 0 20px;
+  }
+
+  /* progress ring header */
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:22px;
+  }
+  .progress-row .ptext{flex:1;}
+  .progress-row .plabel{font-size:12px; color:var(--text-dim); margin-bottom:2px;}
+  .progress-row .pval{font-family:'Fraunces',serif; font-size:20px; font-weight:600;}
+  svg.star-ring{flex-shrink:0; display:block;}
+
+  /* divider */
+  .divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:26px 0 18px;
+    opacity:0.55;
+  }
+
+  /* home cards */
+  .doa-card{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 16px 15px;
+    margin-bottom:12px;
+    cursor:pointer;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .doa-card:active{ transform: scale(0.985); }
+  .doa-card:hover{ border-color: rgba(216,184,118,0.4); background:var(--bg-elev-2); }
+  .doa-card-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .doa-index{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold);
+    letter-spacing:0.05em;
+  }
+  .doa-dot{
+    width:9px; height:9px; border-radius:50%;
+    background: rgba(154,161,196,0.3);
+    flex-shrink:0;
+    margin-top:2px;
+    transition: background .2s ease, box-shadow .2s ease;
+  }
+  .doa-dot.hafal{
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(216,184,118,0.7);
+  }
+  .doa-title{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  .doa-arabic-snip{
+    font-family:'Amiri', serif;
+    direction:rtl;
+    font-size:19px;
+    color:var(--text);
+    opacity:0.85;
+    margin-bottom:10px;
+    line-height:1.6;
+  }
+  .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    padding:3px 9px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+  }
+
+  /* detail view */
+  #detail{
+    position:fixed;
+    inset:0;
+    background: radial-gradient(ellipse at top, #171C3A 0%, var(--bg) 55%);
+    z-index:20;
+    overflow-y:auto;
+    display:none;
+  }
+  #detail.open{ display:block; animation: slideup .28s ease; }
+  @keyframes slideup{ from{ opacity:0; transform: translateY(14px);} to{opacity:1; transform:translateY(0);} }
+  .detail-inner{ max-width:520px; margin:0 auto; padding:18px 18px 70px; }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; color:var(--text-dim);
+    font-family:'Inter'; font-size:13.5px; cursor:pointer;
+    padding:8px 0; margin-bottom:10px;
+  }
+  .back-btn:hover{ color:var(--gold); }
+
+  .detail-title{
+    font-family:'Fraunces', serif; font-weight:600;
+    font-size:24px; line-height:1.2; margin:6px 0 4px;
+  }
+  .detail-meta{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;
+  }
+  .source-line{
+    font-size:12.5px; color:var(--text-dim); margin-bottom:18px; line-height:1.5;
+  }
+
+  .arabic-block{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 20px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .arabic-block .arabic{
+    font-family:'Amiri', serif;
+    direction:rtl;
+    font-size:26px;
+    line-height:2.1;
+  }
+
+  .chip-row{
+    display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    padding:8px 14px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .chip.active{
+    background:var(--gold-dim);
+    border-color:var(--gold);
+    color:var(--gold);
+  }
+
+  .latin-box, .meaning-box, .context-box{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    font-size:14px;
+    line-height:1.65;
+    display:none;
+  }
+  .latin-box{ font-style:italic; color:var(--text); }
+  .meaning-box{ color:var(--text); }
+  .context-box{ color:var(--text-dim); }
+  .box-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px; display:block;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--text-dim);
+    margin: 24px 0 12px;
+  }
+
+  .babak{
+    border-left:3px solid var(--teal);
+    background:var(--bg-elev);
+    border-radius: 0 14px 14px 0;
+    padding:13px 15px;
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .babak[data-c="1"]{ border-left-color: var(--teal); }
+  .babak[data-c="2"]{ border-left-color: var(--gold); }
+  .babak[data-c="3"]{ border-left-color: var(--rose); }
+  .babak[data-c="4"]{ border-left-color: var(--blue); }
+  .babak-head{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .babak-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--text-dim);
+  }
+  .babak-label{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:14.5px;
+    margin-top:2px;
+  }
+  .babak-arabic{
+    font-family:'Amiri', serif;
+    direction:rtl;
+    font-size:17px;
+    margin-top:8px;
+    opacity:0.9;
+  }
+  .babak-latin{
+    font-family:'Inter', sans-serif;
+    font-style:italic;
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-top:6px;
+  }
+  .babak-extra{ display:none; margin-top:9px; }
+  .babak-extra .lat{ font-size:12.5px; font-style:italic; color:var(--text-dim); margin-bottom:5px;}
+  .babak-extra .mean{ font-size:12.5px; color:var(--text); }
+  .babak.expanded .babak-extra{ display:block; }
+  .chevron{ color:var(--text-dim); font-size:12px; transition: transform .2s; }
+  .babak.expanded .chevron{ transform: rotate(180deg); }
+
+  .quiz-toggle{
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--gold-dim);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    font-family:'Inter'; font-weight:600; font-size:13.5px;
+    padding:13px;
+    border-radius:14px;
+    cursor:pointer;
+    margin: 22px 0 10px;
+  }
+  .quiz-toggle:active{ transform: scale(0.98); }
+
+  .hafal-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-top:8px;
+  }
+  .hafal-row .lab{ font-size:13.5px; }
+  .hafal-row .lab .small{ display:block; font-size:11px; color:var(--text-dim); margin-top:2px;}
+  .switch{
+    width:46px; height:26px; border-radius:20px;
+    background: rgba(154,161,196,0.25);
+    position:relative; cursor:pointer; flex-shrink:0;
+    transition: background .2s ease;
+  }
+  .switch.on{ background: var(--gold); }
+  .switch .knob{
+    position:absolute; top:3px; left:3px;
+    width:20px; height:20px; border-radius:50%;
+    background:#10142A;
+    transition: left .2s ease;
+  }
+  .switch.on .knob{ left:23px; background:#fff; }
+
+  /* quiz mode blur */
+  .quiz-hide .arabic, .quiz-hide .babak-arabic{ filter: blur(7px); user-select:none; }
+  .quiz-hide .latin-box, .quiz-hide .meaning-box{ filter: blur(6px); user-select:none; }
+
+  .footnote{
+    text-align:center; color:var(--text-dim); font-size:11px;
+    margin-top:30px; line-height:1.6;
+  }
+
+  /* quiz screen */
+  #quiz{
+    position:fixed; inset:0;
+    background: radial-gradient(ellipse at top, #171C3A 0%, var(--bg) 55%);
+    z-index:30; overflow-y:auto; display:none;
+  }
+  #quiz.open{ display:block; animation: slideup .28s ease; }
+
+  .quiz-progress{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px; color:var(--text-dim);
+    margin-bottom:16px;
+  }
+  .quiz-progress .cur{ color:var(--gold); }
+
+  .quiz-source-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; color:var(--text-dim);
+    margin-bottom:8px;
+  }
+
+  .quiz-question-box{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 20px;
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .quiz-question-box .arabic{
+    font-family:'Amiri', serif;
+    direction:rtl;
+    font-size:23px;
+    line-height:1.9;
+  }
+  .quiz-question-box .latin{
+    font-family:'Inter', sans-serif;
+    font-style:italic;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-top:10px;
+    line-height:1.5;
+  }
+  .quiz-attempts{
+    text-align:center; font-size:11.5px; color:var(--text-dim);
+    margin: -10px 0 16px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .quiz-instruction{
+    font-size:12.5px; color:var(--text-dim); text-align:center; margin-bottom:18px;
+  }
+
+  .option{
+    display:block; width:100%;
+    text-align:left;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'Inter'; font-size:14px; line-height:1.5;
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .option:active{ transform: scale(0.99); }
+  .option.correct{
+    border-color: var(--teal);
+    background: rgba(90,174,159,0.15);
+    color:#EAF7F4;
+  }
+  .option.wrong{
+    border-color: var(--rose);
+    background: rgba(201,132,104,0.15);
+    color:#FBEAE3;
+  }
+  .option[disabled]{ cursor:default; }
+
+  .quiz-result{
+    text-align:center;
+    padding: 40px 10px;
+  }
+  .quiz-result .score{
+    font-family:'Fraunces', serif;
+    font-size:46px;
+    font-weight:600;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .quiz-result .score-label{
+    color:var(--text-dim); font-size:13.5px; margin-bottom:28px;
+  }
+  .btn-primary{
+    display:inline-block;
+    background: var(--gold-dim);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    font-family:'Inter'; font-weight:600; font-size:13.5px;
+    padding:13px 22px;
+    border-radius:14px;
+    cursor:pointer;
+    margin: 6px;
+  }
+  .btn-secondary{
+    display:inline-block;
+    background: transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'Inter'; font-size:13.5px;
+    padding:13px 22px;
+    border-radius:14px;
+    cursor:pointer;
+    margin: 6px;
+  }  .version-badge{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.04em;
+    color:var(--bg);
+    background: var(--gold);
+    padding:3px 9px;
+    border-radius:6px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+
+  /* audio player */
+  .audio-player{
+    display:flex; align-items:center; gap:12px;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    margin-bottom:14px;
+  }
+  .audio-play-btn{
+    flex-shrink:0;
+    width:42px; height:42px; border-radius:50%;
+    background:var(--gold-dim);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    cursor:pointer;
+    transition: transform .15s ease;
+  }
+  .audio-play-btn:active{ transform: scale(0.92); }
+  .audio-body{ flex:1; min-width:0; }
+  .audio-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px;
+  }
+  .audio-track{
+    position:relative;
+    width:100%; height:5px;
+    background: rgba(154,161,196,0.22);
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .audio-fill{
+    position:absolute; top:0; left:0; height:100%;
+    width:0%;
+    background:var(--gold);
+    border-radius:4px;
+  }
+  .audio-times{
+    display:flex; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; color:var(--text-dim);
+    margin-top:6px;
+  }
+  .audio-badge{
+    display:inline-flex; align-items:center; gap:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--teal);
+    margin-left:6px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="eyebrow">MFQ · Hafalan Doa</div>
+  <h1 class="display">Kumpulan Doa, Satu Pola<span class="version-badge">V13</span></h1>
+  <p class="sub">Kerangka babak — Pengakuan → Tauhid → Permohonan — dipakai untuk menghafal semua doa di bawah ini. Total <span id="doaCount"></span> doa. <span style="color:var(--teal);">12 doa pertama sudah dilengkapi audio.</span></p>
+
+  <div class="progress-row">
+    <svg class="star-ring" width="46" height="46" viewBox="0 0 46 46" id="starRing"></svg>
+    <div class="ptext">
+      <div class="plabel">Progres hafalan</div>
+      <div class="pval" id="progressVal">0 / 6 doa</div>
+    </div>
+  </div>
+
+  <button class="quiz-toggle" style="margin-top:0; margin-bottom:22px;" onclick="startQuiz()">Mulai Kuis Pilihan Ganda</button>
+
+  <div id="homeList"></div>
+
+  <div class="footnote">Ketuk kartu doa untuk mulai menghafal.<br>Progres tersimpan otomatis di perangkat ini.</div>
+</div>
+
+<div id="detail">
+  <div class="detail-inner" id="detailInner"></div>
+</div>
+
+<div id="quiz">
+  <div class="detail-inner" id="quizInner"></div>
+</div>
+
+<script>
+const DATA = [
+  {
+    id:1, cat:"hadits",
+    audio:"audio/doa-sujud-aisyah.mp3",
+    title:"Doa Sujud Aisyah",
+    subtitle:"Dibaca Saat Sujud",
+    theme:"Perlindungan",
+    source:"Muslim (486), Abu Dawud, Tirmidzi, Nasa'i, Ibnu Majah, Ahmad",
+    context:"Aisyah ra. kehilangan Nabi \u25c9 dari ranjang di tengah malam, meraba dalam gelap, hingga tangannya menyentuh telapak kaki beliau yang sedang sujud. Saat itulah doa ini terdengar.",
+    arabic:"اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِرِضَاكَ مِنْ سَخَطِكَ، وَبِمُعَافَاتِكَ مِنْ عُقُوْبَتِكَ، وَأَعُوْذُ بِكَ مِنْكَ، لَا أُحْصِيْ ثَنَاءً عَلَيْكَ، أَنْتَ كَمَا أَثْنَيْتَ عَلَى نَفْسِكَ",
+    latin:"Allāhumma innī a'ūdhu bi-riḍāka min sakhaṭika, wa bi-mu'āfātika min 'uqūbatika, wa a'ūdhu bika minka, lā uḥṣī thanā'an 'alayka, anta kamā athnayta 'alā nafsik.",
+    meaning:"Ya Allah, aku berlindung dengan keridhaan-Mu dari kemurkaan-Mu, dan dengan ampunan-Mu dari siksa-Mu, dan aku berlindung kepada-Mu dari (murka)-Mu. Aku tidak mampu menghitung pujian atas-Mu, Engkau seperti pujian-Mu atas Diri-Mu sendiri.",
+    babak:[
+      {label:"Perlindungan Berpasangan", ar:"أَعُوْذُ بِرِضَاكَ مِنْ سَخَطِكَ، وَبِمُعَافَاتِكَ مِنْ عُقُوْبَتِكَ", lat:"a'ūdhu bi-riḍāka min sakhaṭika, wa bi-mu'āfātika min 'uqūbatika", mean:"Berlindung dengan ridha dari murka, dengan ampunan dari siksa", c:1},
+      {label:"Puncak (Allah dari Allah)", ar:"وَأَعُوْذُ بِكَ مِنْكَ", lat:"wa a'ūdhu bika minka", mean:"Berlindung kepada-Mu dari (murka)-Mu sendiri — tanpa lawan kata", c:2},
+      {label:"Pengakuan Lemah", ar:"لَا أُحْصِيْ ثَنَاءً عَلَيْكَ ...", lat:"lā uḥṣī thanā'an 'alayka ...", mean:"Tak mampu menghitung pujian, Engkau seperti pujian-Mu sendiri", c:3},
+    ]
+  },
+  {
+    id:2, cat:"hadits",
+    audio:"audio/doa-abu-bakar.mp3",
+    title:"Doa Abu Bakar",
+    subtitle:"Tasyahud Akhir, Sebelum Salam",
+    theme:"Istighfar",
+    source:"Al-Bukhari (6326) & Muslim (2705) — muttafaq 'alaih",
+    context:"Abu Bakar ash-Shiddiq — sahabat terdekat Nabi \u25c9 yang dijamin surga — tetap meminta diajarkan doa untuk dibaca dalam shalatnya. Menunjukkan bahwa istighfar dibutuhkan siapa pun, sekalipun orang paling dekat dengan Nabi \u25c9.",
+    arabic:"اَللّٰهُمَّ إِنِّيْ ظَلَمْتُ نَفْسِيْ ظُلْمًا كَثِيْرًا، وَلَا يَغْفِرُ الذُّنُوْبَ إِلَّا أَنْتَ، فَاغْفِرْ لِيْ مَغْفِرَةً مِنْ عِنْدِكَ، وَارْحَمْنِيْ، إِنَّكَ أَنْتَ الْغَفُوْرُ الرَّحِيْمُ",
+    latin:"Allāhumma innī ẓalamtu nafsī ẓulman kathīrā, wa lā yaghfiru-dh-dhunūba illā anta, faghfir lī maghfiratan min 'indika, warḥamnī, innaka anta-l-Ghafūru-r-Raḥīm.",
+    meaning:"Ya Allah, sesungguhnya aku telah menzalimi diriku sendiri dengan kezaliman yang banyak, dan tidak ada yang mengampuni dosa-dosa selain Engkau. Maka ampunilah aku dengan ampunan dari sisi-Mu, dan sayangilah aku. Sesungguhnya Engkau Maha Pengampun lagi Maha Penyayang.",
+    babak:[
+      {label:"Mengaku", ar:"ظَلَمْتُ نَفْسِيْ ظُلْمًا كَثِيْرًا", lat:"ẓalamtu nafsī ẓulman kathīrā", mean:"Aku menzalimi diriku, banyak sekali", c:1},
+      {label:"Tauhid", ar:"وَلَا يَغْفِرُ الذُّنُوْبَ إِلَّا أَنْتَ", lat:"wa lā yaghfiru-dh-dhunūba illā anta", mean:"Tak ada yang mengampuni dosa kecuali Engkau", c:2},
+      {label:"Memohon", ar:"فَاغْفِرْ لِيْ ... وَارْحَمْنِيْ", lat:"faghfir lī ... warḥamnī", mean:"Maka ampunilah aku ... sayangilah aku", c:3},
+    ]
+  },
+  {
+    id:3, cat:"hadits",
+    audio:"audio/doa-ism-al-azham.mp3",
+    title:"Doa Ism al-A'zham",
+    subtitle:"Setelah Dzikir, Pembuka Doa",
+    theme:"Tauhid & Tawasul",
+    source:"An-Nasa'i, Abu Dawud, Ibnu Majah — shahih",
+    context:"Asal-usulnya dari hadits: seorang sahabat membaca doa ini setelah tasyahud akhir dalam shalat, dan Nabi \u25c9 menegaskan itu adalah Nama Allah yang Teragung. Namun secara praktik yang lebih umum dianjurkan, doa ini justru dibaca setelah dzikir seusai shalat \u2014 sebagai 'kunci pembuka' sebelum memulai rangkaian doa, karena isinya adalah tawasul (perantara pendekatan diri), bukan permintaan spesifik.",
+    arabic:"اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ بِأَنِّيْ أَشْهَدُ أَنَّكَ أَنْتَ اللّٰهُ لَا إِلٰهَ إِلَّا أَنْتَ، اَلْأَحَدُ الصَّمَدُ، الَّذِيْ لَمْ يَلِدْ وَلَمْ يُوْلَدْ، وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+    latin:"Allāhumma innī as'aluka bi'annī ashhadu annaka anta-Llāhu lā ilāha illā anta, al-Aḥadu-ṣ-Ṣamad, alladhī lam yalid wa lam yūlad, wa lam yakun lahu kufuwan aḥad.",
+    meaning:"Ya Allah, sesungguhnya aku memohon kepada-Mu dengan persaksianku bahwa Engkau adalah Allah, tiada Tuhan selain Engkau, Yang Maha Esa, Tempat Bergantung, yang tidak beranak dan tidak diperanakkan, dan tiada sesuatu pun setara dengan-Nya.",
+    babak:[
+      {label:"Tawasul (Pembuka)", ar:"أَسْأَلُكَ بِأَنِّيْ", lat:"as'aluka bi'annī", mean:"Aku memohon kepada-Mu dengan (perantara)...", c:1},
+      {label:"Persaksian Keesaan", ar:"أَشْهَدُ أَنَّكَ أَنْتَ اللّٰهُ لَا إِلٰهَ إِلَّا أَنْتَ", lat:"ashhadu annaka anta-Llāhu lā ilāha illā anta", mean:"Aku bersaksi Engkaulah Allah, tiada Tuhan selain Engkau", c:2},
+      {label:"Penegasan Sifat", ar:"اَلْأَحَدُ الصَّمَدُ ... كُفُوًا أَحَدٌ", lat:"al-Aḥadu-ṣ-Ṣamad ... kufuwan aḥad", mean:"Esa, Tempat bergantung, tiada bandingan (inti Al-Ikhlas)", c:3},
+    ]
+  },
+  {
+    id:4, cat:"quran",
+    audio:"audio/doa-nabi-adam.mp3",
+    title:"Doa Nabi Adam",
+    subtitle:"QS Al-A'raf: 23",
+    theme:"Taubat & Pengakuan",
+    source:"QS. Al-A'raf ayat 23",
+    context:"Doa Nabi Adam & Hawa setelah memakan buah terlarang \u2014 kalimat inilah yang diterima Adam dari Tuhannya (QS 2:37) sehingga taubatnya diterima. Doa taubat pertama dalam sejarah manusia, cikal-bakal pola \u2018mengaku dulu, baru minta\u2019 yang juga dipakai Doa Abu Bakar.",
+    arabic:"رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+    latin:"Rabbanā ẓalamnā anfusanā wa illam taghfir lanā wa tarḥamnā lanakūnanna minal-khāsirīn.",
+    meaning:"Ya Tuhan kami, kami telah menzalimi diri kami sendiri, dan jika Engkau tidak mengampuni kami dan memberi rahmat kepada kami, niscaya kami termasuk orang-orang yang merugi.",
+    babak:[
+      {label:"Mengaku", ar:"ظَلَمْنَا أَنْفُسَنَا", lat:"ẓalamnā anfusanā", mean:"Kami menzalimi diri kami sendiri", c:1},
+      {label:"Syarat / Kerentanan", ar:"وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا", lat:"wa illam taghfir lanā wa tarḥamnā", mean:"Jika Engkau tak mengampuni & merahmati kami", c:2},
+      {label:"Konsekuensi", ar:"لَنَكُونَنَّ مِنَ الْخَاسِرِينَ", lat:"lanakūnanna minal-khāsirīn", mean:"Niscaya kami termasuk orang yang merugi", c:3},
+    ]
+  },
+  {
+    id:5, cat:"quran",
+    audio:"audio/doa-nabi-ibrahim.mp3",
+    title:"Doa Nabi Ibrahim",
+    subtitle:"QS Ibrahim: 40-41",
+    theme:"Keturunan & Shalat",
+    source:"QS. Ibrahim ayat 40-41",
+    context:"Doa penutup dari rangkaian doa panjang Nabi Ibrahim setelah menetap di lembah Makkah bersama keturunannya \u2014 mencakup permohonan untuk diri sendiri, keturunan, dan meluas hingga seluruh orang beriman di Hari Kiamat.",
+    arabic:"رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي رَبَّنَا وَتَقَبَّلْ دُعَاءِ رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+    latin:"Rabbi ij'alnī muqīmaṣ-ṣalāti wa min dhurriyyatī, rabbanā wa taqabbal du'ā'. Rabbanaghfir lī wa liwālidayya wa lil-mu'minīna yawma yaqūmul-ḥisāb.",
+    meaning:"Ya Tuhanku, jadikanlah aku dan sebagian keturunanku orang yang tetap mendirikan shalat. Ya Tuhan kami, perkenankanlah doaku. Ya Tuhan kami, ampunilah aku dan kedua orang tuaku dan semua orang yang beriman pada hari terjadinya hisab.",
+    babak:[
+      {label:"Permohonan Diri & Keturunan", ar:"اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي", lat:"ij'alnī muqīmaṣ-ṣalāti wa min dhurriyyatī", mean:"Jadikan aku & keturunanku pendiri shalat", c:1},
+      {label:"Permohonan Diterima", ar:"رَبَّنَا وَتَقَبَّلْ دُعَاءِ", lat:"rabbanā wa taqabbal du'ā'", mean:"Ya Tuhan kami, terimalah doaku", c:2},
+      {label:"Permohonan Ampunan Meluas", ar:"رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ", lat:"rabbanaghfir lī wa liwālidayya wa lil-mu'minīn", mean:"Ampuni aku, orang tuaku, dan seluruh mukmin", c:3},
+    ]
+  },
+  {
+    id:6, cat:"quran",
+    audio:"audio/doa-nabi-ayub.mp3",
+    title:"Doa Nabi Ayub",
+    subtitle:"QS Al-Anbiya: 83",
+    theme:"Kesabaran dalam Ujian",
+    source:"QS. Al-Anbiya ayat 83",
+    context:"Nabi Ayub diuji sakit fisik parah serta kehilangan harta dan anak-anak bertahun-tahun, tetap bersabar tanpa mengeluh \u2014 hingga akhirnya memanjatkan doa singkat ini. Ini bukan keluhan, melainkan laporan keadaan yang langsung diiringi pujian sifat Allah. Kesabaran Ayub (\u2018shabr Ayyub\u2019) jadi pepatah terkenal.",
+    arabic:"أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ",
+    latin:"Annī massaniyaḍ-ḍurru wa anta arḥamur-rāḥimīn.",
+    meaning:"Sesungguhnya aku telah ditimpa kesengsaraan, dan Engkau adalah Yang Maha Penyayang di antara para penyayang.",
+    babak:[
+      {label:"Pengaduan Keadaan (doa terpendek dalam kumpulan ini)", ar:"أَنِّي مَسَّنِيَ الضُّرُّ", lat:"annī massaniyaḍ-ḍurru", mean:"Sesungguhnya aku ditimpa kesengsaraan", c:1},
+      {label:"Pengakuan Sifat Allah", ar:"وَأَنتَ أَرْحَمُ الرَّاحِمِينَ", lat:"wa anta arḥamur-rāḥimīn", mean:"Dan Engkau Yang Maha Penyayang di antara para penyayang", c:2},
+    ]
+  },
+  {
+    id:7, cat:"quran",
+    audio:"audio/doa-nabi-musa.mp3",
+    title:"Doa Nabi Musa",
+    subtitle:"QS Thaha: 25-28",
+    theme:"Kelapangan Hati",
+    source:"QS. Thaha ayat 25-28",
+    context:"Dipanjatkan Musa saat diperintahkan menghadap Fir'aun \u2014 penguasa paling kejam pada masanya. Musa memiliki kesulitan bicara sejak kecil, sehingga memohon kelapangan hati sekaligus kefasihan lisan sebelum mengemban tugas berat ini.",
+    arabic:"رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي يَفْقَهُوا قَوْلِي",
+    latin:"Rabbi-shraḥ lī ṣadrī, wa yassir lī amrī, waḥlul 'uqdatam-mil-lisānī, yafqahū qawlī.",
+    meaning:"Ya Tuhanku, lapangkanlah untukku dadaku, mudahkanlah untukku urusanku, dan lepaskanlah simpul dari lisanku, agar mereka mengerti perkataanku.",
+    babak:[
+      {label:"Permohonan Kelapangan Hati", ar:"اشْرَحْ لِي صَدْرِي", lat:"ishraḥ lī ṣadrī", mean:"Lapangkan dadaku", c:1},
+      {label:"Permohonan Kemudahan Urusan", ar:"وَيَسِّرْ لِي أَمْرِي", lat:"wa yassir lī amrī", mean:"Mudahkan urusanku", c:2},
+      {label:"Permohonan Kefasihan Lisan", ar:"وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي يَفْقَهُوا قَوْلِي", lat:"waḥlul 'uqdatam-mil-lisānī, yafqahū qawlī", mean:"Lepaskan simpul lisanku, agar mereka paham perkataanku", c:3},
+    ]
+  },
+  {
+    id:8, cat:"quran",
+    audio:"audio/doa-nabi-yunus.mp3",
+    title:"Doa Nabi Yunus",
+    subtitle:"QS Al-Anbiya: 87 (Doa Dzun Nun)",
+    theme:"Tauhid & Kegundahan",
+    source:"QS. Al-Anbiya ayat 87 — Nabi \u25c9 bersabda doa ini tak pernah dibaca muslim dalam kesulitan apapun kecuali dikabulkan (HR. Tirmidzi, shahih)",
+    context:"Dipanjatkan Nabi Yunus dalam tiga lapis kegelapan sekaligus: perut ikan, dasar laut, dan malam hari \u2014 setelah pergi meninggalkan kaumnya tanpa izin Allah. \u2018Dzun Nun\u2019 artinya pemilik/sahabat ikan besar, julukan beliau.",
+    arabic:"لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ",
+    latin:"Lā ilāha illā anta subḥānaka innī kuntu minaẓ-ẓālimīn.",
+    meaning:"Tiada Tuhan selain Engkau, Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.",
+    babak:[
+      {label:"Tauhid", ar:"لَا إِلَٰهَ إِلَّا أَنتَ", lat:"lā ilāha illā anta", mean:"Tiada Tuhan selain Engkau", c:1},
+      {label:"Tasbih", ar:"سُبْحَانَكَ", lat:"subḥānaka", mean:"Maha Suci Engkau", c:2},
+      {label:"Pengakuan (di akhir — kebalikan pola lain)", ar:"إِنِّي كُنتُ مِنَ الظَّالِمِينَ", lat:"innī kuntu minaẓ-ẓālimīn", mean:"Aku termasuk orang-orang yang zalim", c:3},
+    ]
+  },
+  {
+    id:9, cat:"quran",
+    audio:"audio/doa-rasikhun.mp3",
+    title:"Doa Rāsikhūn fil-'Ilm",
+    subtitle:"QS Ali 'Imran: 8",
+    theme:"Keteguhan Hati",
+    source:"QS. Ali 'Imran ayat 8",
+    context:"Doa orang-orang yang teguh ilmunya, sebagai kontras dari orang yang hatinya condong ke arah sesat. Abu Bakar membacanya sebagai qunut di masa krisis kemurtadan sepeninggal Nabi \u25c9.",
+    arabic:"رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً إِنَّكَ أَنتَ الْوَهَّابُ",
+    latin:"Rabbanā lā tuzigh qulūbanā ba'da idz hadaytanā wa hab lanā min ladunka raḥmah, innaka anta-l-Wahhāb.",
+    meaning:"Ya Tuhan kami, janganlah Engkau condongkan hati kami kepada kesesatan setelah Engkau beri petunjuk kepada kami, dan karuniakanlah kepada kami rahmat dari sisi-Mu; sesungguhnya Engkau-lah Maha Pemberi.",
+    babak:[
+      {label:"Permohonan Jaga Hati", ar:"لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا", lat:"lā tuzigh qulūbanā ba'da idz hadaytanā", mean:"Jangan condongkan hati kami setelah Kau beri hidayah", c:1},
+      {label:"Permohonan Rahmat", ar:"وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً", lat:"wa hab lanā min ladunka raḥmah", mean:"Karuniakan rahmat dari sisi-Mu", c:2},
+      {label:"Tauhid / Sifat Penutup", ar:"إِنَّكَ أَنتَ الْوَهَّابُ", lat:"innaka anta-l-Wahhāb", mean:"Sesungguhnya Engkau Maha Pemberi", c:3},
+    ]
+  },
+  {
+    id:10, cat:"quran",
+    audio:"audio/doa-orang-bertakwa.mp3",
+    title:"Doa Orang Bertakwa",
+    subtitle:"QS Ali 'Imran: 16",
+    theme:"Istighfar & Tauhid",
+    source:"QS. Ali 'Imran ayat 16",
+    context:"Bagian dari ciri-ciri muttaqīn (orang bertakwa) yang dijanjikan surga. Bentuk kata kerja present tense menunjukkan mereka terus memperbarui permohonan ampun ini.",
+    arabic:"رَبَّنَا إِنَّنَا آمَنَّا فَاغْفِرْ لَنَا ذُنُوبَنَا وَقِنَا عَذَابَ النَّارِ",
+    latin:"Rabbanā innanā āmannā faghfir lanā dhunūbanā wa qinā 'adzāban-nār.",
+    meaning:"Ya Tuhan kami, sesungguhnya kami telah beriman, maka ampunilah dosa-dosa kami dan peliharalah kami dari siksa neraka.",
+    babak:[
+      {label:"Pengakuan", ar:"إِنَّنَا آمَنَّا", lat:"innanā āmannā", mean:"Sesungguhnya kami telah beriman", c:1},
+      {label:"Permohonan Ampun", ar:"فَاغْفِرْ لَنَا ذُنُوبَنَا", lat:"faghfir lanā dhunūbanā", mean:"Maka ampunilah dosa-dosa kami", c:2},
+      {label:"Permohonan Jaga Neraka", ar:"وَقِنَا عَذَابَ النَّارِ", lat:"wa qinā 'adzāban-nār", mean:"Peliharalah kami dari siksa neraka", c:3},
+    ]
+  },
+  {
+    id:11, cat:"quran",
+    audio:"audio/doa-ulul-albab.mp3",
+    title:"Doa Ulul Albab",
+    subtitle:"QS Ali 'Imran: 191–194",
+    theme:"Tafakur & Harapan",
+    source:"QS. Ali 'Imran ayat 191–194 (penutup surat)",
+    context:"Alur pikir Ulul Albab (orang berakal): tafakur alam \u2192 iman & makrifat \u2192 doa & munajat. Empat ayat ini adalah salah satu penutup doa terindah dalam Al-Qur'an.",
+    arabic:"رَبَّنَا مَا خَلَقْتَ هَٰذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ. رَبَّنَا إِنَّكَ مَن تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ. رَبَّنَا إِنَّنَا سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ أَنْ آمِنُوا بِرَبِّكُمْ فَآمَنَّا. رَبَّنَا وَآتِنَا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ",
+    latin:"Rabbanā mā khalaqta hādzā bāṭilā, subḥānaka fa qinā 'adzāban-nār. Rabbanā innaka man tudkhili-n-nāra faqad akhzaytah. Rabbanā innanā sami'nā munādiyan yunādī lil-īmāni an āminū bi-rabbikum fa āmannā. Rabbanā wa ātinā mā wa'attanā 'alā rusulika wa lā tukhzinā yawma-l-qiyāmah.",
+    meaning:"Ya Tuhan kami, tidaklah Engkau menciptakan semua ini sia-sia. Ya Tuhan kami, siapa yang Engkau masukkan ke neraka sungguh telah Kau hinakan. Ya Tuhan kami, kami mendengar penyeru kepada iman lalu kami beriman. Ya Tuhan kami, berikanlah janji-Mu dan jangan hinakan kami di hari kiamat.",
+    babak:[
+      {label:"Renungan Alam (191)", ar:"مَا خَلَقْتَ هَٰذَا بَاطِلًا سُبْحَانَكَ", lat:"mā khalaqta hādzā bāṭilā, subḥānaka", mean:"Ciptaan-Mu tidak sia-sia, Maha Suci Engkau", c:1},
+      {label:"Takut Neraka (192)", ar:"مَن تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ", lat:"man tudkhili-n-nāra faqad akhzaytah", mean:"Siapa dimasukkan neraka, sungguh terhina", c:4},
+      {label:"Kesaksian Iman (193)", ar:"سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ فَآمَنَّا", lat:"sami'nā munādiyan yunādī lil-īmāni fa āmannā", mean:"Kami dengar penyeru iman, lalu kami beriman", c:2},
+      {label:"Harap Janji Allah (194)", ar:"آتِنَا مَا وَعَدتَّنَا ... وَلَا تُخْزِنَا", lat:"ātinā mā wa'attanā ... wa lā tukhzinā", mean:"Penuhi janji-Mu, jangan hinakan kami", c:3},
+    ]
+  },
+  {
+    id:12, cat:"quran",
+    audio:"audio/doa-sapu-jagat.mp3",
+    title:"Doa Sapu Jagat",
+    subtitle:"QS Al-Baqarah: 201",
+    theme:"Permohonan Menyeluruh",
+    source:"QS. Al-Baqarah ayat 201 — doa paling sering dibaca Nabi \u25c9 (Bukhari-Muslim, dari Anas bin Malik)",
+    context:"Disebut \u2018doa sapu jagat\u2019 karena mencakup semua kebaikan sekaligus: dunia, akhirat, dan perlindungan neraka. Nabi \u25c9 pernah menegur seorang sahabat sakit parah yang berdoa minta disegerakan azab akhiratnya di dunia, lalu mengajarkan doa ini sebagai gantinya \u2014 orang itu pun sembuh.",
+    arabic:"رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+    latin:"Rabbanā ātinā fid-dunyā ḥasanah, wa fil-ākhirati ḥasanah, wa qinā 'adzāban-nār.",
+    meaning:"Ya Tuhan kami, berikanlah kepada kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami dari siksa neraka.",
+    babak:[
+      {label:"Permohonan Dunia", ar:"آتِنَا فِي الدُّنْيَا حَسَنَةً", lat:"ātinā fid-dunyā ḥasanah", mean:"Berikan kami kebaikan di dunia", c:1},
+      {label:"Permohonan Akhirat", ar:"وَفِي الْآخِرَةِ حَسَنَةً", lat:"wa fil-ākhirati ḥasanah", mean:"Dan kebaikan di akhirat", c:2},
+      {label:"Permohonan Perlindungan", ar:"وَقِنَا عَذَابَ النَّارِ", lat:"wa qinā 'adzāban-nār", mean:"Dan peliharalah kami dari siksa neraka", c:3},
+    ]
+  },
+
+];
+
+let hafalStatus = {};
+let currentQuizMode = false;
+
+async function loadProgress(){
+  try{
+    const res = await window.storage.get('hafal-status');
+    if(res && res.value){ hafalStatus = JSON.parse(res.value); }
+  }catch(e){ hafalStatus = {}; }
+  renderHome();
+}
+
+async function saveProgress(){
+  try{ await window.storage.set('hafal-status', JSON.stringify(hafalStatus)); }
+  catch(e){ console.warn('Gagal menyimpan progres', e); }
+}
+
+function progressCount(){
+  return DATA.filter(d => hafalStatus[d.id]).length;
+}
+
+function renderStarRing(){
+  const total = DATA.length, done = progressCount();
+  const pct = done/total;
+  const r = 18, cx=23, cy=23;
+  const circumference = 2*Math.PI*r;
+  const offset = circumference * (1-pct);
+  const svg = document.getElementById('starRing');
+  svg.innerHTML = `
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(154,161,196,0.2)" stroke-width="4"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#D8B876" stroke-width="4"
+      stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+      stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"
+      style="transition: stroke-dashoffset .4s ease"/>
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#F1ECDD">${done}/${total}</text>
+  `;
+  document.getElementById('progressVal').textContent = `${done} / ${total} doa`;
+}
+
+function renderHome(){
+  renderStarRing();
+  document.getElementById('doaCount').textContent = DATA.length;
+  const list = document.getElementById('homeList');
+  list.innerHTML = DATA.map((d,i) => `
+    <div class="doa-card" onclick="openDetail(${i})">
+      <div class="doa-card-top">
+        <span class="doa-index">${String(i+1).padStart(2,'0')} · ${d.subtitle}${d.audio ? ' <span class=\'audio-badge\'>&#9835; audio</span>' : ''}</span>
+        <span class="doa-dot ${hafalStatus[d.id] ? 'hafal':''}"></span>
+      </div>
+      <div class="doa-title">${d.title}</div>
+      <div class="doa-arabic-snip">${d.arabic.split('،')[0].split('.')[0]}</div>
+      <span class="tag">${d.theme}</span>
+    </div>
+  `).join('');
+}
+
+function openDetail(i){
+  const d = DATA[i];
+  currentQuizMode = false;
+  const inner = document.getElementById('detailInner');
+  inner.innerHTML = `
+    <button class="back-btn" onclick="closeDetail()">&larr; Kembali</button>
+    <div class="detail-meta"><span class="tag">${d.subtitle}</span><span class="tag">${d.theme}</span></div>
+    <div class="detail-title">${d.title}</div>
+    <div class="source-line">Sumber: ${d.source}</div>
+
+    <div class="arabic-block" id="arabicBlock">
+      <div class="arabic">${d.arabic}</div>
+    </div>
+
+    ${d.audio ? `
+    <div class="audio-player">
+      <div class="audio-play-btn" id="audioPlayBtn" onclick="toggleAudio()">&#9658;</div>
+      <div class="audio-body">
+        <div class="audio-label">Dengarkan Bacaan</div>
+        <div class="audio-track" id="audioTrack" onclick="seekAudio(event)">
+          <div class="audio-fill" id="audioFill"></div>
+        </div>
+        <div class="audio-times">
+          <span id="audioCur">0:00</span>
+          <span id="audioDur">0:00</span>
+        </div>
+      </div>
+    </div>
+    <audio id="doaAudioEl" preload="metadata" playsinline webkit-playsinline="true" style="display:none"></audio>
+    ` : ''}
+
+    <div class="chip-row">
+      <button class="chip" id="chipLatin" onclick="toggleBox('latin')">Latin</button>
+      <button class="chip" id="chipMeaning" onclick="toggleBox('meaning')">Arti</button>
+      <button class="chip" id="chipContext" onclick="toggleBox('context')">Konteks</button>
+    </div>
+
+    <div class="latin-box" id="boxLatin"><span class="box-label">Transliterasi</span>${d.latin}</div>
+    <div class="meaning-box" id="boxMeaning"><span class="box-label">Arti</span>${d.meaning}</div>
+    <div class="context-box" id="boxContext"><span class="box-label">Konteks Sejarah</span>${d.context}</div>
+
+    <div class="section-label">Kerangka ${d.babak.length} Babak</div>
+    ${d.babak.map((b,idx) => `
+      <div class="babak" data-c="${b.c}" onclick="toggleBabak(this)">
+        <div class="babak-head">
+          <div>
+            <span class="babak-num">Babak ${idx+1}</span>
+            <div class="babak-label">${b.label}</div>
+          </div>
+          <span class="chevron">&#9662;</span>
+        </div>
+        <div class="babak-arabic">${b.ar}</div>
+        <div class="babak-latin">${b.lat}</div>
+        <div class="babak-extra">
+          <div class="mean">${b.mean}</div>
+        </div>
+      </div>
+    `).join('')}
+
+    <button class="quiz-toggle" id="quizBtn" onclick="toggleQuiz()">Mode Uji Ingatan</button>
+    <button class="btn-secondary" style="width:100%; text-align:center; margin:0 0 10px; box-sizing:border-box;" onclick="startQuiz(${d.id})">Kuis Pilihan Ganda — Doa Ini Saja</button>
+
+    <div class="hafal-row">
+      <div class="lab">Sudah Hafal
+        <span class="small">Tandai kalau sudah lancar tanpa lihat teks</span>
+      </div>
+      <div class="switch ${hafalStatus[d.id] ? 'on':''}" id="hafalSwitch" onclick="toggleHafal(${d.id})">
+        <div class="knob"></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('detail').classList.add('open');
+  window.scrollTo(0,0);
+  initAudioPlayer(d);
+}
+
+function closeDetail(){
+  stopAudio();
+  document.getElementById('detail').classList.remove('open');
+  renderHome();
+}
+
+function toggleBox(name){
+  const box = document.getElementById('box' + name.charAt(0).toUpperCase()+name.slice(1));
+  const chip = document.getElementById('chip' + name.charAt(0).toUpperCase()+name.slice(1));
+  const isShown = box.style.display === 'block';
+  box.style.display = isShown ? 'none' : 'block';
+  chip.classList.toggle('active', !isShown);
+}
+
+function toggleBabak(el){
+  el.classList.toggle('expanded');
+}
+
+function toggleQuiz(){
+  currentQuizMode = !currentQuizMode;
+  const detail = document.getElementById('detail');
+  detail.classList.toggle('quiz-hide', currentQuizMode);
+  document.getElementById('quizBtn').textContent = currentQuizMode
+    ? 'Tampilkan Jawaban'
+    : 'Mode Uji Ingatan';
+}
+
+function toggleHafal(id){
+  hafalStatus[id] = !hafalStatus[id];
+  document.getElementById('hafalSwitch').classList.toggle('on', hafalStatus[id]);
+  saveProgress();
+  renderStarRing();
+}
+
+// ===== KUIS PILIHAN GANDA =====
+let questionBank = [];
+let quizQueue = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizDoaFilter = null;
+const QUIZ_LENGTH = 8;
+
+function buildQuestionBank(){
+  const bank = [];
+  DATA.forEach(d => {
+    d.babak.forEach(b => {
+      bank.push({ ar: b.ar, lat: b.lat, mean: b.mean, doaId: d.id, doaTitle: d.title, babakLabel: b.label });
+    });
+  });
+  return bank;
+}
+
+function shuffleArr(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function startQuiz(doaId){
+  questionBank = buildQuestionBank();
+  quizDoaFilter = (typeof doaId === 'number') ? doaId : null;
+
+  if(quizDoaFilter !== null){
+    const doaOnly = questionBank.filter(x => x.doaId === quizDoaFilter);
+    quizQueue = doaOnly; // urut sesuai babak, tidak diacak — uji urutan hafalan
+  } else {
+    quizQueue = shuffleArr(questionBank).slice(0, Math.min(QUIZ_LENGTH, questionBank.length));
+  }
+  quizIndex = 0;
+  quizScore = 0;
+  document.getElementById('detail').classList.remove('open');
+  document.getElementById('quiz').classList.add('open');
+  renderQuizQuestion();
+  window.scrollTo(0,0);
+}
+
+function closeQuiz(){
+  document.getElementById('quiz').classList.remove('open');
+}
+
+let quizAttempts = 0;
+const MAX_ATTEMPTS = 2;
+
+function renderQuizQuestion(){
+  const q = quizQueue[quizIndex];
+  quizAttempts = 0;
+  const distractors = shuffleArr(
+    questionBank.filter(x => x.mean !== q.mean)
+  ).slice(0,3).map(x => x.mean);
+  const options = shuffleArr([q.mean, ...distractors]);
+
+  const inner = document.getElementById('quizInner');
+  const modeLabel = quizDoaFilter !== null ? `Kuis: ${q.doaTitle}` : 'Kuis Semua Doa';
+  inner.innerHTML = `
+    <button class="back-btn" onclick="closeQuiz()">&larr; Keluar Kuis</button>
+    <div class="quiz-source-tag">${modeLabel}</div>
+    <div class="quiz-progress">Soal <span class="cur">${quizIndex+1}</span> / ${quizQueue.length} &nbsp;·&nbsp; Skor: ${quizScore}</div>
+    <div class="quiz-source-tag">${q.babakLabel}</div>
+    <div class="quiz-question-box">
+      <div class="arabic">${q.ar}</div>
+      <div class="latin">${q.lat}</div>
+    </div>
+    <div class="quiz-instruction">Pilih arti/makna yang tepat untuk frasa di atas:</div>
+    <div class="quiz-attempts" id="attemptsInfo">Kesempatan tersisa: ${MAX_ATTEMPTS}</div>
+    <div id="optionsWrap">
+      ${options.map(opt => `<button class="option" onclick="answerQuiz(this, '${escapeQuote(opt)}', '${escapeQuote(q.mean)}')">${opt}</button>`).join('')}
+    </div>
+  `;
+}
+
+function escapeQuote(str){
+  return str.replace(/'/g, "\\'");
+}
+
+function answerQuiz(btn, chosen, correct){
+  if(btn.hasAttribute('disabled')) return;
+
+  if(chosen === correct){
+    btn.classList.add('correct');
+    document.querySelectorAll('#optionsWrap .option').forEach(o => o.setAttribute('disabled','true'));
+    quizScore++;
+    setTimeout(goToNextQuestion, 900);
+    return;
+  }
+
+  // jawaban salah
+  quizAttempts++;
+  btn.classList.add('wrong');
+  btn.setAttribute('disabled','true');
+
+  const attemptsInfo = document.getElementById('attemptsInfo');
+  const remaining = MAX_ATTEMPTS - quizAttempts;
+
+  if(quizAttempts >= MAX_ATTEMPTS){
+    // kunci semua opsi, tampilkan jawaban benar
+    document.querySelectorAll('#optionsWrap .option').forEach(o => {
+      o.setAttribute('disabled','true');
+      if(o.textContent === correct){ o.classList.add('correct'); }
+    });
+    attemptsInfo.textContent = 'Kesempatan habis — jawaban benar ditandai hijau';
+    setTimeout(goToNextQuestion, 1300);
+  } else {
+    attemptsInfo.textContent = `Belum tepat, coba lagi. Kesempatan tersisa: ${remaining}`;
+  }
+}
+
+function goToNextQuestion(){
+  quizIndex++;
+  if(quizIndex < quizQueue.length){
+    renderQuizQuestion();
+  } else {
+    renderQuizResult();
+  }
+}
+
+function renderQuizResult(){
+  const total = quizQueue.length;
+  const pct = Math.round((quizScore/total)*100);
+  let msg = 'Terus berlatih, Anda pasti hafal!';
+  if(pct >= 90) msg = 'Mantap — hampir sempurna!';
+  else if(pct >= 70) msg = 'Bagus, tinggal sedikit lagi!';
+  else if(pct >= 40) msg = 'Lumayan, ulangi beberapa babak lagi ya.';
+
+  const inner = document.getElementById('quizInner');
+  inner.innerHTML = `
+    <button class="back-btn" onclick="closeQuiz()">&larr; Keluar Kuis</button>
+    <div class="quiz-result">
+      <div class="score">${quizScore}/${total}</div>
+      <div class="score-label">${msg}</div>
+      <button class="btn-primary" onclick="startQuiz(${quizDoaFilter !== null ? quizDoaFilter : 'null'})">Ulangi Kuis</button>
+      <button class="btn-secondary" onclick="closeQuiz()">Kembali ke Beranda</button>
+    </div>
+  `;
+}
+
+// ===== AUDIO PLAYER =====
+// Menggunakan elemen <audio> native di DOM + file eksternal (bukan base64)
+// supaya reliable di berbagai browser/webview HP dan tidak membengkakkan file HTML.
+
+function formatTime(sec){
+  if(!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec/60);
+  const s = Math.floor(sec%60);
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function getAudioEl(){
+  return document.getElementById('doaAudioEl');
+}
+
+function stopAudio(){
+  const el = getAudioEl();
+  if(el){
+    el.pause();
+    el.removeAttribute('src');
+    el.load();
+  }
+}
+
+function initAudioPlayer(d){
+  if(!d.audio) return;
+  const el = getAudioEl();
+  if(!el) return;
+
+  el.src = d.audio;
+  el.load();
+
+  el.addEventListener('loadedmetadata', () => {
+    const durEl = document.getElementById('audioDur');
+    if(durEl) durEl.textContent = formatTime(el.duration);
+  });
+
+  el.addEventListener('timeupdate', () => {
+    const fill = document.getElementById('audioFill');
+    const cur = document.getElementById('audioCur');
+    if(!fill || !cur) return;
+    const pct = el.duration ? (el.currentTime / el.duration) * 100 : 0;
+    fill.style.width = pct + '%';
+    cur.textContent = formatTime(el.currentTime);
+  });
+
+  el.addEventListener('play', () => {
+    const btn = document.getElementById('audioPlayBtn');
+    if(btn) btn.innerHTML = '&#10074;&#10074;';
+  });
+
+  el.addEventListener('pause', () => {
+    const btn = document.getElementById('audioPlayBtn');
+    if(btn) btn.innerHTML = '&#9658;';
+  });
+
+  el.addEventListener('ended', () => {
+    const fill = document.getElementById('audioFill');
+    if(fill) fill.style.width = '0%';
+    el.currentTime = 0;
+  });
+
+  el.addEventListener('error', () => {
+    const label = document.querySelector('.audio-label');
+    if(label) label.textContent = 'Audio gagal dimuat — pastikan folder audio/ ada di lokasi yang sama dengan file ini';
+  });
+}
+
+function toggleAudio(){
+  const el = getAudioEl();
+  if(!el) return;
+  if(el.paused){
+    const playPromise = el.play();
+    if(playPromise !== undefined){
+      playPromise.catch(() => {
+        const label = document.querySelector('.audio-label');
+        if(label) label.textContent = 'Tidak bisa memutar otomatis — gunakan kontrol audio di bawah';
+      });
+    }
+  } else {
+    el.pause();
+  }
+}
+
+function seekAudio(evt){
+  const el = getAudioEl();
+  if(!el || !el.duration) return;
+  const track = document.getElementById('audioTrack');
+  const rect = track.getBoundingClientRect();
+  const pct = (evt.clientX - rect.left) / rect.width;
+  el.currentTime = Math.max(0, Math.min(1, pct)) * el.duration;
+}
+
+loadProgress();
+</script>
+</body>
+</html>
