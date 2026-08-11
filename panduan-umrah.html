@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Panduan Umrah — 9 Langkah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Karla:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF6EA;
+    --cream-2:#F2E8CE;
+    --ink:#22301F;
+    --ink-soft:#5B6355;
+    --teal-deep:#0D3A34;
+    --teal:#15564C;
+    --gold:#BE9A3F;
+    --gold-light:#E4C877;
+    --gold-dim:#D8CBA0;
+    --line:#DCCE9F;
+    --shadow: 0 10px 24px -12px rgba(13,58,52,0.28);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% 0%, rgba(190,154,63,0.10), transparent 40%),
+      radial-gradient(circle at 88% 8%, rgba(21,86,76,0.10), transparent 45%),
+      var(--cream);
+    font-family:'Karla', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    height:100vh;
+    height:100dvh;
+    background:var(--cream);
+    position:relative;
+    overflow:hidden;
+    box-shadow: 0 0 60px rgba(0,0,0,0.06);
+  }
+
+  .view-home{
+    position:absolute; inset:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    z-index:1;
+    background:var(--cream);
+  }
+
+  .masthead{
+    position:relative;
+    padding:34px 20px 22px;
+    text-align:center;
+    background:linear-gradient(180deg, var(--teal-deep) 0%, var(--teal) 100%);
+    color:var(--cream);
+    border-bottom-left-radius:90px 40px;
+    border-bottom-right-radius:90px 40px;
+  }
+  .masthead .eyebrow{
+    font-size:11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size:34px;
+    line-height:1.05;
+    margin:0 0 6px;
+    letter-spacing:.01em;
+  }
+  .masthead p{
+    margin:0;
+    font-size:12.5px;
+    color:#CFE3DD;
+    font-weight:500;
+  }
+  .arch-deco{
+    position:absolute; top:14px; width:26px; height:26px; opacity:.55;
+  }
+  .arch-deco.left{left:16px;} .arch-deco.right{right:16px;}
+
+  .tasbih-wrap{
+    padding:16px 22px 4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+
+  /* ---------- TABS ---------- */
+  .tabbar{
+    display:flex;
+    gap:8px;
+    padding:14px 16px 4px;
+  }
+  .tab-btn{
+    flex:1;
+    text-align:center;
+    padding:10px 8px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:700;
+    font-family:'Karla',sans-serif;
+    cursor:pointer;
+    border:1.5px solid var(--gold-dim);
+    color:var(--teal-deep);
+    background:transparent;
+    transition:all .2s ease;
+  }
+  .tab-btn.active{
+    background:var(--teal-deep);
+    border-color:var(--teal-deep);
+    color:var(--cream);
+  }
+
+  /* ---------- ZIARAH ---------- */
+  #view-ziarah{padding:6px 16px 32px; display:none;}
+  #view-ziarah.active{display:block;}
+  #view-wisata{padding:6px 16px 32px; display:none;}
+  #view-wisata.active{display:block;}
+  .ziarah-intro{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.55;
+    margin:2px 0 18px;
+  }
+  .ziarah-group-title{
+    font-family:'Cormorant Garamond', serif;
+    font-size:20px;
+    font-weight:700;
+    color:var(--teal-deep);
+    margin:22px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .ziarah-group-title:first-of-type{margin-top:0;}
+  .ziarah-banner{
+    width:100%;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    margin-top:4px;
+    background:linear-gradient(160deg, var(--teal-deep), var(--teal));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .ziarah-banner img{
+    width:100%; height:190px;
+    object-fit:contain;
+    display:block;
+  }
+  .zi-item-img{
+    margin:0 14px 12px;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:linear-gradient(160deg, var(--teal-deep), var(--teal));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .zi-item-img img{
+    width:100%; height:190px; display:block;
+    object-fit:contain;
+  }
+  .zi-lit{padding:0 14px 14px;}
+  .zi-lit-sec{margin-bottom:10px;}
+  .zi-lit-sec:last-child{margin-bottom:0;}
+  .zi-lit-label{
+    display:flex; align-items:center; gap:6px;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin:0 0 4px;
+  }
+  .zi-lit-label.peristiwa{color:var(--teal-deep);}
+  .zi-lit-label.daya-tarik{color:var(--gold);}
+  .zi-lit-label.keutamaan{color:#8B6B1F;}
+  .zi-lit-label .dot{width:5px; height:5px; border-radius:50%; background:currentColor; flex:0 0 auto;}
+  .zi-lit-text{
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink);
+    margin:0;
+  }
+  .zi-lit-sec.keutamaan-box{
+    background:#FFF9EC;
+    border:1px solid var(--gold-dim);
+    border-radius:10px;
+    padding:9px 11px;
+  }
+  .zi-lit-label.tips-kunjungan{color:var(--teal);}
+  .ziarah-group-title .line{
+    flex:1; height:1px; background:var(--line);
+  }
+  .ziarah-item{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:10px;
+    overflow:hidden;
+  }
+  .ziarah-item-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 14px;
+    cursor:pointer;
+  }
+  .ziarah-item-head .zi-icon{
+    width:34px; height:34px; flex:0 0 auto;
+    border-radius:50%;
+    background:var(--teal-deep);
+    color:var(--gold-light);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ziarah-item-head .zi-icon svg{width:17px;height:17px;}
+  .ziarah-item-head h4{
+    margin:0; flex:1;
+    font-family:'Cormorant Garamond', serif;
+    font-size:16px;
+    font-weight:700;
+    color:var(--teal-deep);
+  }
+  .ziarah-item-head .zi-chev{
+    color:var(--gold);
+    transition:transform .2s ease;
+    flex:0 0 auto;
+  }
+  .ziarah-item.open .zi-chev{transform:rotate(90deg);}
+  .ziarah-item-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .28s ease;
+  }
+  .ziarah-item.open .ziarah-item-body{max-height:1400px;}
+  .ziarah-item-body-inner{
+    padding:0 14px 14px 58px;
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .ziarah-note{
+    margin-top:18px;
+    background:#FFF9EC;
+    border:1px solid var(--gold-dim);
+    border-radius:12px;
+    padding:14px 15px;
+    font-size:12px;
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .ziarah-note strong{color:var(--teal-deep);}
+  .bead{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--cream-2);
+    border:1.5px solid var(--gold-dim);
+    transition:all .35s ease;
+    flex-shrink:0;
+  }
+  .bead.done{
+    background:linear-gradient(145deg, var(--gold-light), var(--gold));
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(190,154,63,0.14);
+  }
+  .bead.current{
+    width:20px;height:20px;
+    box-shadow:0 0 0 4px rgba(21,86,76,0.14);
+  }
+  .tasbih-label{
+    text-align:center;
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:.04em;
+    padding-bottom:10px;
+  }
+
+  #view-overview{padding:6px 16px 32px;}
+  .grid{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    margin-top:14px;
+  }
+  .step-row{
+    position:relative;
+    display:flex;
+    align-items:stretch;
+    gap:10px;
+    padding-bottom:14px;
+  }
+  .step-row:last-child{padding-bottom:0;}
+  .step-num-col{
+    flex:0 0 auto;
+    width:32px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .step-num-col .num-circle{
+    width:32px; height:32px;
+    border-radius:50%;
+    background:var(--gold);
+    border:2px solid var(--teal-deep);
+    color:var(--teal-deep);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    font-weight:800;
+    font-family:'Karla',sans-serif;
+    flex:0 0 auto;
+    box-shadow:0 2px 5px rgba(13,58,52,0.28);
+  }
+  .step-num-col.seen .num-circle{
+    background:var(--teal-deep);
+    color:var(--gold-light);
+    border-color:var(--gold);
+  }
+  .step-num-col .dash{
+    width:2px;
+    flex:1;
+    margin-top:4px;
+    background:repeating-linear-gradient(to bottom, var(--gold-dim) 0 5px, transparent 5px 10px);
+  }
+  .step-num-col .arrow{
+    width:0; height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:6px solid var(--gold-dim);
+    margin:-1px auto 0;
+  }
+  .card{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    text-align:left;
+    cursor:pointer;
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+    gap:0;
+    transition:transform .15s ease, box-shadow .15s ease;
+    position:relative;
+    overflow:hidden;
+    flex:1;
+  }
+  .card:active{transform:scale(.98);}
+  .card .icon{
+    width:30px; height:30px;
+    color:var(--teal-deep);
+  }
+  .card.seen .icon{color:var(--gold);}
+  .card .thumb-wrap{
+    position:relative;
+    width:78px;
+    min-width:78px;
+    height:auto;
+    overflow:hidden;
+    background:linear-gradient(160deg, var(--teal-deep), var(--teal));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .card .thumb-wrap img{
+    width:100%; height:100%;
+    object-fit:contain;
+    display:block;
+    filter:saturate(1.02);
+  }
+  .card.seen .thumb-wrap::after{
+    content:'';
+    position:absolute; inset:0;
+    box-shadow: inset 0 0 0 2px var(--gold);
+  }
+  .card .num{
+    top:6px; left:6px; right:auto;
+    background:var(--gold);
+    color:var(--teal-deep);
+    width:22px; height:22px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px;
+    font-weight:800;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .card .card-text{
+    padding:12px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    flex:1;
+  }
+  .card h3{
+    font-family:'Cormorant Garamond', serif;
+    font-size:18px;
+    font-weight:700;
+    margin:0;
+    color:var(--teal-deep);
+    line-height:1.15;
+  }
+  .card p{
+    font-size:11.5px;
+    margin:4px 0 0;
+    color:var(--ink-soft);
+    line-height:1.35;
+  }
+  .card .chevron{
+    display:flex;
+    align-items:center;
+    padding-right:12px;
+    color:var(--gold);
+    opacity:.7;
+  }
+  .footer-note{
+    margin-top:22px;
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    padding:0 12px;
+  }
+  .footer-note .divider{
+    width:36px;height:2px;background:var(--gold);
+    margin:14px auto;border-radius:2px;
+  }
+  .credit-line{
+    margin-top:18px;
+    text-align:center;
+    font-size:10px;
+    letter-spacing:.03em;
+    color:var(--gold-dim);
+    padding:0 12px 4px;
+  }
+  .credit-line b{
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+
+  #view-detail{
+    position:absolute; inset:0;
+    background:var(--cream);
+    transform:translateX(100%);
+    transition:transform .32s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    z-index:5;
+  }
+  #view-detail.active{transform:translateX(0);}
+
+  .detail-top{
+    background:linear-gradient(180deg, var(--teal-deep), var(--teal));
+    color:var(--cream);
+    padding:16px 18px 26px;
+    border-bottom-left-radius:34px;
+    border-bottom-right-radius:34px;
+    position:relative;
+  }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.22);
+    color:var(--cream);
+    border-radius:20px;
+    padding:6px 14px 6px 10px;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Karla',sans-serif;
+  }
+  .detail-top .step-tag{
+    margin-top:18px;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    font-weight:700;
+  }
+  .detail-top h2{
+    font-family:'Cormorant Garamond', serif;
+    font-size:30px;
+    font-weight:700;
+    margin:4px 0 2px;
+    line-height:1.1;
+  }
+  .detail-top .sub{
+    font-size:12.5px;
+    color:#CFE3DD;
+  }
+  .detail-icon{
+    position:absolute; right:18px; top:16px;
+    width:44px;height:44px;
+    color:var(--gold-light);
+    opacity:.9;
+  }
+
+  .hero-wrap{
+    margin:16px 20px 0;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    background:linear-gradient(160deg, var(--teal-deep), var(--teal));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .hero-wrap img{
+    width:100%; height:220px;
+    object-fit:contain;
+    display:block;
+  }
+
+  .detail-body{padding:20px 20px 36px;}
+  .section-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 8px;
+  }
+  .block{margin-bottom:22px;}
+  .summary-text{
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink);
+    margin:0;
+  }
+  ul.steps-list{
+    margin:0; padding:0; list-style:none;
+  }
+  ul.steps-list li{
+    display:flex; gap:10px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--ink);
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  ul.steps-list li:last-child{border-bottom:none;}
+  ul.steps-list li .dot{
+    flex-shrink:0; margin-top:6px;
+    width:6px;height:6px;border-radius:50%;
+    background:var(--teal);
+  }
+  .dua-box{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold);
+    border-radius:12px;
+    padding:16px 16px 14px;
+  }
+  .dua-arabic{
+    font-family:'Noto Naskh Arabic', serif;
+    font-size:22px;
+    line-height:2;
+    text-align:right;
+    direction:rtl;
+    color:var(--teal-deep);
+    margin:0 0 10px;
+  }
+  .dua-translit{
+    font-size:12.5px;
+    font-style:italic;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+    line-height:1.5;
+  }
+  .dua-id{
+    font-size:12.5px;
+    color:var(--ink);
+    margin:0;
+    line-height:1.5;
+  }
+  .dua-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--gold);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin:0 0 8px;
+  }
+  .dua-box{margin-bottom:12px;}
+  .dua-box:last-child{margin-bottom:0;}
+
+  /* ---------- TAWAF PUTARAN CAROUSEL ---------- */
+  .putaran-carousel{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 14px 16px;
+  }
+  .putaran-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .putaran-nav-btn{
+    width:32px; height:32px;
+    border-radius:50%;
+    background:var(--teal-deep);
+    color:var(--gold-light);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    flex:0 0 auto;
+    border:none;
+  }
+  .putaran-nav-btn.disabled{opacity:.3; pointer-events:none;}
+  .putaran-nav-label{
+    font-family:'Cormorant Garamond', serif;
+    font-size:17px;
+    font-weight:700;
+    color:var(--teal-deep);
+    text-align:center;
+  }
+  .putaran-dots{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-top:12px;
+  }
+  .putaran-dot{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--gold-dim);
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+  .putaran-dot.active{
+    background:var(--gold);
+    width:18px;
+    border-radius:4px;
+  }
+  .putaran-carousel .dua-arabic{font-size:19px; line-height:1.9;}
+  .putaran-carousel .dua-box{margin-bottom:0;}
+  .moment-note{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin:0 0 10px;
+    line-height:1.45;
+  }
+  .tips-box{
+    background:#FFF9EC;
+    border:1px solid var(--gold-dim);
+    border-radius:12px;
+    padding:14px 15px;
+    font-size:12.5px;
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .tips-box strong{color:var(--teal-deep);}
+
+  .larangan-group{margin-bottom:14px;}
+  .larangan-group:last-child{margin-bottom:0;}
+  .larangan-group-label{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--teal-deep);
+    margin:0 0 6px;
+  }
+  .larangan-list{margin:0; padding:0; list-style:none;}
+  .larangan-list li{
+    display:flex; gap:8px;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink);
+    padding:6px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .larangan-list li:last-child{border-bottom:none;}
+  .larangan-list li .x-icon{
+    flex:0 0 auto;
+    width:16px; height:16px;
+    margin-top:1px;
+    color:#B4483B;
+  }
+  .sanksi-item{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-left:4px solid #B4483B;
+    border-radius:10px;
+    padding:11px 13px;
+    margin-bottom:8px;
+    font-size:12.5px;
+    line-height:1.5;
+  }
+  .sanksi-item:last-child{margin-bottom:0;}
+  .sanksi-item .sk-pelanggaran{
+    font-weight:700;
+    color:var(--teal-deep);
+    display:block;
+    margin-bottom:3px;
+  }
+  .sanksi-item.berat{border-left-color:#8B1E1E; background:#FBEDEA;}
+  .sanksi-item.berat .sk-pelanggaran{color:#8B1E1E;}
+
+  .syarat-list{margin:0; padding:0; list-style:none;}
+  .syarat-list li{
+    display:flex; gap:8px;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink);
+    padding:7px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .syarat-list li:last-child{border-bottom:none;}
+  .syarat-list li .check-icon{
+    flex:0 0 auto;
+    width:16px; height:16px;
+    margin-top:1px;
+    color:var(--teal);
+  }
+
+  .map-box{
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--cream-2);
+  }
+  .map-box img{
+    width:100%;
+    display:block;
+  }
+  .map-caption{
+    padding:10px 14px 12px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+
+  .nav-footer{
+    display:flex; gap:10px;
+    padding:6px 20px 30px;
+  }
+  .nav-btn{
+    flex:1;
+    border:1px solid var(--line);
+    background:var(--cream-2);
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Karla',sans-serif;
+  }
+  .nav-btn .lbl{
+    display:block; font-size:10px; color:var(--ink-soft);
+    letter-spacing:.08em; text-transform:uppercase; margin-bottom:2px;
+  }
+  .nav-btn .name{
+    display:block; font-size:13px; font-weight:700; color:var(--teal-deep);
+  }
+  .nav-btn.disabled{opacity:.35; pointer-events:none;}
+  .nav-btn.primary{background:var(--teal-deep); border-color:var(--teal-deep);}
+  .nav-btn.primary .lbl{color:#CFE3DD;}
+  .nav-btn.primary .name{color:var(--cream);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="view-home">
+    <div class="masthead">
+      <svg class="arch-deco left" viewBox="0 0 24 24" fill="none"><path d="M12 2c-4 0-7 3-7 7v11h14V9c0-4-3-7-7-7z" stroke="#E4C877" stroke-width="1.3"/><circle cx="12" cy="9" r="1.4" fill="#E4C877"/></svg>
+      <svg class="arch-deco right" viewBox="0 0 24 24" fill="none"><path d="M12 2c-4 0-7 3-7 7v11h14V9c0-4-3-7-7-7z" stroke="#E4C877" stroke-width="1.3"/><circle cx="12" cy="9" r="1.4" fill="#E4C877"/></svg>
+      <div class="eyebrow">Panduan Ringkas</div>
+      <h1>Urutan Kegiatan<br/>Umrah</h1>
+      <p>9 langkah pelaksanaan — ketuk tiap langkah untuk detail</p>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab-btn active" id="tabUmrah" onclick="switchTab('umrah')">Umrah</div>
+      <div class="tab-btn" id="tabZiarah" onclick="switchTab('ziarah')">Ziarah</div>
+      <div class="tab-btn" id="tabWisata" onclick="switchTab('wisata')">Wisata</div>
+    </div>
+
+    <div class="tasbih-wrap" id="tasbih"></div>
+    <div class="tasbih-label" id="tasbihLabel">0 dari 9 langkah dibuka</div>
+
+    <div id="view-overview">
+      <div class="grid" id="grid"></div>
+      <div class="footer-note">
+        <div class="divider"></div>
+        Semoga Allah menerima umrah kita, mengampuni dosa-dosa kita,<br/>dan memudahkan untuk kembali ke Baitullah.
+      </div>
+      <div class="credit-line">Ide &amp; konten: <b>Chilmar</b> &nbsp;·&nbsp; Dikembangkan bersama <b>Claude</b> &amp; <b>ChatGPT</b></div>
+    </div>
+
+    <div id="view-ziarah">
+      <p class="ziarah-intro">Selain rangkaian umrah, jamaah biasanya juga berkesempatan mengunjungi tempat-tempat bersejarah di Madinah dan Makkah. Kunjungan ini bersifat <strong>sunnah/ziarah</strong>, bukan bagian dari rukun atau wajib umrah, dan tidak terikat urutan waktu tertentu.</p>
+      <div id="ziarahContent"></div>
+      <div class="ziarah-note">
+        <strong>Catatan adab ziarah:</strong> Niatkan ziarah untuk mengambil pelajaran dan mendoakan (bukan meminta kepada yang telah wafat). Ikuti jadwal & tata tertib kunjungan setempat (mis. reservasi Raudhah), jaga ketenangan, dan dahulukan ibadah wajib di Masjidil Haram/Nabawi sebelum kunjungan ziarah.
+      </div>
+    </div>
+
+    <div id="view-wisata">
+      <p class="ziarah-intro">Di sela jadwal ibadah, jemaah umrah Indonesia biasanya juga menyempatkan <strong>city tour</strong> ke beberapa titik wisata umum di Madinah dan Jeddah. Kunjungan ini murni rekreasi dan wawasan &mdash; tidak memiliki nilai ibadah atau keutamaan khusus dalam syariat, berbeda dengan tempat-tempat di tab Ziarah.</p>
+      <div id="wisataContent"></div>
+      <div class="ziarah-note">
+        <strong>Catatan:</strong> Jadwal city tour biasanya ditentukan oleh biro perjalanan dan bersifat opsional/tentatif. Tetap dahulukan ibadah wajib dan istirahat yang cukup sebelum mengikuti agenda wisata tambahan.
+      </div>
+    </div>
+  </div>
+
+  <div id="view-detail">
+    <div class="detail-top">
+      <button class="back-btn" onclick="closeDetail()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Kembali
+      </button>
+      <div class="step-tag" id="detailTag">Langkah 1</div>
+      <h2 id="detailTitle">—</h2>
+      <div class="sub" id="detailSub">—</div>
+    </div>
+    <div class="hero-wrap"><img id="detailHero" src="" alt=""></div>
+    <div class="detail-body">
+      <div class="block">
+        <div class="section-label">Ringkasan</div>
+        <p class="summary-text" id="detailSummary"></p>
+      </div>
+      <div class="block">
+        <div class="section-label">Tata Cara</div>
+        <ul class="steps-list" id="detailSteps"></ul>
+      </div>
+      <div class="block" id="syaratBlock" style="display:none;">
+        <div class="section-label">Syarat Sah Tahallul</div>
+        <ul class="syarat-list" id="syaratContent"></ul>
+      </div>
+      <div class="block" id="duaBlock" style="display:none;">
+        <div class="section-label">Bacaan</div>
+        <div id="duaContainer"></div>
+      </div>
+
+      <div class="block" id="putaranBlock" style="display:none;">
+        <div class="section-label">Bacaan Tawaf Tiap Putaran</div>
+        <div class="putaran-carousel">
+          <div class="putaran-nav">
+            <button class="putaran-nav-btn" id="putaranPrev" onclick="goPutaran(-1)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="putaran-nav-label" id="putaranLabel">Putaran 1 dari 7</div>
+            <button class="putaran-nav-btn" id="putaranNext" onclick="goPutaran(1)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="dua-box">
+            <p class="dua-arabic" id="putaranArabic"></p>
+            <p class="dua-translit" id="putaranTranslit"></p>
+            <p class="dua-id" id="putaranId"></p>
+          </div>
+          <div class="putaran-dots" id="putaranDots"></div>
+        </div>
+      </div>
+
+      <div class="block" id="saiBlock" style="display:none;">
+        <div class="section-label">Bacaan Sa\u2019i Sesuai Posisi</div>
+        <div class="putaran-carousel">
+          <div class="putaran-nav">
+            <button class="putaran-nav-btn" id="saiPrev" onclick="goSai(-1)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="putaran-nav-label" id="saiLabel">Di Bukit Shafa</div>
+            <button class="putaran-nav-btn" id="saiNext" onclick="goSai(1)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <p class="moment-note" id="saiNote"></p>
+          <div class="dua-box">
+            <p class="dua-arabic" id="saiArabic"></p>
+            <p class="dua-translit" id="saiTranslit"></p>
+            <p class="dua-id" id="saiId"></p>
+          </div>
+          <div class="putaran-dots" id="saiDots"></div>
+        </div>
+      </div>
+      <div class="block" id="mapBlock" style="display:none;">
+        <div class="section-label" id="mapLabel">Peta Posisi</div>
+        <div class="map-box">
+          <img id="mapImg" src="" alt="">
+          <div class="map-caption" id="mapCaption"></div>
+        </div>
+      </div>
+
+      <div class="block" id="laranganBlock" style="display:none;">
+        <div class="section-label">Larangan Setelah Niat Ihram</div>
+        <div id="laranganContent"></div>
+      </div>
+
+      <div class="block" id="sanksiBlock" style="display:none;">
+        <div class="section-label">Sanksi (Dam) Jika Dilanggar</div>
+        <div id="sanksiContent"></div>
+      </div>
+      <div class="block">
+        <div class="section-label">Catatan Penting</div>
+        <div class="tips-box" id="detailTips"></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div class="nav-btn" id="prevBtn" onclick="go(-1)">
+        <span class="lbl">Sebelumnya</span>
+        <span class="name" id="prevName">—</span>
+      </div>
+      <div class="nav-btn primary" id="nextBtn" onclick="go(1)">
+        <span class="lbl">Berikutnya</span>
+        <span class="name" id="nextName">—</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ICONS = {
+  shower: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3l2 2M17 3l-2 2M4 8h16M6 8v4a6 6 0 0012 0V8"/><path d="M7 16v2M11 16v3M15 16v2"/></svg>',
+  sign: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21V8M6 8h12l-2 3 2 3H6z"/></svg>',
+  speech: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a8 8 0 11-3.2-6.4M21 3v6h-6"/></svg>',
+  door: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 21V5a1 1 0 011-1h9a1 1 0 011 1v16M5 21h11M9 12h.01"/></svg>',
+  orbit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M12 3a9 9 0 019 9M18 4l1.5-1.5"/></svg>',
+  water: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></svg>',
+  walk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19l5-5M14 5l6 14M9 14l3-4M6 9l3 2"/></svg>',
+  scissors: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><path d="M7.6 7.6L20 20M20 4L7.6 16.4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>'
+};
+
+const IMAGES = [
+  'images_umrah/panel_1.webp',
+  'images_umrah/panel_2.webp',
+  'images_umrah/panel_3.webp',
+  'images_umrah/panel_4.webp',
+  'images_umrah/panel_5.webp',
+  'images_umrah/panel_6.webp',
+  'images_umrah/panel_7.webp',
+  'images_umrah/panel_8.webp',
+  'images_umrah/panel_9.webp'
+];
+
+const MAP_TAWAF = 'images_umrah/map_tawaf.webp';
+
+const MAP_SHALAT = 'images_umrah/map_shalat.webp';
+
+const MAP_SAI = 'images_umrah/map_sai.webp';
+
+const MAP_MIQAT = 'images_umrah/map_miqat.webp';
+
+const MAP_IHRAM = 'images_umrah/map_ihram.webp';
+
+const STEPS = [
+  {
+    icon:'shower', title:'Persiapan Ihram', sub:'Sebelum berangkat ke Miqat',
+    summary:'Bersuci dan berpakaian ihram adalah langkah awal sebelum berniat umrah. Tujuannya menghadap Allah dalam keadaan bersih, sederhana, dan setara, tanpa status maupun jenis pakaian yang membedakan satu jamaah dengan lainnya.',
+    steps:[
+      'Mandi sunnah ihram (boleh dilakukan meski sedang tidak wajib mandi).',
+      'Memotong kuku, merapikan bulu, dan memangkas rambut yang mengganggu.',
+      'Memakai wewangian ke badan (bukan ke kain ihram) sebelum niat diucapkan, ini sunnah.',
+      'Pria: memakai dua lembar kain ihram putih tanpa jahitan (izar dan rida), tidak menutup kepala.',
+      'Wanita: memakai pakaian menutup aurat, wajah dan telapak tangan tetap terbuka.'
+    ],
+    map:{ src: MAP_IHRAM, caption:'Pria: pakai izar (kain bawah) dililit menutup pinggang ke bawah lalu dikencangkan, kemudian rida (kain atas) diselimutkan menutup bahu — tanpa jahitan. Wanita: pakaian muslimah longgar menutup aurat, wajah dan telapak tangan tetap terbuka, tanpa niqab atau sarung tangan; warna tidak harus putih, yang penting sopan.'},
+    tips:'<strong>Catatan:</strong> Larangan ihram (memotong kuku, memakai wangi-wangian di kain, dsb.) baru berlaku setelah niat umrah diucapkan di Miqat, bukan sejak memakai kain ihram.'
+  },
+  {
+    icon:'sign', title:'Miqat & Niat Umrah', sub:'Batas mulai ihram',
+    summary:'Miqat adalah batas geografis yang telah ditetapkan tempat seorang muslim wajib memulai ihram sebelum memasuki tanah suci. Titik miqat berbeda tergantung arah kedatangan jamaah.',
+    steps:[
+      'Kenali titik miqat sesuai jalur kedatangan: Dzul Hulaifah/Bir Ali (dari Madinah), Qarnul Manazil, Yalamlam, Al-Juhfah, atau miqat udara di atas titik tersebut bagi yang naik pesawat.',
+      'Jika memungkinkan, shalat sunnah ihram 2 rakaat sebelum berniat.',
+      'Mengucapkan niat umrah dengan lisan sambil menghadirkan niat di hati.',
+      'Sejak niat diucapkan, seluruh larangan ihram mulai berlaku hingga tahallul.'
+    ],
+    map:{ src: MAP_MIQAT, caption:'5 titik miqat utama sesuai arah kedatangan: Dzul Hulaifah/Bir Ali (dari Madinah), Al-Juhfah/Rabigh (dari Syam, Mesir, Afrika), Qarn al-Manazil/As-Sayl al-Kabir (dari Najd, Thaif, Teluk, Asia), Dhat \u2018Irq (dari Irak), dan Yalamlam (dari Yaman & selatan). Jamaah pesawat umumnya berniat saat mendekati/sejajar titik miqat sesuai arahan pembimbing.'},
+    larangan:{
+      umum:[
+        'Memotong atau mencabut rambut dan bulu badan',
+        'Memotong kuku',
+        'Memakai wangi-wangian (parfum) pada badan atau pakaian ihram setelah niat',
+        'Memburu atau membunuh binatang darat yang halal dimakan',
+        'Melangsungkan akad nikah, melamar, atau menikahkan orang lain',
+        'Bercumbu dengan syahwat (mubasyarah)',
+        'Berhubungan suami istri (jima\u2019)',
+        'Mencabut atau merusak tumbuhan/pepohonan di tanah haram'
+      ],
+      pria:[
+        'Memakai pakaian berjahit yang mengikuti bentuk tubuh (baju, celana, dsb.)',
+        'Menutup kepala dengan sesuatu yang menempel langsung (topi, sorban, dsb.) — payung/tenda yang tidak menempel diperbolehkan'
+      ],
+      wanita:[
+        'Menutup wajah dengan cadar/niqab dan memakai sarung tangan selama ihram'
+      ]
+    },
+    sanksi:[
+      { berat:false, pelanggaran:'Mencukur rambut, memotong kuku, memakai wangi-wangian, memakai pakaian berjahit (pria), atau menutup kepala langsung (pria)', dam:'Dam takhyir (pilih salah satu): menyembelih 1 ekor kambing, atau berpuasa 3 hari, atau bersedekah makanan kepada 6 orang miskin (\u00bd sha\u2019 per orang).' },
+      { berat:false, pelanggaran:'Berburu atau membunuh binatang darat yang halal', dam:'Mengganti dengan hewan ternak yang sepadan (dinilai oleh 2 orang adil), atau senilai itu dalam bentuk makanan untuk fakir miskin, atau berpuasa sesuai takaran makanan.' },
+      { berat:false, pelanggaran:'Mencabut atau merusak tumbuhan di tanah haram', dam:'Mengganti sesuai nilai kerusakan (ditentukan oleh ahlinya) dan disedekahkan.' },
+      { berat:false, pelanggaran:'Bercumbu dengan syahwat tanpa jima\u2019', dam:'Dam seekor kambing, menurut pendapat sebagian ulama.' },
+      { berat:false, pelanggaran:'Melangsungkan akad nikah saat ihram', dam:'Akad nikahnya tidak sah/batal. Tidak ada dam khusus, namun pernikahan perlu diulang setelah ihram selesai.' },
+      { berat:true, pelanggaran:'Berhubungan suami istri (jima\u2019) sebelum tahallul', dam:'Pelanggaran paling berat — umrah menjadi batal dan wajib diqadha (diulang), ditambah wajib membayar dam seekor unta atau yang setara, menurut pendapat mayoritas ulama.' }
+    ],
+    dua:[{ar:'نَوَيْتُ الْعُمْرَةَ وَأَحْرَمْتُ بِهَا لِلّٰهِ تَعَالَى', translit:'Nawaitul umrata wa ahramtu bihaa lillaahi taaalaa', id:'Aku niat umrah dan aku ihram karenanya karena Allah Ta ala.'}],
+    tips:'<strong>Catatan:</strong> Melewati miqat tanpa berihram (misalnya lupa saat di pesawat) berpotensi terkena dam (denda). Pastikan sudah berihram sebelum batas miqat terlampaui.'
+  },
+  {
+    icon:'speech', title:'Talbiyah', sub:'Dzikir sepanjang perjalanan',
+    summary:'Setelah berniat, jamaah dianjurkan memperbanyak bacaan talbiyah secara terus-menerus sepanjang perjalanan menuju Masjidil Haram, sebagai bentuk penghambaan dan kesiapan memenuhi panggilan Allah.',
+    steps:[
+      'Dibaca sejak selesai niat hingga akan memulai tawaf.',
+      'Pria disunnahkan mengeraskan suara; wanita membaca dengan suara lirih.',
+      'Diperbanyak terutama saat perubahan keadaan: naik-turun kendaraan, bertemu rombongan lain, selesai shalat.',
+      'Talbiyah dihentikan tepat sebelum memulai putaran pertama tawaf.'
+    ],
+    dua:[{ar:'لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ',
+      translit:'Labbaik Allaahumma labbaik, labbaika laa syariika laka labbaik, innal hamda wan-niimata laka wal mulk, laa syariika lak',
+      id:'Aku penuhi panggilan-Mu ya Allah, aku penuhi panggilan-Mu. Aku penuhi panggilan-Mu, tiada sekutu bagi-Mu, aku penuhi panggilan-Mu. Sesungguhnya segala puji, nikmat, dan kerajaan adalah milik-Mu, tiada sekutu bagi-Mu.'}],
+    tips:'<strong>Tips:</strong> Hafalkan talbiyah sebelum berangkat agar bisa dibaca dengan khusyuk tanpa perlu melihat teks selama perjalanan.'
+  },
+  {
+    icon:'door', title:'Masuk Masjidil Haram', sub:'Menuju Ka bah',
+    summary:'Memasuki Masjidil Haram dilakukan dengan adab khusus sebagaimana masjid pada umumnya, ditambah kondisi hati yang penuh haru saat pertama kali melihat Ka bah secara langsung.',
+    steps:[
+      'Dianjurkan masuk dengan kaki kanan terlebih dahulu.',
+      'Membaca doa masuk masjid seperti biasa.',
+      'Saat pertama kali melihat Ka bah, dianjurkan berdoa sesuai kebutuhan masing-masing, tidak ada lafaz khusus yang wajib.',
+      'Talbiyah dihentikan tepat ketika akan memulai tawaf di titik sejajar Hajar Aswad.'
+    ],
+    dua:[
+      { label:'Doa masuk Masjidil Haram', ar:'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ', translit:'Allaahummaf-tah lii abwaaba rahmatik', id:'Ya Allah, bukakanlah untukku pintu-pintu rahmat-Mu.' },
+      { label:'Doa ketika melihat Ka\u2019bah', ar:'اللَّهُمَّ زِدْ هَذَا الْبَيْتَ تَشْرِيفًا وَتَعْظِيمًا وَتَكْرِيمًا وَمَهَابَةً، وَزِدْ مَنْ شَرَّفَهُ وَكَرَّمَهُ مِمَّنِ اعْتَمَرَهُ أَوْ حَجَّهُ تَشْرِيفًا وَتَكْرِيمًا وَتَعْظِيمًا وَبِرًّا', translit:'Allaahumma zid haadzal-baita tasyriifan wa ta\u2019zhiiman wa takriiman wa mahaabah, wa zid man syarrafahu wa karramahu mimmani\u2019tamarahu au hajjahu tasyriifan wa takriiman wa ta\u2019zhiiman wa birraa', id:'Ya Allah, tambahkanlah kemuliaan, keagungan, kehormatan, dan kewibawaan pada Baitullah ini. Dan tambahkanlah kemuliaan, kehormatan, keagungan, serta kebaikan kepada orang yang memuliakan dan menghormatinya, di antara mereka yang berumrah atau berhaji.' }
+    ],
+    tips:'<strong>Catatan:</strong> Area sekitar Ka bah bisa sangat padat. Tetap tenang, jaga barang bawaan, dan ikuti arah petugas terutama saat jam-jam ramai. Tidak ada lafaz doa yang wajib saat melihat Ka\u2019bah pertama kali \u2014 boleh berdoa bebas sesuai hajat; doa di atas adalah salah satu yang umum diamalkan.'
+  },
+  {
+    icon:'orbit', title:'Tawaf 7 Putaran', sub:'Mengelilingi Ka bah',
+    summary:'Tawaf adalah mengelilingi Ka bah sebanyak 7 kali berlawanan arah jarum jam, dimulai dan diakhiri sejajar Hajar Aswad, dengan posisi Ka bah selalu berada di sisi kiri tubuh.',
+    steps:[
+      'Mulai putaran pertama sejajar Hajar Aswad; jika mampu, mencium atau menyentuhnya. Jika tidak mampu karena padat, cukup memberi isyarat tangan sambil mengucap Allahu Akbar.',
+      'Pria disunnahkan Idtiba (menyelempangkan kain ihram di bawah ketiak kanan) selama tawaf.',
+      'Pada 3 putaran pertama, pria disunnahkan Raml (berjalan agak cepat dengan langkah pendek), lalu berjalan biasa pada 4 putaran berikutnya.',
+      'Perbanyak dzikir dan doa bebas di setiap putaran sesuai kebutuhan.',
+      'Antara Rukun Yamani dan Hajar Aswad, dianjurkan membaca doa Rabbana atina (lihat bacaan).',
+      'Putaran ketujuh berakhir kembali sejajar Hajar Aswad, tawaf selesai.'
+    ],
+    dua:[{ label:'Doa antara Rukun Yamani \u2013 Hajar Aswad (dibaca tiap putaran)', ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',
+      translit:'Rabbanaa aatina fid-dunyaa hasanah, wa fil-aakhirati hasanah, wa qinaa adzaaban-naar',
+      id:'Ya Tuhan kami, berilah kami kebaikan di dunia dan kebaikan di akhirat, dan lindungilah kami dari siksa neraka.'}],
+    putaranDua:true,
+    map:{ src: MAP_TAWAF, caption:'Posisi mulai/akhir tawaf sejajar Hajar Aswad, Ka\u2019bah selalu di sisi kiri tubuh, arah berlawanan jarum jam. Empat rukun Ka\u2019bah: Rukun Hajar Aswad (1), Rukun Iraqi (2), Rukun Syami (3), dan Rukun Yamani (4) — disunnahkan disentuh jika memungkinkan, tanpa berdesakan.'},
+    tips:'<strong>Tips:</strong> Jika area dekat Ka bah terlalu padat, tawaf boleh dilakukan di lantai atas atau area yang lebih luas, yang wajib adalah mengelilingi Ka bah, bukan berada tepat di dekatnya. Bacaan tiap putaran di atas adalah versi yang umum diamalkan jemaah Indonesia \u2014 tidak wajib dihafal, boleh diganti doa/dzikir bebas sesuai kemampuan.'
+  },
+  {
+    icon:'water', title:'Shalat Sunnah & Zamzam', sub:'Setelah tawaf',
+    summary:'Usai menyelesaikan 7 putaran tawaf, jamaah dianjurkan melaksanakan shalat sunnah 2 rakaat di dekat Maqam Ibrahim, kemudian minum air zamzam sepuasnya.',
+    steps:[
+      'Shalat sunnah 2 rakaat idealnya di belakang Maqam Ibrahim; jika penuh, boleh dilakukan di area mana pun di Masjidil Haram.',
+      'Rakaat pertama dianjurkan membaca surat Al-Kafirun, rakaat kedua Al-Ikhlas (sunnah, bukan wajib).',
+      'Setelah shalat, menuju titik air zamzam dan meminumnya sambil berdiri menghadap kiblat bila memungkinkan.',
+      'Dianjurkan berdoa sesuai keinginan sebelum minum, karena air zamzam diminum sesuai niat peminumnya.'
+    ],
+    dua:[
+      { label:'Contoh doa saat minum air zamzam', ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا وَاسِعًا، وَشِفَاءً مِنْ كُلِّ دَاءٍ', translit:'Allaahumma innii as\u2019aluka \u2018ilman naafi\u2019an, wa rizqan waasi\u2019an, wa syifaa\u2019an min kulli daa\u2019', id:'Ya Allah, sesungguhnya aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang luas, dan kesembuhan dari segala penyakit.' }
+    ],
+    map:{ src: MAP_SHALAT, caption:'Posisi utama shalat sunnah setelah tawaf adalah di belakang Maqam Ibrahim (sejajar dengan Hajar Aswad). Jika area tersebut penuh, boleh shalat di alternatif sekitarnya atau di tempat lain di Masjidil Haram — yang penting jangan mengganggu arus jamaah yang sedang tawaf.'},
+    tips:'<strong>Catatan:</strong> Jika area Maqam Ibrahim terlalu ramai, jangan memaksakan diri berdesakan, keutamaan tempat tidak menggugurkan kewajiban menjaga keselamatan dan ketertiban. Air zamzam diminum sesuai niat peminumnya (HR. Ibnu Majah) \u2014 doa di atas hanya salah satu contoh, silakan berdoa dengan bahasa dan hajat sendiri.'
+  },
+  {
+    icon:'walk', title:'Sa i Shafa-Marwah', sub:'7 kali perjalanan',
+    summary:'Sa i adalah berjalan bolak-balik antara bukit Shafa dan Marwah sebanyak 7 kali, mengenang perjuangan Siti Hajar mencari air untuk putranya, Nabi Ismail AS.',
+    steps:[
+      'Dimulai dari bukit Shafa: menghadap Ka bah, mengucap takbir dan doa, lalu berjalan menuju Marwah, dihitung sebagai putaran ke-1.',
+      'Dari Marwah kembali ke Shafa dihitung putaran ke-2, dan seterusnya secara bergantian.',
+      'Total 7 kali perjalanan, dimulai dari Shafa dan diakhiri di Marwah.',
+      'Di titik yang ditandai lampu/pilar hijau, pria dahulu disunnahkan mempercepat langkah (kini menyesuaikan kondisi lantai/keramaian); wanita berjalan seperti biasa.',
+      'Perbanyak dzikir dan doa bebas sepanjang perjalanan.'
+    ],
+    saiDua:true,
+    map:{ src: MAP_SAI, caption:'1 kali perjalanan = sekali jalan dari Safa ke Marwah atau sebaliknya. Total 7 kali perjalanan bolak-balik di lorong Mas\u2019a, dimulai dari Safa (perjalanan 1, 3, 5, 7 arah ke Marwah) dan diakhiri di Marwah pada perjalanan ke-7.'},
+    tips:'<strong>Tips:</strong> Gunakan alas kaki yang nyaman, jarak Shafa-Marwah cukup panjang dan ditempuh 7 kali. Bawa air minum secukupnya bila diperlukan. Bacaan pada kartu di atas hanya contoh yang umum diamalkan \u2014 boleh diganti doa/dzikir bebas sesuai kemampuan.'
+  },
+  {
+    icon:'scissors', title:'Tahallul', sub:'Mengakhiri ihram',
+    summary:'Tahallul adalah mencukur atau memendekkan rambut setelah sa i selesai di Marwah, sebagai tanda berakhirnya rangkaian ihram umrah.',
+    steps:[
+      'Pria: mencukur habis rambut kepala (halq, lebih afdal) atau memendekkannya secara merata (taqshir).',
+      'Wanita: cukup memotong ujung rambut sepanjang kurang lebih satu ruas jari, dikumpulkan dari beberapa helai.',
+      'Dilakukan setelah sa i selesai di bukit Marwah, tidak perlu kembali ke tempat lain.',
+      'Setelah tahallul, seluruh larangan ihram menjadi halal kembali, rangkaian umrah dinyatakan selesai.'
+    ],
+    syarat:[
+      'Menghilangkan minimal 3 helai rambut kepala (sudah dianggap sah menurut madzhab Syafi i, meski afdalnya mencukur/memendekkan merata).',
+      'Dilakukan setelah sa i selesai (bukan sebelum), sesuai urutan rangkaian umrah.',
+      'Disertai niat tahallul dalam hati, tidak perlu diucapkan dengan lisan.',
+      'Boleh dipotong sendiri, atau dibantu orang lain (petugas/tukang cukur, mahram, suami/istri) — tidak ada ketentuan orang tertentu yang wajib melakukannya, yang penting rambut yang dipotong benar-benar milik jamaah yang berihram.',
+      'Bagi yang berkepala botak/gundul: tetap wajib tahallul, dilakukan dengan isyarat menggerakkan pisau cukur/alat di atas kulit kepala sebanyak 3 kali sambil berniat.'
+    ],
+    dua:[
+      { label:'Takbir sebelum mencukur (3x)', ar:'اللهُ أَكْبَرُ اللهُ أَكْبَرُ اللهُ أَكْبَرُ', translit:'Allaahu akbar, Allaahu akbar, Allaahu akbar', id:'Allah Maha Besar, Allah Maha Besar, Allah Maha Besar.' },
+      { label:'Doa saat rambut mulai dipotong', ar:'اللَّهُمَّ أَثْبِتْ لِي بِكُلِّ شَعْرَةٍ حَسَنَةً، وَامْحُ عَنِّي بِهَا سَيِّئَةً، وَارْفَعْ لِي بِهَا عِنْدَكَ دَرَجَةً', translit:'Allaahumma atsbit lii bikulli sya\u2019ratin hasanatan, wamhu \u2018annii bihaa sayyi\u2019atan, warfa\u2018 lii bihaa \u2018indaka darajah', id:'Ya Allah, tetapkanlah bagiku dengan setiap helai rambut ini satu kebaikan, hapuskanlah dariku satu keburukan dengannya, dan angkatlah untukku satu derajat di sisi-Mu karenanya.' },
+      { label:'Doa untuk yang mencukur/memendekkan', ar:'اللَّهُمَّ اغْفِرْ لِلْمُحَلِّقِينَ وَلِلْمُقَصِّرِينَ', translit:'Allaahummaghfir lil-muhalliqiina wal-muqashshiriin', id:'Ya Allah, ampunilah orang-orang yang mencukur habis rambutnya, dan juga yang memendekkannya.' }
+    ],
+    tips:'<strong>Catatan:</strong> Doa tahallul hukumnya sunnah, bukan syarat sah — tidak membacanya tidak membatalkan tahallul. Pastikan juga mencukur di area yang memang disediakan untuk itu agar potongan rambut tidak mengotori area masjid.'
+  },
+  {
+    icon:'check', title:'Umrah Selesai', sub:'Alhamdulillah',
+    summary:'Setelah tahallul, seluruh rangkaian ibadah umrah telah sempurna. Jamaah kembali diperbolehkan melakukan hal-hal yang sebelumnya dilarang selama ihram.',
+    steps:[
+      'Mengucap syukur atas kelancaran ibadah yang telah dilaksanakan.',
+      'Boleh berganti pakaian biasa dan kembali beraktivitas normal.',
+      'Dianjurkan memperbanyak dzikir, doa, dan shalat sunnah selama masih berada di Masjidil Haram.',
+      'Menjaga kemabruran umrah dengan memperbaiki akhlak dan istiqamah setelah kembali ke tanah air.'
+    ],
+    tips:'<strong>Catatan:</strong> Umrah bisa diulang kapan saja selama berada di Tanah Suci dengan mengambil miqat baru (mis. dari Tan im), namun utamakan memperbanyak ibadah di Masjidil Haram terlebih dahulu.'
+  }
+];
+
+const BANNER_MAKKAH = 'images_umrah/banner_makkah.webp';
+const BANNER_MADINAH = 'images_umrah/banner_madinah.webp';
+const IMG_RAUDHAH = 'images_umrah/img_raudhah.webp';
+
+const IMG_QUBA = 'images_umrah/img_quba.webp';
+const IMG_JABALNUR = 'images_umrah/img_jabalnur.webp';
+
+const IMG_QIBLATAIN = 'images_umrah/img_qiblatain.webp';
+const IMG_JABALTSUR = 'images_umrah/img_jabaltsur.webp';
+const PETA_NABAWI = 'images_umrah/peta_nabawi.webp';
+
+const IMG_BAQI = 'images_umrah/img_baqi.webp';
+const IMG_UHUD = 'images_umrah/img_uhud.webp';
+const IMG_KEBUNKURMA = 'images_umrah/img_kebunkurma.webp';
+
+const IMG_MASJIDJIN = 'images_umrah/img_masjidjin.webp';
+const IMG_JABALRAHMAH = 'images_umrah/img_jabalrahmah.webp';
+
+const TAWAF_PUTARAN = [
+  { ar:'سُبْحَانَ اللهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللهُ وَاللهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيْمِ. اللَّهُمَّ إِيمَانًا بِكَ وَتَصْدِيقًا بِكِتَابِكَ وَوَفَاءً بِعَهْدِكَ وَاتِّبَاعًا لِسُنَّةِ نَبِيِّكَ مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ',
+    translit:'Subhaanallaahi walhamdu lillaahi wa laa ilaaha illallaahu wallaahu akbar, wa laa haula wa laa quwwata illaa billaahil \u2018aliyyil \u2018azhiim. Allaahumma iimaanan bika wa tashdiiqan bikitaabika wa wafaa\u2019an bi\u2018ahdika wattibaa\u2019an lisunnati nabiyyika muhammadin shallallaahu \u2018alaihi wa sallam',
+    id:'Maha Suci Allah, segala puji bagi Allah, tiada Tuhan selain Allah, Allah Maha Besar, tiada daya dan kekuatan kecuali dengan pertolongan Allah Yang Maha Tinggi lagi Maha Agung. Ya Allah, aku bertawaf karena keimanan kepada-Mu, membenarkan kitab-Mu, memenuhi janji-Mu, dan mengikuti sunnah Nabi-Mu Muhammad SAW.' },
+  { ar:'اللَّهُمَّ إِنَّ هَذَا الْبَيْتَ بَيْتُكَ وَالْحَرَمَ حَرَمُكَ وَالْأَمْنَ أَمْنُكَ وَالْعَبْدَ عَبْدُكَ وَأَنَا عَبْدُكَ وَابْنُ عَبْدِكَ وَهَذَا مَقَامُ الْعَائِذِ بِكَ مِنَ النَّارِ فَحَرِّمْ لُحُومَنَا وَبَشَرَتَنَا عَلَى النَّارِ',
+    translit:'Allaahumma inna haadzal-baita baituka wal-harama haramuka wal-amna amnuka wal-\u2018abda \u2018abduka wa ana \u2018abduka wabnu \u2018abdika wa haadzaa maqaamul-\u2018aa\u2019idzi bika minan-naari faharrim luhuumanaa wa basyaratanaa \u2018alan-naar',
+    id:'Ya Allah, sesungguhnya rumah ini adalah rumah-Mu, tanah suci ini adalah tanah suci-Mu, keamanan ini adalah keamanan-Mu, hamba ini adalah hamba-Mu, dan aku adalah hamba-Mu, anak dari hamba-Mu. Ini adalah tempat berlindung kepada-Mu dari api neraka, maka haramkanlah daging dan kulit kami dari api neraka.' },
+  { ar:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الشَّكِّ وَالشِّرْكِ وَالشِّقَاقِ وَالنِّفَاقِ وَسُوءِ الْأَخْلَاقِ وَسُوءِ الْمَنْظَرِ وَالْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ وَالْوَلَدِ. اللَّهُمَّ إِنِّي أَسْأَلُكَ رِضَاكَ وَالْجَنَّةَ، وَأَعُوذُ بِكَ مِنْ سَخَطِكَ وَالنَّارِ',
+    translit:'Allaahumma innii a\u2018uudzubika minasy-syakki wasy-syirki wasy-syiqaaqi wan-nifaaqi wa suu\u2019il akhlaaqi wa suu\u2019il manzhari wal-munqalabi fil-maali wal-ahli wal-walad. Allaahumma innii as\u2019aluka ridhaaka wal-jannata, wa a\u2018uudzubika min sakhathika wan-naar',
+    id:'Ya Allah, aku berlindung kepada-Mu dari keraguan, kesyirikan, perpecahan, kemunafikan, akhlak buruk, pemandangan buruk, dan keburukan dalam harta, keluarga, serta anak. Ya Allah, aku memohon ridha-Mu dan surga, serta berlindung kepada-Mu dari murka-Mu dan api neraka.' },
+  { ar:'اللَّهُمَّ اجْعَلْهُ حَجًّا مَبْرُورًا وَسَعْيًا مَشْكُورًا وَذَنْبًا مَغْفُورًا وَعَمَلًا صَالِحًا مَقْبُولًا وَتِجَارَةً لَنْ تَبُورَ. رَبِّ اغْفِرْ وَارْحَمْ وَتَجَاوَزْ عَمَّا تَعْلَمُ إِنَّكَ أَنْتَ الْأَعَزُّ الْأَكْرَمُ',
+    translit:'Allaahummaj\u2018alhu hajjan mabruuran wa sa\u2018yan masykuuran wa dzanban maghfuuran wa \u2018amalan shaalihan maqbuulaa wa tijaaratan lan tabuur. Rabbighfir warham watajaawaz \u2018ammaa ta\u2018lamu innaka antal-a\u2018azzul-akram',
+    id:'Ya Allah, jadikanlah ini haji/umrah yang mabrur, usaha yang disyukuri, dosa yang diampuni, amal shalih yang diterima, dan perniagaan yang tidak akan merugi. Ya Tuhanku, ampunilah, rahmatilah, dan maafkanlah apa yang Engkau ketahui, sesungguhnya Engkau Maha Mulia lagi Maha Pemurah.' },
+  { ar:'اللَّهُمَّ أَظِلَّنِي تَحْتَ ظِلِّ عَرْشِكَ يَوْمَ لَا ظِلَّ إِلَّا ظِلُّكَ وَلَا بَاقِيَ إِلَّا وَجْهُكَ وَأَسْقِنِي مِنْ حَوْضِ نَبِيِّكَ مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ شُرْبَةً هَنِيئَةً مَرِيئَةً لَا أَظْمَأُ بَعْدَهَا أَبَدًا',
+    translit:'Allaahumma azhillanii tahta zhilli \u2018arsyika yauma laa zhilla illaa zhilluka wa laa baaqiya illaa wajhuka wa asqinii min haudhi nabiyyika muhammadin shallallaahu \u2018alaihi wa sallam syurbatan hanii\u2019atan marii\u2019atan laa azhma\u2019u ba\u2018dahaa abadaa',
+    id:'Ya Allah, naungilah aku di bawah naungan \u2018Arsy-Mu pada hari yang tiada naungan kecuali naungan-Mu, dan tiada yang kekal kecuali wajah-Mu. Berilah aku minum dari telaga Nabi-Mu Muhammad SAW, minuman yang lezat dan menyegarkan, yang setelahnya aku tidak akan haus selamanya.' },
+  { ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ، وَأَعُوذُ بِكَ مِنَ النَّارِ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ. اللَّهُمَّ اجْعَلْنِي مِنْ أَكْرَمِ وَفْدِكَ عَلَيْكَ',
+    translit:'Allaahumma innii as\u2019alukal-jannata wa maa qarraba ilaihaa min qawlin au \u2018amal, wa a\u2018uudzubika minan-naari wa maa qarraba ilaihaa min qawlin au \u2018amal. Allaahummaj\u2018alnii min akrami wafdika \u2018alaik',
+    id:'Ya Allah, aku memohon surga dan segala perkataan atau perbuatan yang mendekatkan kepadanya, dan aku berlindung kepada-Mu dari neraka dan segala perkataan atau perbuatan yang mendekatkan kepadanya. Ya Allah, jadikanlah aku termasuk rombongan yang paling mulia di sisi-Mu.' },
+  { ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ وَرَحْمَتِكَ فَإِنَّهُ لَا يَمْلِكُهَا إِلَّا أَنْتَ. اللَّهُمَّ يَا رَبَّ الْبَيْتِ الْعَتِيقِ أَعْتِقْ رِقَابَنَا وَرِقَابَ آبَائِنَا وَأُمَّهَاتِنَا وَإِخْوَانِنَا وَأَوْلَادِنَا مِنَ النَّارِ يَا ذَا الْجُودِ وَالْكَرَمِ',
+    translit:'Allaahumma innii as\u2019aluka min fadhlika wa rahmatika fa innahu laa yamlikuhaa illaa anta. Allaahumma yaa rabbal-baitil-\u2018atiiq a\u2018tiq riqaabanaa wa riqaaba aabaa\u2019inaa wa ummahaatinaa wa ikhwaaninaa wa aulaadinaa minan-naari yaa dzal-juudi wal-karam',
+    id:'Ya Allah, aku memohon keutamaan dan rahmat-Mu, karena tidak ada yang memilikinya kecuali Engkau. Ya Allah, wahai Tuhan pemilik Baitul \u2018Atiq (Ka\u2019bah), bebaskanlah leher kami, leher ayah-ibu kami, saudara-saudara kami, dan anak-anak kami dari api neraka, wahai Dzat Yang Maha Pemurah lagi Maha Mulia.' }
+];
+
+const SAI_MOMENTS = [
+  { label:'Di Bukit Shafa (Sebelum Mulai)', note:'Dibaca sekali di awal, menghadap Ka\u2019bah, sebelum melangkah menuju Marwah.',
+    ar:'إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ، فَمَنْ حَجَّ الْبَيْتَ أَوِ اعْتَمَرَ فَلَا جُنَاحَ عَلَيْهِ أَنْ يَطَّوَّفَ بِهِمَا، وَمَنْ تَطَوَّعَ خَيْرًا فَإِنَّ اللَّهَ شَاكِرٌ عَلِيمٌ. أَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ',
+    translit:'Innash-shafaa wal-marwata min sya\u2018aa-irillaah, faman hajjal-baita awi\u2019tamara falaa junaaha \u2018alaihi ay-yathawwafa bihimaa, wa man tathawwa\u2018a khairan fa innallaaha syaakirun \u2018aliim. Abda\u2019u bimaa bada\u2019allaahu bih',
+    id:'Sesungguhnya Shafa dan Marwah adalah sebagian dari syiar (tanda kebesaran) Allah. Maka barang siapa berhaji ke Baitullah atau berumrah, tidak ada dosa baginya mengerjakan sa\u2019i antara keduanya. Dan siapa yang dengan kerelaan hati mengerjakan kebajikan, sesungguhnya Allah Maha Mensyukuri lagi Maha Mengetahui. Aku memulai dengan apa yang Allah mulai (yaitu Shafa).' },
+  { label:'Naik ke Shafa / Marwah', note:'Dibaca setiap kali tiba di atas Shafa maupun Marwah (di awal setiap etape), menghadap ke arah Ka\u2019bah.',
+    ar:'اللهُ أَكْبَرُ، اللهُ أَكْبَرُ، اللهُ أَكْبَرُ. لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+    translit:'Allaahu akbar, Allaahu akbar, Allaahu akbar. Laa ilaaha illallaahu wahdahu laa syariika lah, lahul-mulku wa lahul-hamdu yuhyii wa yumiitu wa huwa \u2018alaa kulli syai\u2019in qadiir',
+    id:'Allah Maha Besar, Allah Maha Besar, Allah Maha Besar. Tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya. Bagi-Nya kerajaan dan segala puji, Dia yang menghidupkan dan mematikan, dan Dia Maha Kuasa atas segala sesuatu. (Diulang, disela doa bebas sesuai hajat.)' },
+  { label:'Saat Berjalan Biasa', note:'Sepanjang perjalanan di luar area lampu hijau — perbanyak dzikir dan doa bebas sesuai hajat.',
+    ar:'سُبْحَانَ اللهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ',
+    translit:'Subhaanallaah, walhamdulillaah, wa laa ilaaha illallaah, wallaahu akbar',
+    id:'Maha Suci Allah, segala puji bagi Allah, tiada Tuhan selain Allah, Allah Maha Besar. (Contoh dzikir ringan; boleh diganti istighfar, shalawat, atau doa pribadi.)' },
+  { label:'Di Antara Dua Lampu Hijau', note:'Pria disunnahkan berlari-lari kecil di area ini; wanita tetap berjalan biasa.',
+    ar:'رَبِّ اغْفِرْ وَارْحَمْ وَاعْفُ وَتَكَرَّمْ وَتَجَاوَزْ عَمَّا تَعْلَمُ إِنَّكَ تَعْلَمُ مَا لَا نَعْلَمُ إِنَّكَ أَنْتَ اللهُ الْأَعَزُّ الْأَكْرَمُ',
+    translit:'Rabbighfir warham wa\u2019fu wa takarram, wa tajaawaz \u2018ammaa ta\u2018lam, innaka ta\u2018lamu maa laa na\u2018lam, innaka antallaahul-a\u2018azzul-akram',
+    id:'Ya Tuhanku, ampunilah, sayangilah, maafkanlah, dan bermurah hatilah, serta lampauilah apa yang Engkau ketahui. Sesungguhnya Engkau mengetahui apa yang tidak kami ketahui. Sesungguhnya Engkaulah Allah Yang Maha Mulia lagi Maha Pemurah.' },
+  { label:'Di Marwah (Selesai Putaran ke-7)', note:'Dibaca di akhir, setelah sa\u2019i genap 7 kali perjalanan dan berakhir di Marwah.',
+    ar:'اللَّهُمَّ رَبَّنَا تَقَبَّلْ مِنَّا وَعَافِنَا وَاعْفُ عَنَّا، وَعَلَى طَاعَتِكَ وَشُكْرِكَ أَعِنَّا، وَعَلَى غَيْرِكَ لَا تَكِلْنَا، وَعَلَى الْإِيمَانِ وَالْإِسْلَامِ الْكَامِلِ جَمِيعًا تَوَفَّنَا وَأَنْتَ رَاضٍ عَنَّا',
+    translit:'Allaahumma rabbanaa taqabbal minnaa wa \u2018aafinaa wa\u2019fu \u2018annaa, wa \u2018alaa thaa\u2018atika wa syukrika a\u2018innaa, wa \u2018alaa ghairika laa takilnaa, wa \u2018alal-iimaani wal-islaamil-kaamili jamii\u2018an tawaffanaa wa anta raadhin \u2018annaa',
+    id:'Ya Allah, Tuhan kami, terimalah amal kami, sehatkanlah kami, dan maafkanlah kesalahan kami. Bantulah kami untuk taat dan bersyukur kepada-Mu, dan jangan Engkau jadikan kami bergantung selain kepada-Mu. Wafatkanlah kami dalam iman dan Islam yang sempurna, dan Engkau ridha kepada kami.' }
+];
+
+const IMG_MUSEUMWAHYU = 'images_umrah/img_museumwahyu.webp';
+const IMG_JABALMAGNET = 'images_umrah/img_jabalmagnet.webp';
+const IMG_PERCETAKAN = 'images_umrah/img_percetakan.webp';
+const IMG_ALBALAD = 'images_umrah/img_albalad.webp';
+const IMG_CORNICHE = 'images_umrah/img_corniche.webp';
+const IMG_ALHADA = 'images_umrah/img_alhada.webp';
+const IMG_MAWAR = 'images_umrah/img_mawar.webp';
+const IMG_SYUBRA = 'images_umrah/img_syubra.webp';
+const IMG_SABAH = 'images_umrah/img_sabah.webp';
+
+const ZIARAH_ICONS = {
+  mosque: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/><circle cx="12" cy="5" r="1"/></svg>',
+  garden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21V9M12 9c0-3 2-5 5-5-1 3-2 5-5 5zM12 9C12 6 10 4 7 4c1 3 2 5 5 5z"/><path d="M6 21h12"/></svg>',
+  grave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 21V10a6 6 0 0112 0v11M6 21h12M9 21v-4h6v4"/></svg>',
+  mountain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 20l6-11 4 6 2-3 6 8H3z"/></svg>',
+  cave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 20h20M4 20c0-6 3-11 8-11s8 5 8 11"/><path d="M9 20c0-3 1.5-5 3-5s3 2 3 5"/></svg>',
+  qibla: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l16 8-7 2-2 7-7-17z"/></svg>',
+  palm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22V11M12 11C9 9 6 9 4 7c3-1 6 0 8 3M12 11c3-2 6-2 8-4-3-1-6 0-8 3M12 11c-2-3-2-6-1-9 2 2 3 5 1 9zM12 11c2-3 2-6 1-9-2 2-3 5-1 9z"/></svg>',
+  jin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>',
+  museum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21V11l8-6 8 6v10M8 21v-6h8v6"/><path d="M2 11l10-7 10 7"/></svg>',
+  sevenmosque: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 21h20M4 21v-7l3-3 3 3v7M11 21v-9l3-4 3 4v9M17 21v-6l2-2 2 2v6"/></svg>',
+  magnet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4v7a5 5 0 0010 0V4"/><path d="M7 4h4M13 4h4M7 8h4M13 8h4"/></svg>',
+  print: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="7" rx="1"/><path d="M5 15h14M8 19h8M6 10h12v9H6z"/></svg>',
+  oldtown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V8l4-4 4 4v13M13 21v-9l3-3 3 3v9"/><path d="M7 12h1M7 16h1"/></svg>',
+  wave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M12 4v9"/><circle cx="12" cy="4" r="1.5"/></svg>',
+  gondola: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 6l20 4M2 6l4 3M22 10l-4 2"/><rect x="9" y="10" width="6" height="5" rx="1"/><path d="M10 10V8.5M14 10V9"/></svg>',
+  rose: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M12 12v9M9 15c1-1 2-1 3 0M9 18c1-1 2-1 3 0"/></svg>',
+  palace: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21v-9l8-6 8 6v9M10 21v-6h4v6"/><path d="M8 21v-4M16 21v-4"/></svg>'
+};
+
+const ZIARAH = [
+  { group:'Madinah', banner: BANNER_MADINAH, items:[
+    { icon:'mosque', title:'Masjid Nabawi', img: PETA_NABAWI, desc:'Masjid yang dibangun Rasulullah SAW, tempat shalat berjamaah paling utama kedua setelah Masjidil Haram. Di dalamnya terdapat makam Nabi Muhammad SAW beserta dua sahabat beliau, Abu Bakar dan Umar RA.', lit:{peristiwa:'Dibangun langsung oleh Nabi Muhammad SAW tak lama setelah hijrah ke Madinah (622 M), awalnya sangat sederhana — dinding tanah liat, atap pelepah kurma, tanpa penerangan. Nabi wafat dan dimakamkan di kamar Aisyah RA yang kini menyatu dengan area masjid.', daya_tarik:'Kubah hijau ikonik menandai lokasi makam Nabi, payung raksasa otomatis yang mekar di pelataran saat siang hari, serta arsitektur yang terus diperluas dari generasi ke generasi hingga menjadi salah satu masjid terbesar di dunia.', keutamaan:'Shalat di Masjid Nabawi pahalanya dilipatgandakan 1.000 kali dibanding masjid lain, kecuali Masjidil Haram (hadits shahih riwayat Bukhari-Muslim).'} },
+    { icon:'garden', title:'Raudhah', img: IMG_RAUDHAH, desc:'Area khusus di dalam Masjid Nabawi, antara mimbar dan rumah Nabi, disebut sebagai salah satu "taman surga". Dianjurkan shalat sunnah dan berdoa di sini; saat ini umumnya memerlukan reservasi jadwal kunjungan melalui aplikasi resmi.', lit:{peristiwa:'Area ini merupakan bekas rumah Nabi SAW, tempat beliau biasa mengajar dan menerima para sahabat, terletak persis di antara mimbar dan kamar beliau.', daya_tarik:'Ditandai karpet bermotif berbeda dari area masjid lainnya (umumnya hijau-putih), suasananya selalu padat oleh jamaah yang berebut kesempatan shalat dan berdoa di dalamnya.', keutamaan:'Nabi SAW sendiri menyebutnya sebagai salah satu "taman surga" (raudhatun min riyaadhil jannah) — hadits shahih riwayat Bukhari-Muslim.'} },
+    { icon:'grave', title:'Makam Baqi', img: IMG_BAQI, desc:'Pemakaman utama Madinah, tempat dimakamkannya banyak sahabat Nabi dan sebagian keluarga beliau. Ziarah ke sini dianjurkan untuk mendoakan dan mengambil pelajaran tentang kematian, bukan untuk meminta kepada yang telah wafat.', lit:{peristiwa:'Menjadi pemakaman umum Madinah sejak masa Nabi, tempat dimakamkannya lebih dari sepuluh ribu sahabat — termasuk sebagian istri dan putra-putri Nabi, serta khalifah Utsman bin Affan RA.', daya_tarik:'Nisan-nisannya sangat sederhana tanpa hiasan (sesuai sunnah), berkontras mencolok dengan kemegahan kubah hijau Masjid Nabawi yang berdiri tepat di sampingnya.', keutamaan:'Nabi SAW sendiri biasa berziarah ke Baqi dan mendoakan penghuninya; ziarah kubur dianjurkan untuk mengingatkan kita pada kematian dan kehidupan akhirat.'} },
+    { icon:'mosque', title:'Masjid Quba', img: IMG_QUBA, desc:'Masjid pertama yang dibangun dalam sejarah Islam. Disunnahkan berwudhu dari rumah lalu shalat sunnah 2 rakaat di sini — disebutkan pahalanya setara dengan umrah dalam salah satu hadits.', lit:{peristiwa:'Masjid pertama dalam sejarah Islam — batu pertamanya diletakkan langsung oleh Nabi SAW ketika singgah di Quba dalam perjalanan hijrah, sebelum melanjutkan ke pusat kota Madinah.', daya_tarik:'Kubah putihnya yang khas dan bersih, menjadi salah satu masjid tertua di dunia yang masih berfungsi, dengan suasana yang jauh lebih tenang dibanding Masjid Nabawi yang selalu ramai.', keutamaan:'Shalat 2 rakaat di Masjid Quba disebutkan pahalanya setara dengan satu kali umrah (HR. Ibnu Majah, dinilai hasan oleh At-Tirmidzi).'} },
+    { icon:'qibla', title:'Masjid Qiblatain', img: IMG_QIBLATAIN, desc:'Masjid yang menjadi saksi peristiwa perubahan arah kiblat dari Baitul Maqdis (Yerusalem) ke Ka\u2019bah di Makkah, terjadi saat Nabi sedang mengimami shalat.', lit:{peristiwa:'Di sinilah Nabi SAW sedang mengimami shalat Zhuhur ketika turun wahyu memerintahkan perubahan arah kiblat dari Masjidil Aqsha ke Ka’bah — Nabi langsung berputar arah di tengah shalat, diikuti seluruh jamaah di belakangnya.', daya_tarik:'Memiliki dua mihrab dalam satu bangunan (mengarah ke dua kiblat berbeda) sebagai jejak sejarah, meski kini hanya mihrab ke arah Makkah yang difungsikan untuk shalat.', keutamaan:'Mengingatkan pada ketaatan total para sahabat terhadap perintah Allah — bahkan di tengah pelaksanaan ibadah sekalipun, tanpa keraguan sedikit pun.'} },
+    { icon:'mountain', title:'Jabal Uhud', img: IMG_UHUD, desc:'Bukit lokasi terjadinya Perang Uhud. Di kaki bukit ini dimakamkan para syuhada, termasuk Hamzah bin Abdul Muthalib, paman Nabi yang dijuluki "Singa Allah".', lit:{peristiwa:'Lokasi Perang Uhud (625 M), pertempuran besar kedua umat Islam melawan kaum Quraisy. Pasukan pemanah muslim sempat lengah meninggalkan pos hingga pasukan terdesak balik dan Nabi sendiri terluka.', daya_tarik:'Hamparan pegunungan gersang yang membentang luas, "Jabal Rumat" (bukit pemanah) yang masih bisa dikenali dari kejauhan, dan suasana hening yang mengundang perenungan.', keutamaan:'Nabi SAW bersabda, "Uhud adalah gunung yang mencintai kami dan kami mencintainya." Mengunjunginya mengingatkan pada pengorbanan 70 syuhada Uhud, termasuk Hamzah bin Abdul Muthalib, paman Nabi.'} },
+    { icon:'palm', title:'Kebun Kurma Madinah', img: IMG_KEBUNKURMA, desc:'Perkebunan kurma khas Madinah (termasuk varietas Ajwa) yang umum dikunjungi jamaah — bukan situs ibadah, namun bagian dari pengalaman mengenal Madinah lebih dekat.', lit:{peristiwa:'Madinah dikenal sejak zaman Nabi sebagai kota agrikultur kurma yang subur; beberapa varietas unggul seperti Ajwa disebutkan langsung dalam hadits Nabi.', daya_tarik:'Deretan pohon kurma yang rimbun dan teduh, kesempatan mencicipi serta membeli kurma segar langsung dari kebunnya, dengan suasana yang syahdu dan berbeda dari hiruk-pikuk kota.', keutamaan:'Bukan situs ibadah, namun mengingatkan pada sabda Nabi SAW tentang kurma Ajwa Madinah sebagai penawar racun (HR. Bukhari-Muslim) — bagian dari mengenal sunnah keseharian Nabi.'} },
+    { icon:'sevenmosque', title:'Masajid Sab\u2019ah (7 Masjid)', img: IMG_SABAH, desc:'Kompleks tujuh masjid kecil peninggalan lokasi Perang Khandaq, berdekatan satu sama lain di kaki Jabal Sila\u2019, termasuk Masjid Salman Al-Farisi, Abu Bakar, Umar, Ali, dan Fatimah.', lit:{peristiwa:'Kawasan ini adalah lokasi pertahanan pasukan Muslim saat Perang Khandaq/Perang Parit (627 M), ketika Salman Al-Farisi mengusulkan strategi menggali parit mengelilingi Madinah untuk menahan pasukan gabungan Quraisy dan sekutunya.', daya_tarik:'Tujuh masjid kecil yang berjajar, masing-masing menandai posisi berjaga sahabat tertentu saat perang berlangsung; sebagian sudah direnovasi modern, sebagian tetap sederhana.', keutamaan:'Mengenang strategi pertahanan yang menunjukkan kecerdikan dan kekompakan pasukan Muslim awal, sekaligus keteguhan iman menghadapi kepungan musuh dalam jumlah besar.'} }
+  ]},
+  { group:'Makkah', banner: BANNER_MAKKAH, items:[
+    { icon:'cave', title:'Jabal Nur (Gua Hira)', img: IMG_JABALNUR, desc:'Bukit tempat Gua Hira berada — lokasi Nabi Muhammad SAW menerima wahyu pertama (QS. Al-\u2018Alaq). Pendakian cukup menanjak dan memakan waktu, perlu stamina serta alas kaki yang sesuai.', lit:{peristiwa:'Di Gua Hira inilah, pada malam 17 Ramadhan, Malaikat Jibril pertama kali menyampaikan wahyu (QS. Al-‘Alaq: 1–5) kepada Nabi Muhammad SAW yang sedang berkhalwat, menandai awal masa kenabian.', daya_tarik:'Pendakian menantang sekitar 1–2 jam melalui jalur bebatuan terjal, dengan pemandangan Kota Makkah yang memukau dari ketinggian saat tiba di puncak.', keutamaan:'Bukan ritual ibadah khusus, namun kunjungannya menjadi momen kontemplatif untuk mengenang detik-detik awal turunnya wahyu dan permulaan dakwah Islam.'} },
+    { icon:'cave', title:'Jabal Tsur', img: IMG_JABALTSUR, desc:'Bukit tempat Gua Tsur berada, lokasi persembunyian Nabi Muhammad SAW dan Abu Bakar RA selama tiga hari saat peristiwa hijrah ke Madinah, sebagaimana disebutkan dalam Al-Qur\u2019an (QS. At-Taubah: 40).', lit:{peristiwa:'Tempat Nabi SAW dan Abu Bakar RA bersembunyi selama tiga hari tiga malam dari kejaran kaum Quraisy saat hijrah ke Madinah; Allah melindungi keduanya dengan sarang laba-laba dan sarang burung di mulut gua (QS. At-Taubah: 40).', daya_tarik:'Pendakiannya lebih terjal dan jauh dibanding Jabal Nur (sekitar 2–3 jam), sehingga lebih jarang dikunjungi dan suasananya terasa lebih sunyi serta otentik.', keutamaan:'Kisah di gua ini menjadi teladan tawakal — Nabi menenangkan Abu Bakar dengan firman Allah, "Jangan bersedih, sesungguhnya Allah bersama kita" (QS. At-Taubah: 40).'} },
+    { icon:'jin', title:'Masjid Jin', img: IMG_MASJIDJIN, desc:'Masjid yang dibangun di tempat yang diyakini terkait peristiwa turunnya ayat tentang golongan jin yang mendengarkan bacaan Al-Qur\u2019an Nabi Muhammad SAW (QS. Al-Jin).', lit:{peristiwa:'Terkait peristiwa segolongan jin dari Nashibin yang mendengar Nabi SAW membaca Al-Qur’an lalu beriman dan kembali mendakwahi kaumnya, sebagaimana diabadikan dalam QS. Al-Jin.', daya_tarik:'Ukurannya kecil dan sederhana dibanding masjid-masjid besar lainnya di Makkah, sehingga sering terlewat oleh jamaah yang belum mengetahui keberadaannya.', keutamaan:'Mengingatkan bahwa dakwah dan mukjizat Al-Qur’an menjangkau bukan hanya manusia, tetapi juga alam jin — memperluas pemahaman tentang keagungan wahyu.'} },
+    { icon:'mountain', title:'Jabal Rahmah (Arafah)', img: IMG_JABALRAHMAH, desc:'Bukit di dataran Arafah yang menurut sebagian riwayat menjadi tempat pertemuan Nabi Adam dan Hawa AS. Umumnya dikunjungi jika jadwal ziarah mencakup area Arafah.', lit:{peristiwa:'Menurut sebagian riwayat (bukan hadits shahih, lebih merupakan tradisi lisan), bukit ini diyakini sebagai tempat Nabi Adam AS dan Hawa dipertemukan kembali oleh Allah setelah diturunkan terpisah ke bumi.', daya_tarik:'Tugu putih di puncak bukit menjadi latar foto yang populer, ramai dikunjungi terutama pada musim haji karena letaknya berdekatan dengan Padang Arafah.', keutamaan:'Karena riwayatnya lemah, tidak ada amalan atau doa khusus yang disyariatkan di sini — kunjungannya lebih bersifat historis dan edukatif, bukan ritual ibadah tersendiri.'} },
+    { icon:'museum', title:'Museum Al-Wahyu', img: IMG_MUSEUMWAHYU, desc:'Museum modern di kaki Jabal Nur, diresmikan 2023, menampilkan sejarah turunnya wahyu pertama melalui multimedia interaktif dan replika Gua Hira berskala 1:1.', lit:{peristiwa:'Dibangun untuk mengabadikan momen turunnya wahyu pertama (QS. Al-\u2018Alaq: 1\u20135) kepada Nabi Muhammad SAW di Gua Hira, serta menampilkan perjalanan dakwah Nabi dari Makkah hingga Madinah.', daya_tarik:'Replika Gua Hira skala 1:1 yang bisa dimasuki tanpa perlu mendaki, animasi dan pencahayaan yang menghadirkan suasana kontemplatif, koleksi mushaf kuno, serta pemandu berbahasa Indonesia.', keutamaan:'Alternatif bagi jamaah yang tidak kuat mendaki Jabal Nur, untuk tetap merasakan dan memahami suasana peristiwa turunnya wahyu secara mendalam.'} }
+  ]}
+];
+
+const WISATA = [
+  { group:'Madinah', items:[
+    { icon:'magnet', title:'Jabal Magnet (Wadi Jin)', img: IMG_JABALMAGNET, desc:'Titik jalan di pinggiran Madinah yang terkenal karena fenomena optik unik: mobil yang dimatikan mesinnya tampak "berjalan sendiri" menanjak, akibat ilusi kemiringan jalan.',
+      daya_tarik:'Fenomena yang sering diuji langsung oleh jemaah dengan mobil masing-masing, jadi pengalaman seru dan banyak diabadikan lewat video singkat.',
+      tips:'Bukan situs religius, murni fenomena alam/optik \u2014 kunjungi sekadar sebagai hiburan ringan di sela jadwal ziarah, tidak ada kaitan dengan ibadah.' },
+    { icon:'print', title:'Percetakan Al-Qur\u2019an Raja Fahd', img: IMG_PERCETAKAN, desc:'Kompleks percetakan mushaf Al-Qur\u2019an terbesar di dunia, berlokasi di Madinah, mencetak jutaan eksemplar Al-Qur\u2019an setiap tahun untuk dibagikan gratis ke seluruh dunia.',
+      daya_tarik:'Tur singkat melihat proses pencetakan mushaf dari dekat; banyak jemaah mendapatkan mushaf gratis sebagai oleh-oleh dari sini.',
+      tips:'Kunjungan biasanya perlu dikoordinasikan oleh biro perjalanan karena jadwal terbatas dan memerlukan izin masuk.' }
+  ]},
+  { group:'Jeddah', items:[
+    { icon:'oldtown', title:'Al-Balad (Kota Tua Jeddah)', img: IMG_ALBALAD, desc:'Kawasan kota tua Jeddah berusia lebih dari 2.500 tahun, ditetapkan UNESCO sebagai Situs Warisan Dunia sejak 2014, terkenal dengan rumah-rumah kayu bertingkat bergaya khas Hijaz.',
+      daya_tarik:'Arsitektur unik dengan jendela kayu berukir (rawasheen), gang-gang sempit bersejarah, dan suasana pasar tradisional yang masih hidup.',
+      tips:'Cocok dikunjungi sore/malam hari saat cuaca lebih sejuk; biasanya jadi agenda city tour sebelum kepulangan lewat Jeddah.' },
+    { icon:'wave', title:'Jeddah Corniche & Masjid Terapung', img: IMG_CORNICHE, desc:'Kawasan tepi pantai Laut Merah di Jeddah dengan pemandangan air mancur King Fahd Fountain (salah satu tertinggi di dunia) dan Masjid Ar-Rahma yang tampak "mengapung" di atas air.',
+      daya_tarik:'Pemandangan matahari terbenam di tepi Laut Merah, arsitektur masjid terapung yang ikonik, udara laut yang segar setelah rangkaian ibadah \u2014 dan kabar gembira buat yang kangen kampung halaman, kini ada restoran masakan Indonesia di sekitar Corniche, lengkap dengan bakso.',
+      tips:'Umumnya jadi agenda terakhir sebelum penerbangan pulang, karena letaknya dekat Bandara King Abdulaziz Jeddah. Sekalian jadi kesempatan terakhir menikmati masakan Nusantara sebelum pulang.' }
+  ]},
+  { group:'Thaif', items:[
+    { icon:'gondola', title:'Kereta Gantung Al-Hada', img: IMG_ALHADA, desc:'Kereta gantung (teleferik) sepanjang sekitar 4 km yang menghubungkan puncak Pegunungan Al-Hada dengan lembah di bawahnya, menyajikan pemandangan pegunungan dan lembah Thaif dari ketinggian.',
+      daya_tarik:'Sensasi melintasi jurang dan perbukitan batu khas Arab Saudi yang kontras dengan pemandangan gersang Makkah; di area puncak juga tersedia taman rekreasi dan restoran untuk bersantai.',
+      tips:'Cuaca Thaif jauh lebih sejuk dibanding Makkah/Madinah karena berada di dataran tinggi \u2014 siapkan jaket tipis. Operasional cable car bersifat kondisional tergantung cuaca.' },
+    { icon:'rose', title:'Kebun & Penyulingan Mawar Thaif', img: IMG_MAWAR, desc:'Thaif dikenal sebagai kota penghasil mawar terbaik di Arab Saudi; sebagian hasil penyulingannya bahkan digunakan dalam proses perawatan Ka\u2019bah.',
+      daya_tarik:'Menyaksikan langsung proses penyulingan air mawar secara tradisional, serta berbelanja produk khas seperti minyak wangi, sabun, dan air mawar sebagai oleh-oleh.',
+      tips:'Musim panen mawar biasanya sekitar Maret\u2013Mei, saat kebun terlihat paling semarak; di luar musim itu, tempat penyulingan tetap bisa dikunjungi.' },
+    { icon:'palace', title:'Istana Syubra (Shubra Palace)', img: IMG_SYUBRA, desc:'Istana bersejarah peninggalan awal abad ke-20 yang dulunya menjadi kediaman musim panas keluarga kerajaan, kini berfungsi sebagai museum budaya yang menampilkan arsitektur khas Hijaz.',
+      daya_tarik:'Detail arsitektur kayu dan ukiran khas Arab tempo dulu, koleksi benda peninggalan sejarah, serta suasana istana yang tenang dan teduh.',
+      tips:'Cocok dipadukan dengan kunjungan ke pasar tradisional Thaif (Souk Okaz) di hari yang sama untuk merasakan budaya lokal lebih lengkap.' }
+  ]}
+];
+
+let wisataRendered = false;
+
+function renderWisata(){
+  if(wisataRendered) return;
+  const wrap = document.getElementById('wisataContent');
+  wrap.innerHTML = WISATA.map(g => `
+    <div class="ziarah-group-title">${g.group}<span class="line"></span></div>
+    ${g.items.map((it, idx) => `
+      <div class="ziarah-item" id="ws-${g.group}-${idx}">
+        <div class="ziarah-item-head" onclick="toggleWisata('${g.group}-${idx}')">
+          <div class="zi-icon">${ZIARAH_ICONS[it.icon]}</div>
+          <h4>${it.title}</h4>
+          <div class="zi-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="ziarah-item-body">
+          ${it.img ? `<div class="zi-item-img"><img src="${it.img}" alt="${it.title}" loading="lazy"></div>` : ''}
+          <div class="ziarah-item-body-inner">${it.desc}</div>
+          <div class="zi-lit">
+            <div class="zi-lit-sec">
+              <div class="zi-lit-label daya-tarik"><span class="dot"></span>Daya Tarik</div>
+              <p class="zi-lit-text">${it.daya_tarik}</p>
+            </div>
+            <div class="zi-lit-sec keutamaan-box">
+              <div class="zi-lit-label tips-kunjungan"><span class="dot"></span>Tips Kunjungan</div>
+              <p class="zi-lit-text">${it.tips}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  `).join('');
+  wisataRendered = true;
+}
+
+function toggleWisata(id){
+  const el = document.getElementById('ws-'+id);
+  el.classList.toggle('open');
+}
+
+let ziarahRendered = false;
+
+function renderZiarah(){
+  if(ziarahRendered) return;
+  const wrap = document.getElementById('ziarahContent');
+  wrap.innerHTML = ZIARAH.map(g => `
+    <div class="ziarah-group-title">${g.group}<span class="line"></span></div>
+    ${g.banner ? `<div class="ziarah-banner"><img src="${g.banner}" alt="${g.group}" loading="lazy"></div>` : ''}
+    ${g.items.map((it, idx) => `
+      <div class="ziarah-item" id="zi-${g.group}-${idx}">
+        <div class="ziarah-item-head" onclick="toggleZiarah('${g.group}-${idx}')">
+          <div class="zi-icon">${ZIARAH_ICONS[it.icon]}</div>
+          <h4>${it.title}</h4>
+          <div class="zi-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="ziarah-item-body">
+          ${it.img ? `<div class="zi-item-img"><img src="${it.img}" alt="${it.title}" loading="lazy"></div>` : ''}
+          <div class="ziarah-item-body-inner">${it.desc}</div>
+          ${it.lit ? `
+          <div class="zi-lit">
+            <div class="zi-lit-sec">
+              <div class="zi-lit-label peristiwa"><span class="dot"></span>Peristiwa Bersejarah</div>
+              <p class="zi-lit-text">${it.lit.peristiwa}</p>
+            </div>
+            <div class="zi-lit-sec">
+              <div class="zi-lit-label daya-tarik"><span class="dot"></span>Daya Tarik</div>
+              <p class="zi-lit-text">${it.lit.daya_tarik}</p>
+            </div>
+            <div class="zi-lit-sec keutamaan-box">
+              <div class="zi-lit-label keutamaan"><span class="dot"></span>Keutamaan Mengunjungi</div>
+              <p class="zi-lit-text">${it.lit.keutamaan}</p>
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+    `).join('')}
+  `).join('');
+  ziarahRendered = true;
+}
+
+function toggleZiarah(id){
+  const el = document.getElementById('zi-'+id);
+  el.classList.toggle('open');
+}
+
+function switchTab(tab){
+  const tabs = { umrah: document.getElementById('tabUmrah'), ziarah: document.getElementById('tabZiarah'), wisata: document.getElementById('tabWisata') };
+  const viewOverview = document.getElementById('view-overview');
+  const viewZiarah = document.getElementById('view-ziarah');
+  const viewWisata = document.getElementById('view-wisata');
+
+  Object.values(tabs).forEach(btn => btn.classList.remove('active'));
+  tabs[tab].classList.add('active');
+
+  viewOverview.style.display = tab === 'umrah' ? 'block' : 'none';
+  viewZiarah.classList.toggle('active', tab === 'ziarah');
+  viewWisata.classList.toggle('active', tab === 'wisata');
+
+  if(tab === 'ziarah') renderZiarah();
+  if(tab === 'wisata') renderWisata();
+}
+
+let current = -1;
+let putaranIndex = 0;
+
+function renderPutaran(){
+  const p = TAWAF_PUTARAN[putaranIndex];
+  document.getElementById('putaranLabel').textContent = `Putaran ${putaranIndex+1} dari 7`;
+  document.getElementById('putaranArabic').textContent = p.ar;
+  document.getElementById('putaranTranslit').textContent = p.translit;
+  document.getElementById('putaranId').textContent = p.id;
+  document.getElementById('putaranPrev').classList.toggle('disabled', putaranIndex === 0);
+  document.getElementById('putaranNext').classList.toggle('disabled', putaranIndex === TAWAF_PUTARAN.length-1);
+  document.getElementById('putaranDots').innerHTML = TAWAF_PUTARAN.map((_,i)=>
+    `<div class="putaran-dot ${i===putaranIndex?'active':''}" onclick="setPutaran(${i})"></div>`
+  ).join('');
+}
+
+function goPutaran(dir){
+  const next = putaranIndex + dir;
+  if(next < 0 || next >= TAWAF_PUTARAN.length) return;
+  putaranIndex = next;
+  renderPutaran();
+}
+
+function setPutaran(i){
+  putaranIndex = i;
+  renderPutaran();
+}
+
+let saiIndex = 0;
+
+function renderSai(){
+  const m = SAI_MOMENTS[saiIndex];
+  document.getElementById('saiLabel').textContent = m.label;
+  document.getElementById('saiNote').textContent = m.note;
+  document.getElementById('saiArabic').textContent = m.ar;
+  document.getElementById('saiTranslit').textContent = m.translit;
+  document.getElementById('saiId').textContent = m.id;
+  document.getElementById('saiPrev').classList.toggle('disabled', saiIndex === 0);
+  document.getElementById('saiNext').classList.toggle('disabled', saiIndex === SAI_MOMENTS.length-1);
+  document.getElementById('saiDots').innerHTML = SAI_MOMENTS.map((_,i)=>
+    `<div class="putaran-dot ${i===saiIndex?'active':''}" onclick="setSai(${i})"></div>`
+  ).join('');
+}
+
+function goSai(dir){
+  const next = saiIndex + dir;
+  if(next < 0 || next >= SAI_MOMENTS.length) return;
+  saiIndex = next;
+  renderSai();
+}
+
+function setSai(i){
+  saiIndex = i;
+  renderSai();
+}
+const seen = new Set();
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = STEPS.map((s,i)=>`
+    <div class="step-row">
+      <div class="step-num-col ${seen.has(i)?'seen':''}">
+        <div class="num-circle">${i+1}</div>
+        ${i < STEPS.length-1 ? '<div class="dash"></div><div class="arrow"></div>' : ''}
+      </div>
+      <div class="card ${seen.has(i)?'seen':''}" onclick="openDetail(${i})">
+        <div class="thumb-wrap">
+          <img src="${IMAGES[i]}" alt="${s.title}" loading="lazy">
+        </div>
+        <div class="card-text">
+          <h3>${s.title}</h3>
+          <p>${s.sub}</p>
+        </div>
+        <div class="chevron">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTasbih(){
+  const t = document.getElementById('tasbih');
+  t.innerHTML = STEPS.map((s,i)=>`<span class="bead ${seen.has(i)?'done':''} ${i===current?'current':''}"></span>`).join('');
+  document.getElementById('tasbihLabel').textContent = seen.size + ' dari 9 langkah dibuka';
+}
+
+function openDetail(i){
+  current = i;
+  seen.add(i);
+  const s = STEPS[i];
+  document.getElementById('detailTag').textContent = 'Langkah ' + (i+1) + ' dari 9';
+  document.getElementById('detailTitle').textContent = s.title;
+  document.getElementById('detailSub').textContent = s.sub;
+  document.getElementById('detailHero').src = IMAGES[i];
+  document.getElementById('detailHero').alt = s.title;
+  document.getElementById('detailSummary').textContent = s.summary;
+  document.getElementById('detailSteps').innerHTML = s.steps.map(t=>`<li><span class="dot"></span><span>${t}</span></li>`).join('');
+  document.getElementById('detailTips').innerHTML = s.tips;
+
+  const syaratBlock = document.getElementById('syaratBlock');
+  if(s.syarat && s.syarat.length){
+    syaratBlock.style.display = 'block';
+    const checkIcon = '<svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>';
+    document.getElementById('syaratContent').innerHTML = s.syarat.map(t=>`<li>${checkIcon}<span>${t}</span></li>`).join('');
+  } else {
+    syaratBlock.style.display = 'none';
+  }
+
+  const duaBlock = document.getElementById('duaBlock');
+  if(s.dua && s.dua.length){
+    duaBlock.style.display = 'block';
+    document.getElementById('duaContainer').innerHTML = s.dua.map(d => `
+      <div class="dua-box">
+        ${d.label ? `<div class="dua-label">${d.label}</div>` : ''}
+        <p class="dua-arabic">${d.ar}</p>
+        <p class="dua-translit">${d.translit}</p>
+        <p class="dua-id">${d.id}</p>
+      </div>
+    `).join('');
+  } else {
+    duaBlock.style.display = 'none';
+  }
+
+  const putaranBlock = document.getElementById('putaranBlock');
+  if(s.putaranDua){
+    putaranBlock.style.display = 'block';
+    putaranIndex = 0;
+    renderPutaran();
+  } else {
+    putaranBlock.style.display = 'none';
+  }
+
+  const saiBlock = document.getElementById('saiBlock');
+  if(s.saiDua){
+    saiBlock.style.display = 'block';
+    saiIndex = 0;
+    renderSai();
+  } else {
+    saiBlock.style.display = 'none';
+  }
+
+  const mapBlock = document.getElementById('mapBlock');
+  if(s.map){
+    mapBlock.style.display = 'block';
+    document.getElementById('mapImg').src = s.map.src;
+    document.getElementById('mapImg').alt = s.title + ' - peta posisi';
+    document.getElementById('mapCaption').textContent = s.map.caption;
+  } else {
+    mapBlock.style.display = 'none';
+  }
+
+  const laranganBlock = document.getElementById('laranganBlock');
+  if(s.larangan){
+    laranganBlock.style.display = 'block';
+    const L = s.larangan;
+    const xIcon = '<svg class="x-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>';
+    let html = '';
+    if(L.umum && L.umum.length){
+      html += `<div class="larangan-group"><div class="larangan-group-label">Berlaku untuk pria &amp; wanita</div><ul class="larangan-list">${L.umum.map(t=>`<li>${xIcon}<span>${t}</span></li>`).join('')}</ul></div>`;
+    }
+    if(L.pria && L.pria.length){
+      html += `<div class="larangan-group"><div class="larangan-group-label">Khusus pria</div><ul class="larangan-list">${L.pria.map(t=>`<li>${xIcon}<span>${t}</span></li>`).join('')}</ul></div>`;
+    }
+    if(L.wanita && L.wanita.length){
+      html += `<div class="larangan-group"><div class="larangan-group-label">Khusus wanita</div><ul class="larangan-list">${L.wanita.map(t=>`<li>${xIcon}<span>${t}</span></li>`).join('')}</ul></div>`;
+    }
+    document.getElementById('laranganContent').innerHTML = html;
+  } else {
+    laranganBlock.style.display = 'none';
+  }
+
+  const sanksiBlock = document.getElementById('sanksiBlock');
+  if(s.sanksi && s.sanksi.length){
+    sanksiBlock.style.display = 'block';
+    document.getElementById('sanksiContent').innerHTML = s.sanksi.map(sk => `
+      <div class="sanksi-item ${sk.berat ? 'berat' : ''}">
+        <span class="sk-pelanggaran">${sk.pelanggaran}</span>
+        <span>${sk.dam}</span>
+      </div>
+    `).join('');
+  } else {
+    sanksiBlock.style.display = 'none';
+  }
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  if(i>0){ prevBtn.classList.remove('disabled'); document.getElementById('prevName').textContent = STEPS[i-1].title; }
+  else{ prevBtn.classList.add('disabled'); document.getElementById('prevName').textContent = '-'; }
+  if(i<STEPS.length-1){ nextBtn.classList.remove('disabled'); document.getElementById('nextName').textContent = STEPS[i+1].title; }
+  else{ nextBtn.classList.add('disabled'); document.getElementById('nextName').textContent = 'Selesai'; }
+
+  document.getElementById('view-detail').classList.add('active');
+  document.getElementById('view-detail').scrollTop = 0;
+  renderGrid();
+  renderTasbih();
+}
+
+function closeDetail(){
+  document.getElementById('view-detail').classList.remove('active');
+}
+
+function go(dir){
+  const next = current + dir;
+  if(next<0 || next>=STEPS.length) return;
+  openDetail(next);
+}
+
+renderGrid();
+renderTasbih();
+</script>
+</body>
+</html>
