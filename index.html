@@ -4,173 +4,293 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Application Center — Chilmar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1B1F23;
-    --paper:#F6F4EE;
-    --panel:#FFFFFF;
-    --steel:#2E3B45;
+    --bg:#10141A;
+    --bg-grid: rgba(255,255,255,.025);
+    --panel:#171D24;
+    --panel-2:#1C232B;
+    --border:#2A323C;
+    --ink:#E9E6DC;
+    --muted:#8B93A0;
     --amber:#E8A33D;
     --amber-deep:#C9821F;
-    --line:#DCD6C6;
+    --amber-dim:rgba(232,163,61,.14);
+    --cyan:#4FD3C4;
+    --emerald:#2E6B4F;
+    --emerald-bright:#4FAE84;
+    --gold:#C9A24B;
+    --gold-deep:#8A6A22;
+    --gold-dim:rgba(201,162,75,.14);
+  }
+  html[data-theme="light"]{
+    --bg:#F3F1EA;
+    --bg-grid: rgba(27,31,35,.04);
+    --panel:#FFFFFF;
+    --panel-2:#F8F6EF;
+    --border:#DDD7C8;
+    --ink:#1B1F23;
     --muted:#6B7178;
+    --amber:#C9821F;
+    --amber-deep:#A66A17;
+    --amber-dim:rgba(201,130,31,.12);
+    --cyan:#0E8F82;
+    --emerald:#2E6B4F;
+    --emerald-bright:#217A54;
+    --gold:#8A6A22;
+    --gold-deep:#6B5119;
+    --gold-dim:rgba(138,106,34,.12);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
   body{
-    font-family:'Segoe UI',Arial,sans-serif;
-    background:var(--paper);
-    background-image:
-      linear-gradient(180deg, var(--steel) 0px, var(--steel) 210px, transparent 210px),
-      repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 2px, transparent 2px 14px);
+    font-family:'IBM Plex Mono',monospace;
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/28px 100%,
+      var(--bg);
     color:var(--ink);
     min-height:100dvh;
     display:flex;flex-direction:column;align-items:center;
+    transition:background-color .2s ease, color .2s ease;
   }
-  .wrap{width:100%;max-width:520px;padding:0 18px 40px;}
+  .wrap{width:100%;max-width:540px;padding:0 16px 48px;}
+  h1,h2{font-family:'Space Grotesk',sans-serif;}
 
-  header{
-    padding:34px 4px 20px;
-    color:#F6F4EE;
+  /* ===== boot / hud bar ===== */
+  .hud{
+    padding:16px 0 0;
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:.68rem;letter-spacing:.06em;color:var(--muted);
+    gap:10px;
   }
+  .hud .dot{
+    display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--cyan);margin-right:6px;
+    box-shadow:0 0 6px var(--cyan);
+  }
+  .hud .cursor{display:inline-block;width:7px;height:12px;background:var(--amber);margin-left:2px;animation:blink 1.1s steps(1) infinite;vertical-align:-2px;}
+  @keyframes blink{50%{opacity:0;}}
+  @media (prefers-reduced-motion:reduce){ .hud .cursor{animation:none;} }
+
+  .hud-right{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+
+  .theme-toggle{
+    flex:0 0 auto;
+    display:inline-flex;align-items:center;
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+  .theme-toggle button{
+    display:inline-flex;align-items:center;justify-content:center;
+    height:26px;
+    padding:0 10px;
+    background:var(--panel);
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.66rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    transition:background .15s ease, color .15s ease;
+  }
+  .theme-toggle button + button{border-left:1px solid var(--border);}
+  .theme-toggle button.active{background:var(--amber-dim);color:var(--amber);}
+  .theme-toggle button:hover:not(.active){color:var(--ink);}
+  .theme-toggle button:focus-visible{outline:2px solid var(--amber);outline-offset:-2px;}
+
+  /* ===== header ===== */
   .eyebrow{
     display:inline-flex;align-items:center;gap:8px;
-    font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--amber);font-weight:700;
-    border:1px solid rgba(232,163,61,.5);
-    padding:4px 10px;border-radius:999px;
-    margin-bottom:14px;
+    font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+    color:var(--amber);
+    border:1px solid rgba(232,163,61,.45);
+    background:var(--amber-dim);
+    padding:5px 10px;border-radius:3px;
+    margin-bottom:16px;
   }
-  h1{font-size:1.7rem;line-height:1.25;font-weight:800;margin-bottom:6px;}
-  header p{font-size:.9rem;color:#C9D0D6;line-height:1.5;max-width:38ch;}
+  h1{font-size:1.55rem;line-height:1.28;font-weight:700;margin-bottom:10px;color:var(--ink);}
+  header p{font-size:.86rem;color:var(--muted);line-height:1.6;max-width:42ch;font-family:'IBM Plex Mono',monospace;}
 
-  nav.grid{
-    margin-top:-38px;
-    display:flex;flex-direction:column;gap:14px;
+  /* ===== module divider ===== */
+  .module-head{
+    display:flex;align-items:center;gap:10px;
+    margin:34px 0 14px;
   }
+  .module-head .led{width:7px;height:7px;border-radius:50%;flex:0 0 auto;}
+  .module-head .led.amber{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+  .module-head .led.gold{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+  .module-head .line{flex:1;height:1px;background:var(--border);}
+  .module-head .label{
+    font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;
+    white-space:nowrap;color:var(--muted);
+  }
+  .module-head .label b{color:var(--ink);font-weight:600;}
+
+  /* ===== app cards ===== */
+  nav.grid{display:flex;flex-direction:column;gap:12px;}
 
   a.card{
+    position:relative;
     display:flex;gap:14px;align-items:flex-start;
     background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:16px;
+    border:1px solid var(--border);
+    padding:15px 16px;
+    min-height:128px;
     text-decoration:none;color:var(--ink);
-    box-shadow:0 10px 24px -14px rgba(27,31,35,.35);
-    transition:transform .15s ease, box-shadow .15s ease;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
   }
-  a.card:active{transform:translateY(1px) scale(.99);}
-  a.card:focus-visible{outline:3px solid var(--amber);outline-offset:2px;}
+  a.card:active{transform:translateY(1px);}
+  a.card:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
 
-  .icon{
-    flex:0 0 auto;
-    width:52px;height:52px;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.5rem;
-    background:linear-gradient(160deg, var(--amber) 0%, var(--amber-deep) 100%);
-    color:#241703;
+  /* corner brackets — signature motif */
+  a.card::before, a.card::after{
+    content:"";position:absolute;width:9px;height:9px;
+    border:1px solid var(--amber-deep);opacity:.85;
   }
+  a.card::before{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+  a.card::after{bottom:-1px;right:-1px;border-left:none;border-top:none;}
+  a.card:hover{border-color:rgba(232,163,61,.5);background:var(--panel-2);}
+
+  a.card.gold::before, a.card.gold::after{border-color:var(--gold);}
+  a.card.gold:hover{border-color:rgba(201,162,75,.55);}
+
+  .index{
+    flex:0 0 auto;
+    width:46px;height:46px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.35rem;
+    background:var(--amber-dim);
+    color:var(--amber);
+    border:1px solid rgba(232,163,61,.3);
+  }
+  a.card.gold .index{background:var(--gold-dim);color:var(--gold);border-color:rgba(201,162,75,.35);}
+
   .card-body{flex:1;min-width:0;}
   .kicker{
-    font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--amber-deep);margin-bottom:2px;
+    font-size:.64rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:4px;
   }
-  .card-body h2{font-size:1.05rem;font-weight:700;margin-bottom:3px;}
-  .card-body p{font-size:.82rem;color:var(--muted);line-height:1.4;}
-  .go{
-    flex:0 0 auto;align-self:center;
-    font-size:1.1rem;color:var(--line);
+  a.card.gold .kicker{color:var(--gold);}
+  .card-body h2{
+    font-size:1rem;font-weight:600;margin-bottom:4px;color:var(--ink);font-family:'Space Grotesk',sans-serif;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
   }
+  .card-body p{
+    font-size:.78rem;color:var(--muted);line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .tag{
+    display:inline-block;margin-top:8px;
+    font-size:.62rem;letter-spacing:.05em;color:var(--muted);
+    border:1px solid var(--border);padding:2px 6px;
+  }
+  .go{flex:0 0 auto;align-self:center;font-size:1rem;color:var(--border);font-family:monospace;}
 
-  a.card.doc{
-    background:#fff;
-  }
-  a.card.doc .icon{
-    background:linear-gradient(160deg,#4A5A66 0%, var(--steel) 100%);
-    color:#F6F4EE;
-  }
-
-  a.card.gold .icon{
-    background:linear-gradient(160deg,#C9A24B 0%, #8A6A22 100%);
-    color:#251C05;
-  }
-  a.card.gold .kicker{ color:#8A6A22; }
-
-  .section-label{
-    margin:26px 2px 10px;
-    font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--muted);
-  }
+  /* featured external card */
+  .featured{margin-top:16px;}
 
   footer{
-    margin-top:30px;
+    margin-top:38px;
     text-align:center;
-    font-size:.75rem;
+    font-size:.72rem;
     color:var(--muted);
-    line-height:1.6;
+    line-height:1.7;
+    border-top:1px solid var(--border);
+    padding-top:18px;
   }
-  footer .credit{color:var(--amber-deep);font-weight:600;}
+  footer .credit{color:var(--amber);}
+
+  /* ===== desktop layout ===== */
+  @media (min-width:680px){
+    .wrap{max-width:920px;}
+    header p{max-width:56ch;}
+    nav.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch;}
+    nav.grid a.card{height:100%;min-height:150px;}
+    .featured nav.grid{display:block;}
+  }
+  @media (min-width:1040px){
+    .wrap{max-width:1180px;}
+    nav.grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+    header p{white-space:nowrap;max-width:none;}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
+  <div class="hud">
     <span class="eyebrow">⚙ K3 · Keselamatan Kerja</span>
-    <h1> Kumpulan Aplikasi buatan Chilmar &amp; AI </h1>
-    <p>Kumpulan aplikasi bautan Chilmar, untuk menghafal, belajar dan alat bantu dengan metode game interaktif dan visualisasi. </p>
+    <div class="hud-right">
+      <span>APPS.CHILMAR<span class="cursor"></span></span>
+      <div class="theme-toggle" role="group" aria-label="Pilih tema">
+        <button type="button" id="themeLight">Light</button>
+        <button type="button" id="themeDark">Dark</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <h1>Kumpulan Aplikasi buatan Chilmar &amp; AI</h1>
+    <p>Kumpulan aplikasi untuk menghafal, belajar, dan alat bantu — dengan metode game interaktif dan visualisasi.</p>
   </header>
+
+  <div class="module-head">
+    <span class="led amber"></span>
+    <span class="label">Modul 01 · <b>Game &amp; Pelatihan K3</b></span>
+    <span class="line"></span>
+  </div>
 
   <nav class="grid">
 
     <a class="card" href="asah-ingatan-v2.html">
-      <div class="icon">🧠</div>
+      <div class="index">🧠</div>
       <div class="card-body">
-        <div class="kicker">Game Memori</div>
+        <div class="kicker">K3.01 — Game Memori</div>
         <h2>Asah Ingatan</h2>
         <p>Cocokkan pasangan kartu — 5 tingkat kesulitan, dari pemanasan sampai tantangan maksimal.</p>
       </div>
       <div class="go">›</div>
     </a>
-    
+
     <a class="card" href="puzzle-vasa-multi-level-v2.html">
-      <div class="icon">🧩</div>
+      <div class="index">🧩</div>
       <div class="card-body">
-        <div class="kicker">Puzzle</div>
+        <div class="kicker">K3.02 — Puzzle</div>
         <h2>Puzzle Kapal Vasa</h2>
         <p>Susun kembali kepingan gambar Kapal Vasa — 4 tingkat papan, dari 3×3 mudah hingga 6×6 ahli.</p>
       </div>
       <div class="go">›</div>
-    </a> 
+    </a>
 
     <a class="card" href="game-12-aturan-keselamatan.html">
-      <div class="icon">💎</div>
+      <div class="index">💎</div>
       <div class="card-body">
-        <div class="kicker">Game Edukasi</div>
+        <div class="kicker">K3.03 — Game Edukasi</div>
         <h2>12 Aturan Keselamatan Kerja</h2>
-        <p>Belajar Aturan Keselamatan Kerja Yamaha lewat permainan interaktif</p>
+        <p>Belajar Aturan Keselamatan Kerja Yamaha lewat permainan interaktif.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-
-
     <a class="card" href="Petualangan-5S.html">
-      <div class="icon">🧹</div>
+      <div class="index">🧹</div>
       <div class="card-body">
-        <div class="kicker">Game Edukasi</div>
+        <div class="kicker">K3.04 — Game Edukasi</div>
         <h2>Petualangan 5S</h2>
         <p>Belajar Ringkas, Rapi, Resik, Rawat, Rajin lewat permainan interaktif bergaya petualangan.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-    
-
     <a class="card" href="Diamond_Quest_Prototype_v0.37_HoRenSo_Journey_Integrated.html">
-      <div class="icon">💎</div>
+      <div class="index">💎</div>
       <div class="card-body">
-        <div class="kicker">Learning Journey</div>
+        <div class="kicker">K3.05 — Learning Journey</div>
         <h2>Diamond Quest — HoRenSo Journey</h2>
         <p>Eksplorasi Yamaha Diamond, 5S, K3 dan Horenso (報連相).</p>
       </div>
@@ -179,85 +299,87 @@
 
   </nav>
 
-  <a class="card gold" href="MFQ_QUEST.html" target="_blank" rel="noopener">
-      <div class="icon">💎</div>
-      <div class="card-body">
-        <div class="kicker">Aplikasi Eksternal</div>
-        <h2>MFQ Quest</h2>
-        <p>Mnemonic Fonetik Qur'an — Menghafal urutan surat Al Qur'an dengan metode Mnemonic.</p>
-      </div>
-      <div class="go">↗</div>
-    </a>
-  
-  <div class="section-label">📖 Kajian Al-Qur'an &amp; Ihya' Ulumiddin</div>
+  <div class="featured">
+    <nav class="grid">
+      <a class="card gold" href="MFQ_QUEST.html" target="_blank" rel="noopener">
+        <div class="index">💎</div>
+        <div class="card-body">
+          <div class="kicker">Eksternal</div>
+          <h2>MFQ Quest</h2>
+          <p>Mnemonic Fonetik Qur'an — menghafal urutan surat Al-Qur'an dengan metode mnemonic.</p>
+          <span class="tag">↗ buka tab baru</span>
+        </div>
+      </a>
+    </nav>
+  </div>
+
+  <div class="module-head">
+    <span class="led gold"></span>
+    <span class="label">Modul 02 · <b>Kajian Al-Qur'an &amp; Ihya' Ulumiddin</b></span>
+    <span class="line"></span>
+  </div>
+
   <nav class="grid">
 
     <a class="card gold" href="Latihan_Urutan_Surat_Al-Quran.html">
-      <div class="icon">🕋</div>
+      <div class="index">🕋</div>
       <div class="card-body">
-        <div class="kicker">Mnemonic</div>
+        <div class="kicker">AQ.01 — Mnemonic</div>
         <h2>Latihan Urutan Surat Al-Qur'an</h2>
         <p>Latihan menghafal urutan 114 surat menggunakan teknik mnemonic.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-
     <a class="card gold" href="rihlah-kata.html">
-      <div class="icon">🗺️</div>
+      <div class="index">🗺️</div>
       <div class="card-body">
-        <div class="kicker">Kosakata</div>
+        <div class="kicker">AQ.02 — Kosakata</div>
         <h2>Rihlah Kata</h2>
         <p>Perjalanan memperkaya kosakata Al-Qur'an lewat permainan interaktif.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-
     <a class="card gold" href="hafalan-doa-v13.html">
-      <div class="icon">🤲</div>
+      <div class="index">🤲</div>
       <div class="card-body">
-        <div class="kicker">Mnemonic</div>
+        <div class="kicker">AQ.03 — Mnemonic</div>
         <h2>Hafalan Doa</h2>
         <p>Menghafal doa harian dengan satu pola mnemonic yang sama.</p>
       </div>
       <div class="go">›</div>
-    </a>  
-    
-   
+    </a>
+
     <a class="card gold" href="Handbook-Ihya-Prototipe-R22.html">
-      <div class="icon">📗</div>
+      <div class="index">📗</div>
       <div class="card-body">
-        <div class="kicker">Referensi</div>
+        <div class="kicker">AQ.04 — Referensi</div>
         <h2>Handbook Ihya' — Prototipe</h2>
         <p>Ringkasan dan panduan referensi Ihya' Ulumiddin, terjemahan Ismail Yakub dan beberapa jilid terjemahan Republika.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-   
     <a class="card gold" href="Ihya-Digital-R56.html">
-      <div class="icon">📘</div>
+      <div class="index">📘</div>
       <div class="card-body">
-        <div class="kicker">Aplikasi</div>
+        <div class="kicker">AQ.05 — Aplikasi</div>
         <h2>Ihya' Digital — Edisi Republika</h2>
         <p>Digitalisasi lengkap 40 kitab Ihya' Ulumiddin berdasarkan terjemahan Republika Penerbit.</p>
       </div>
       <div class="go">›</div>
     </a>
 
-
     <a class="card gold" href="panduan-umrah.html">
-      <div class="icon">🕌</div>
+      <div class="index">🕌</div>
       <div class="card-body">
-        <div class="kicker">Panduan</div>
+        <div class="kicker">AQ.06 — Panduan</div>
         <h2>Panduan Umrah 9 Langkah + α</h2>
         <p>Panduan praktis pelaksanaan umrah dalam 9 langkah, dilengkapi info Ziarah dan Wisata.</p>
       </div>
       <div class="go">›</div>
     </a>
-
-    
 
   </nav>
 
@@ -267,5 +389,37 @@
   </footer>
 
 </div>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var lightBtn = document.getElementById('themeLight');
+    var darkBtn = document.getElementById('themeDark');
+
+    function applyTheme(theme){
+      if(theme === 'light'){
+        root.setAttribute('data-theme','light');
+        lightBtn.classList.add('active');
+        darkBtn.classList.remove('active');
+      } else {
+        root.removeAttribute('data-theme');
+        darkBtn.classList.add('active');
+        lightBtn.classList.remove('active');
+      }
+    }
+
+    var saved = localStorage.getItem('chilmar-theme');
+    applyTheme(saved === 'light' ? 'light' : 'dark');
+
+    lightBtn.addEventListener('click', function(){
+      localStorage.setItem('chilmar-theme','light');
+      applyTheme('light');
+    });
+    darkBtn.addEventListener('click', function(){
+      localStorage.setItem('chilmar-theme','dark');
+      applyTheme('dark');
+    });
+  })();
+</script>
 </body>
 </html>
