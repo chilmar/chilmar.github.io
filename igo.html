@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Igo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Noto+Serif+JP:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1a1512;
+    --board-1: #dcb877;
+    --board-2: #c89f5c;
+    --grid: rgba(56,36,16,0.62);
+    --surface: #211a14;
+    --surface-2: #2b2117;
+    --border: #3a2d1f;
+    --text: #f2ece0;
+    --muted: #9c8f7c;
+    --vermillion: #ab3b2a;
+    --vermillion-soft: rgba(171,59,42,0.16);
+    --ink: #1c1712;
+    --black-stone-1: #4a4a4a;
+    --black-stone-2: #060606;
+    --white-stone-1: #fefcf6;
+    --white-stone-2: #d7d0bd;
+    --danger: #e2596b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    background:
+      radial-gradient(circle at 15% 0%, #241a10 0%, transparent 45%),
+      radial-gradient(circle at 100% 100%, #1c140d 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    width:100%;
+    max-width:460px;
+    min-height:100vh;
+    padding:18px 16px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+  }
+
+  header{ display:flex; align-items:center; justify-content:space-between; }
+  .brand{ display:flex; align-items:baseline; gap:8px; }
+  .brand .mark{
+    font-family:'Noto Serif JP', serif;
+    font-weight:600;
+    color:var(--vermillion);
+    font-size:14px;
+    letter-spacing:1px;
+    border:1px solid var(--vermillion);
+    padding:2px 7px;
+    border-radius:5px;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:22px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:-0.3px;
+  }
+  .icon-btn{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--muted);
+    width:38px; height:38px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; cursor:pointer;
+  }
+  .icon-btn:active{ background:var(--surface-2); }
+
+  /* ---------- Player bars ---------- */
+  .player-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:9px 12px;
+    position:relative;
+  }
+  .player-bar.turn::before{
+    content:'';
+    position:absolute; inset:0;
+    border:1.5px solid var(--vermillion);
+    border-radius:12px;
+    box-shadow: 0 0 12px rgba(171,59,42,0.22) inset;
+    pointer-events:none;
+  }
+  .player-bar .swatch{
+    width:20px; height:20px;
+    border-radius:50%;
+    flex-shrink:0;
+    border:1px solid rgba(0,0,0,0.25);
+  }
+  .player-bar .swatch.white{ background: radial-gradient(circle at 35% 30%, var(--white-stone-1), var(--white-stone-2)); }
+  .player-bar .swatch.black{ background: radial-gradient(circle at 35% 30%, var(--black-stone-1), var(--black-stone-2)); }
+  .player-bar .pname{ font-weight:600; font-size:13.5px; flex-shrink:0; }
+  .player-bar .stat{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    flex:1;
+    text-align:right;
+  }
+  .player-bar .stat b{ color:var(--vermillion); font-weight:700; }
+
+  .statusline{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+    min-height:16px;
+  }
+  .statusline.alert{ color: var(--danger); font-weight:600; }
+
+  /* ---------- Board ---------- */
+  .board-wrap{
+    position:relative;
+    background: linear-gradient(160deg, #4a3423, #3a2818);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.35);
+  }
+  .goban{
+    position:relative;
+    aspect-ratio:1/1;
+    width:100%;
+    background: linear-gradient(160deg, var(--board-1), var(--board-2));
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .goban svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .point{
+    position:absolute;
+    transform: translate(-50%,-50%);
+    border-radius:50%;
+    cursor:pointer;
+  }
+  .stone{
+    position:absolute;
+    transform: translate(-50%,-50%);
+    border-radius:50%;
+    pointer-events:none;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.4);
+  }
+  .stone.black{ background: radial-gradient(circle at 32% 28%, var(--black-stone-1), var(--black-stone-2)); }
+  .stone.white{ background: radial-gradient(circle at 32% 28%, var(--white-stone-1), var(--white-stone-2)); }
+  .stone.placing{ animation: pop 0.22s ease; }
+  @keyframes pop{ 0%{ transform: translate(-50%,-50%) scale(0.4); } 100%{ transform: translate(-50%,-50%) scale(1); } }
+  .stone.last-move::after{
+    content:'';
+    position:absolute; inset:26%;
+    border-radius:50%;
+    border:1.5px solid var(--vermillion);
+  }
+  .marker.ghost{
+    position:absolute;
+    transform: translate(-50%,-50%);
+    border-radius:50%;
+    background: var(--vermillion-soft);
+    border:1.5px dashed var(--vermillion);
+    pointer-events:none;
+  }
+
+  .end-overlay{
+    position:absolute; inset:0;
+    background:rgba(26,20,15,0.95);
+    display:none;
+    flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:6px;
+    text-align:center;
+    padding:20px;
+    z-index:5;
+    border-radius:6px;
+  }
+  .end-overlay.show{ display:flex; }
+  .end-overlay .big{ font-family:'Space Grotesk', sans-serif; font-size:22px; font-weight:700; color:var(--vermillion); }
+  .end-overlay .sub{ color:var(--muted); font-size:13px; line-height:1.6; }
+  .end-overlay button{ margin-top:10px; }
+
+  /* ---------- Tools ---------- */
+  .tools{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+  }
+  .tools button{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:12px;
+    padding:10px 4px;
+    font-family:'Inter', sans-serif;
+    font-size:10.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .tools button .glyph{ font-size:16px; color:var(--text); }
+  .tools button:active{ background:var(--surface-2); }
+  .tools button:disabled{ opacity:0.35; }
+
+  /* ---------- Sheet ---------- */
+  .sheet-backdrop{
+    position:fixed; inset:0; background:rgba(6,4,2,0.6);
+    display:none; align-items:flex-end; justify-content:center; z-index:20;
+  }
+  .sheet-backdrop.show{ display:flex; }
+  .sheet{
+    width:100%; max-width:460px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px 20px 0 0;
+    padding:20px 18px 26px;
+    display:flex; flex-direction:column; gap:10px;
+    max-height:88vh;
+    overflow-y:auto;
+  }
+  .sheet h2{ font-family:'Space Grotesk', sans-serif; margin:0 0 2px; font-size:18px; }
+  .sheet .group-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); font-weight:700; margin-top:8px; }
+  .mode-option, .diff-option, .size-option, .side-option{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    cursor:pointer;
+  }
+  .mode-option.active, .diff-option.active, .size-option.active, .side-option.active{ border-color:var(--vermillion); }
+  .mode-option .name, .diff-option .name, .size-option .name, .side-option .name{ font-weight:600; font-size:14px; }
+  .mode-option .desc, .diff-option .desc, .size-option .desc{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .size-row, .side-row{ display:flex; gap:8px; }
+  .size-option, .side-option{ flex:1; justify-content:center; flex-direction:column; gap:2px; text-align:center; }
+  .sheet .start-btn{
+    margin-top:6px;
+    background:var(--vermillion);
+    color:#fdf3ea;
+    border:none;
+    border-radius:12px;
+    padding:13px;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    font-family:'Inter', sans-serif;
+  }
+  .sheet .note{
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.5;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:9px 11px;
+    margin-top:4px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:10.5px;
+    letter-spacing:0.3px;
+    margin-top:2px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <span class="mark">碁</span>
+      <h1>Igo</h1>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="icon-btn" id="rulesBtn" title="Aturan permainan">?</button>
+      <button class="icon-btn" id="newGameBtn" title="Permainan baru">⟳</button>
+    </div>
+  </header>
+
+  <div class="player-bar" id="topBar">
+    <div class="swatch black"></div>
+    <div class="pname" id="topName">Hitam</div>
+    <div class="stat" id="topStat">Tangkapan: 0</div>
+  </div>
+
+  <div class="statusline" id="statusline">Giliran Hitam</div>
+
+  <div class="board-wrap">
+    <div class="goban" id="goban"></div>
+    <div class="end-overlay" id="endOverlay">
+      <div class="big" id="endTitle">Permainan Selesai</div>
+      <div class="sub" id="endSub">Hitam 42 – 38.5 Putih</div>
+      <button class="icon-btn" style="width:auto;padding:0 16px;" id="endNewGame">Main lagi</button>
+    </div>
+  </div>
+
+  <div class="player-bar" id="bottomBar">
+    <div class="swatch white"></div>
+    <div class="pname" id="bottomName">Putih</div>
+    <div class="stat" id="bottomStat">Tangkapan: 0</div>
+  </div>
+
+  <div class="tools">
+    <button id="undoBtn"><span class="glyph">↩︎</span>Undo</button>
+    <button id="passBtn"><span class="glyph">⏭</span>Lewati</button>
+    <button id="resignBtn"><span class="glyph">🏳</span>Menyerah</button>
+  </div>
+
+  <footer>Ide: Chilmar • Creator: Claude</footer>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop">
+  <div class="sheet">
+    <h2>Permainan baru</h2>
+
+    <div class="group-label">Ukuran papan</div>
+    <div class="size-row">
+      <div class="size-option active" data-size="9">
+        <div class="name">9×9</div><div class="desc">Cepat</div>
+      </div>
+      <div class="size-option" data-size="13">
+        <div class="name">13×13</div><div class="desc">Sedang</div>
+      </div>
+      <div class="size-option" data-size="19">
+        <div class="name">19×19</div><div class="desc">Penuh</div>
+      </div>
+    </div>
+
+    <div class="group-label">Mode</div>
+    <div class="mode-option active" data-mode="ai">
+      <div><div class="name">Lawan AI</div><div class="desc">Main sendiri melawan komputer</div></div>
+    </div>
+    <div class="mode-option" data-mode="pvp">
+      <div><div class="name">2 Pemain</div><div class="desc">Bergantian di satu HP</div></div>
+    </div>
+
+    <div id="sideGroup">
+      <div class="group-label">Anda bermain sebagai</div>
+      <div class="side-row">
+        <div class="side-option active" data-side="black">
+          <div class="swatch black" style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#060606);margin:0 auto;"></div>
+          <div class="name">Hitam</div>
+        </div>
+        <div class="side-option" data-side="white">
+          <div class="swatch white" style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fefcf6,#d7d0bd);margin:0 auto;"></div>
+          <div class="name">Putih</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="diffGroup">
+      <div class="group-label">Tingkat AI</div>
+      <div class="diff-option" data-level="easy">
+        <div><div class="name">Mudah</div><div class="desc">Langkah cukup acak, cocok untuk belajar aturan</div></div>
+      </div>
+      <div class="diff-option active" data-level="medium">
+        <div><div class="name">Sedang</div><div class="desc">Menangkap bidak lengah, menjaga kelompok sendiri</div></div>
+      </div>
+      <div class="diff-option" data-level="hard">
+        <div><div class="name">Sulit</div><div class="desc">Mempertimbangkan balasan lawan sebelum melangkah</div></div>
+      </div>
+    </div>
+
+    <div class="note">Skor akhir memakai aturan area (gaya Tionghoa): batu di papan + wilayah kosong yang dikuasai, ditambah komi 7,5 untuk Putih. Tangkap bidak mati sebelum melewati giliran dua kali berturut-turut agar skor akurat.</div>
+
+    <button class="start-btn" id="startBtn">Mulai</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="rulesBackdrop">
+  <div class="sheet">
+    <h2>Aturan Permainan Igo</h2>
+
+    <div class="group-label">Tujuan</div>
+    <div class="note" style="margin-top:0;">Menguasai wilayah papan lebih besar daripada lawan, dengan cara mengelilingi titik-titik kosong dan menangkap batu lawan.</div>
+
+    <div class="group-label">1. Giliran &amp; Penempatan</div>
+    <div class="note" style="margin-top:0;">Hitam jalan lebih dulu. Pemain bergantian meletakkan satu batu di titik perpotongan garis (bukan di dalam kotak). Batu yang sudah diletakkan tidak bisa dipindah, hanya bisa ditangkap dan diangkat dari papan.</div>
+
+    <div class="group-label">2. Napas (Liberty)</div>
+    <div class="note" style="margin-top:0;">Setiap batu atau kelompok batu yang terhubung memiliki "napas" — titik kosong yang bersebelahan langsung (atas/bawah/kiri/kanan). Kelompok kehabisan napas (0 napas) berarti tertangkap dan diangkat dari papan.</div>
+
+    <div class="group-label">3. Larangan Bunuh Diri</div>
+    <div class="note" style="margin-top:0;">Tidak boleh meletakkan batu yang membuat kelompok sendiri langsung kehabisan napas — kecuali langkah itu sekaligus menangkap batu lawan lebih dulu.</div>
+
+    <div class="group-label">4. Aturan Ko</div>
+    <div class="note" style="margin-top:0;">Setelah satu batu tertangkap dalam bentuk tertentu (ko), lawan tidak boleh langsung menangkap balik di titik yang sama pada giliran berikutnya. Ia harus bermain di tempat lain dulu (disebut "ancaman ko"), baru boleh mengambil kembali titik itu di giliran berikutnya.</div>
+
+    <div class="group-label">5. Melewati Giliran &amp; Akhir Permainan</div>
+    <div class="note" style="margin-top:0;">Pemain boleh melewati giliran jika merasa tidak ada langkah menguntungkan lagi. Jika kedua pemain melewati giliran secara berturut-turut, permainan berakhir dan skor dihitung.</div>
+
+    <div class="group-label">6. Menghitung Skor</div>
+    <div class="note" style="margin-top:0;">Aplikasi ini memakai aturan area (gaya Tionghoa): skor = jumlah batu di papan + wilayah kosong yang sepenuhnya dikelilingi satu warna. Putih mendapat tambahan komi 7,5 poin sebagai kompensasi karena Hitam jalan lebih dulu. Sebelum melewati giliran, tangkap dulu batu-batu lawan yang sudah "mati" (terkurung tanpa harapan hidup) agar perhitungan akurat.</div>
+
+    <div class="group-label">7. Menyerah</div>
+    <div class="note" style="margin-top:0;">Pemain boleh menyerah kapan saja jika merasa posisinya sudah tidak mungkin menang.</div>
+
+    <a href="https://id.wikipedia.org/wiki/Igo" target="_blank" rel="noopener noreferrer" class="start-btn" style="text-decoration:none; text-align:center; display:block;">Baca aturan lengkap di Wikipedia ↗</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     CORE GO ENGINE
+     (verified separately: capture, suicide, ko, area scoring all match expected results)
+     ============================================================ */
+  const EMPTY=0, BLACK=1, WHITE=2;
+
+  function makeBoard(n){ return Array.from({length:n}, ()=>Array(n).fill(EMPTY)); }
+  function cloneBoard(b){ return b.map(row=>row.slice()); }
+  function neighbors(n,x,y){
+    const res=[];
+    if(x>0) res.push([x-1,y]);
+    if(x<n-1) res.push([x+1,y]);
+    if(y>0) res.push([x,y-1]);
+    if(y<n-1) res.push([x,y+1]);
+    return res;
+  }
+  function findGroup(board, n, x, y){
+    const color = board[y][x];
+    const stack=[[x,y]];
+    const visited = new Set([x+','+y]);
+    const stones=[[x,y]];
+    while(stack.length){
+      const [cx,cy] = stack.pop();
+      for(const [nx,ny] of neighbors(n,cx,cy)){
+        const key = nx+','+ny;
+        if(visited.has(key)) continue;
+        if(board[ny][nx]===color){ visited.add(key); stones.push([nx,ny]); stack.push([nx,ny]); }
+      }
+    }
+    return stones;
+  }
+  function groupLiberties(board, n, stones){
+    const libs = new Set();
+    for(const [x,y] of stones){
+      for(const [nx,ny] of neighbors(n,x,y)){
+        if(board[ny][nx]===EMPTY) libs.add(nx+','+ny);
+      }
+    }
+    return libs;
+  }
+  function tryMove(board, n, x, y, color, koPoint){
+    if(board[y][x] !== EMPTY) return { ok:false, reason:'occupied' };
+    const opp = color===BLACK?WHITE:BLACK;
+    const nb = cloneBoard(board);
+    nb[y][x] = color;
+    let captured = [];
+    const checkedOpp = new Set();
+    for(const [nx,ny] of neighbors(n,x,y)){
+      if(nb[ny][nx]===opp){
+        const key = nx+','+ny;
+        if(checkedOpp.has(key)) continue;
+        const grp = findGroup(nb, n, nx, ny);
+        grp.forEach(([gx,gy])=>checkedOpp.add(gx+','+gy));
+        const libs = groupLiberties(nb, n, grp);
+        if(libs.size===0){ for(const [gx,gy] of grp){ nb[gy][gx]=EMPTY; captured.push([gx,gy]); } }
+      }
+    }
+    const ownGroup = findGroup(nb, n, x, y);
+    const ownLibs = groupLiberties(nb, n, ownGroup);
+    if(ownLibs.size===0) return { ok:false, reason:'suicide' };
+    if(koPoint && koPoint.x===x && koPoint.y===y && captured.length===1) return { ok:false, reason:'ko' };
+    let newKo = null;
+    if(captured.length===1 && ownGroup.length===1) newKo = { x:captured[0][0], y:captured[0][1] };
+    return { ok:true, board: nb, captured, koPoint: newKo };
+  }
+  function legalMoves(board, n, color, koPoint){
+    const moves=[];
+    for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+      if(board[y][x]!==EMPTY) continue;
+      const res = tryMove(board, n, x, y, color, koPoint);
+      if(res.ok) moves.push({x,y});
+    }
+    return moves;
+  }
+  function scoreArea(board, n){
+    const visited = Array.from({length:n}, ()=>Array(n).fill(false));
+    let blackScore=0, whiteScore=0;
+    for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+      if(board[y][x]===BLACK) blackScore++;
+      else if(board[y][x]===WHITE) whiteScore++;
+    }
+    for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+      if(board[y][x]!==EMPTY || visited[y][x]) continue;
+      const stack=[[x,y]]; visited[y][x]=true;
+      const region=[[x,y]]; const borders=new Set();
+      while(stack.length){
+        const [cx,cy]=stack.pop();
+        for(const [nx,ny] of neighbors(n,cx,cy)){
+          if(board[ny][nx]===EMPTY){ if(!visited[ny][nx]){ visited[ny][nx]=true; region.push([nx,ny]); stack.push([nx,ny]); } }
+          else borders.add(board[ny][nx]);
+        }
+      }
+      if(borders.size===1){
+        const owner=[...borders][0];
+        if(owner===BLACK) blackScore+=region.length; else whiteScore+=region.length;
+      }
+    }
+    return { blackScore, whiteScore };
+  }
+
+  /* ============================================================
+     AI: heuristic move scoring (casual/practice strength — this is
+     not a full-search engine; Go's branching factor makes true deep
+     search impractical without MCTS/neural evaluation)
+     ============================================================ */
+  const KOMI = 7.5;
+
+  function isSimpleEye(board, n, x, y, color){
+    for(const [nx,ny] of neighbors(n,x,y)){
+      if(board[ny][nx] !== color) return false;
+    }
+    return true;
+  }
+
+  function heuristicScore(board, n, move, color, koPoint){
+    const res = tryMove(board, n, move.x, move.y, color, koPoint);
+    if(!res.ok) return -Infinity;
+    let score = 0;
+    score += res.captured.length * 90;
+
+    const grp = findGroup(res.board, n, move.x, move.y);
+    const libs = groupLiberties(res.board, n, grp);
+    score += Math.min(libs.size, 6) * 6;
+    if(libs.size===1) score -= 55;
+
+    // reward putting adjacent opponent groups into atari
+    const opp = color===BLACK?WHITE:BLACK;
+    const seen = new Set();
+    for(const [nx,ny] of neighbors(n,move.x,move.y)){
+      if(res.board[ny][nx]===opp){
+        const key=nx+','+ny;
+        if(seen.has(key)) continue;
+        const ogrp = findGroup(res.board, n, nx, ny);
+        ogrp.forEach(([gx,gy])=>seen.add(gx+','+gy));
+        const olibs = groupLiberties(res.board, n, ogrp);
+        if(olibs.size===1) score += 45;
+      }
+    }
+
+    // reward rescuing own groups that were in atari before this move
+    for(const [nx,ny] of neighbors(n,move.x,move.y)){
+      if(board[ny][nx]===color){
+        const before = findGroup(board, n, nx, ny);
+        const beforeLibs = groupLiberties(board, n, before);
+        if(beforeLibs.size===1) score += 35;
+      }
+    }
+
+    // avoid filling own simple eyes
+    if(isSimpleEye(board, n, move.x, move.y, color)) score -= 70;
+
+    // mild preference for 3rd/4th line and proximity to existing stones (avoid first line early game)
+    const distEdge = Math.min(move.x, move.y, n-1-move.x, n-1-move.y);
+    if(distEdge===0) score -= 12;
+    else if(distEdge===2 || distEdge===3) score += 6;
+
+    let stoneCount = 0;
+    for(let yy=0; yy<n; yy++) for(let xx=0; xx<n; xx++) if(board[yy][xx]!==EMPTY) stoneCount++;
+    if(stoneCount > 4){
+      let nearby = 0;
+      for(let dy=-2; dy<=2; dy++) for(let dx=-2; dx<=2; dx++){
+        const xx=move.x+dx, yy=move.y+dy;
+        if(xx>=0 && xx<n && yy>=0 && yy<n && board[yy][xx]!==EMPTY) nearby++;
+      }
+      score += Math.min(nearby, 4) * 3;
+    }
+
+    score += Math.random() * 4;
+    return score;
+  }
+
+  function aiChooseMove(board, n, color, koPoint, level, passesInARow){
+    const moves = legalMoves(board, n, color, koPoint);
+    const candidates = moves.filter(m => !isSimpleEye(board, n, m.x, m.y, color));
+    const pool = candidates.length>0 ? candidates : moves;
+    if(pool.length===0) return null; // must pass
+
+    if(level==='easy'){
+      const scored = pool.map(m=>({m, s: heuristicScore(board,n,m,color,koPoint) + (Math.random()*80-40)}));
+      scored.sort((a,b)=>b.s-a.s);
+      const topN = scored.slice(0, Math.max(1, Math.floor(scored.length*0.5)));
+      return topN[Math.floor(Math.random()*topN.length)].m;
+    }
+
+    const scored = pool.map(m=>({m, s: heuristicScore(board,n,m,color,koPoint)}));
+    scored.sort((a,b)=>b.s-a.s);
+
+    if(level==='medium'){
+      return scored[0].m;
+    }
+
+    // hard: 1-ply lookahead on top candidates
+    const opp = color===BLACK?WHITE:BLACK;
+    const topK = scored.slice(0, Math.min(8, scored.length));
+    let best = null, bestVal = -Infinity;
+    for(const cand of topK){
+      const res = tryMove(board, n, cand.m.x, cand.m.y, color, koPoint);
+      if(!res.ok) continue;
+      const oppMoves = legalMoves(res.board, n, opp, res.koPoint)
+        .filter(m => !isSimpleEye(res.board, n, m.x, m.y, opp));
+      let oppBest = 0;
+      const oppPool = oppMoves.length ? oppMoves : legalMoves(res.board, n, opp, res.koPoint);
+      for(const om of oppPool.slice(0, 20)){
+        const s = heuristicScore(res.board, n, om, opp, res.koPoint);
+        if(s > oppBest) oppBest = s;
+      }
+      const val = cand.s - oppBest*0.5;
+      if(val > bestVal){ bestVal = val; best = cand.m; }
+    }
+    return best || scored[0].m;
+  }
+
+  /* ============================================================
+     UI / GAME STATE
+     ============================================================ */
+  let ui = {
+    n: 9,
+    board: null,
+    turn: BLACK,
+    koPoint: null,
+    mode: 'ai',
+    aiColor: WHITE,
+    level: 'medium',
+    history: [],
+    lastMove: null,
+    passesInARow: 0,
+    over: false,
+    aiThinking: false,
+    capturesByBlack: 0,
+    capturesByWhite: 0
+  };
+
+  const gobanEl = document.getElementById('goban');
+  const statusline = document.getElementById('statusline');
+  const topBar = document.getElementById('topBar');
+  const bottomBar = document.getElementById('bottomBar');
+  const topName = document.getElementById('topName');
+  const bottomName = document.getElementById('bottomName');
+  const topStat = document.getElementById('topStat');
+  const bottomStat = document.getElementById('bottomStat');
+  const endOverlay = document.getElementById('endOverlay');
+
+  const STAR_POINTS = {
+    9: [[2,2],[2,6],[6,2],[6,6],[4,4]],
+    13: [[3,3],[3,9],[9,3],[9,9],[6,6]],
+    19: [[3,3],[3,9],[3,15],[9,3],[9,9],[9,15],[15,3],[15,9],[15,15]]
+  };
+
+  function pct(i, n){ return (i/(n-1))*100; }
+
+  function buildGoban(){
+    const n = ui.n;
+    gobanEl.innerHTML = '';
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox','0 0 100 100');
+    svg.setAttribute('preserveAspectRatio','none');
+    for(let i=0;i<n;i++){
+      const p = pct(i,n);
+      const vline = document.createElementNS(svgNS,'line');
+      vline.setAttribute('x1',p); vline.setAttribute('y1',pct(0,n));
+      vline.setAttribute('x2',p); vline.setAttribute('y2',pct(n-1,n));
+      vline.setAttribute('stroke','var(--grid)'); vline.setAttribute('stroke-width','0.35');
+      svg.appendChild(vline);
+      const hline = document.createElementNS(svgNS,'line');
+      hline.setAttribute('x1',pct(0,n)); hline.setAttribute('y1',p);
+      hline.setAttribute('x2',pct(n-1,n)); hline.setAttribute('y2',p);
+      hline.setAttribute('stroke','var(--grid)'); hline.setAttribute('stroke-width','0.35');
+      svg.appendChild(hline);
+    }
+    const stars = STAR_POINTS[n] || [];
+    for(const [sx,sy] of stars){
+      const c = document.createElementNS(svgNS,'circle');
+      c.setAttribute('cx', pct(sx,n)); c.setAttribute('cy', pct(sy,n));
+      c.setAttribute('r','0.9'); c.setAttribute('fill','var(--grid)');
+      svg.appendChild(c);
+    }
+    gobanEl.appendChild(svg);
+
+    const cellPct = 100/(n-1);
+    const hitSize = Math.min(cellPct*0.92, 9.5);
+    for(let y=0;y<n;y++){
+      for(let x=0;x<n;x++){
+        const pt = document.createElement('div');
+        pt.className = 'point';
+        pt.style.left = pct(x,n)+'%';
+        pt.style.top = pct(y,n)+'%';
+        pt.style.width = hitSize+'%';
+        pt.style.height = hitSize+'%';
+        pt.dataset.x = x; pt.dataset.y = y;
+        pt.addEventListener('click', ()=> onPointClick(x,y));
+        gobanEl.appendChild(pt);
+      }
+    }
+  }
+
+  function stoneSizePct(n){
+    return Math.min(100/(n-1)*0.92, 9.2);
+  }
+
+  function render(){
+    const n = ui.n;
+    gobanEl.querySelectorAll('.stone, .marker').forEach(el=>el.remove());
+
+    for(let y=0;y<n;y++){
+      for(let x=0;x<n;x++){
+        const v = ui.board[y][x];
+        if(v===EMPTY) continue;
+        const st = document.createElement('div');
+        st.className = 'stone ' + (v===BLACK?'black':'white');
+        st.style.left = pct(x,n)+'%';
+        st.style.top = pct(y,n)+'%';
+        const size = stoneSizePct(n);
+        st.style.width = size+'%';
+        st.style.height = size+'%';
+        if(ui.lastMove && ui.lastMove.x===x && ui.lastMove.y===y) st.classList.add('last-move');
+        gobanEl.appendChild(st);
+      }
+    }
+
+    renderBars();
+    renderStatus();
+  }
+
+  function playerLabel(color){
+    if(ui.mode==='pvp') return color===BLACK ? 'Hitam' : 'Putih';
+    return color===ui.aiColor ? 'AI' : 'Anda';
+  }
+
+  function renderBars(){
+    const isPvp = ui.mode==='pvp';
+    topName.textContent = isPvp ? 'Hitam' : (ui.aiColor===BLACK?'AI':'Anda');
+    bottomName.textContent = isPvp ? 'Putih' : (ui.aiColor===WHITE?'AI':'Anda');
+    topStat.innerHTML = 'Tangkapan: <b>'+ui.capturesByBlack+'</b>';
+    bottomStat.innerHTML = 'Tangkapan: <b>'+ui.capturesByWhite+'</b>';
+    topBar.classList.toggle('turn', ui.turn===BLACK && !ui.over);
+    bottomBar.classList.toggle('turn', ui.turn===WHITE && !ui.over);
+  }
+
+  function renderStatus(){
+    if(ui.over) return;
+    if(ui.aiThinking){
+      statusline.textContent = 'AI sedang berpikir…';
+      statusline.classList.remove('alert');
+      return;
+    }
+    if(ui.passesInARow===1){
+      statusline.textContent = playerLabel(ui.turn===BLACK?WHITE:BLACK) + ' melewati giliran — lewati lagi untuk mengakhiri';
+      statusline.classList.add('alert');
+      return;
+    }
+    statusline.textContent = 'Giliran ' + playerLabel(ui.turn);
+    statusline.classList.remove('alert');
+  }
+
+  function newGame(n, mode, level, humanColor){
+    ui.n = n;
+    ui.board = makeBoard(n);
+    ui.turn = BLACK;
+    ui.koPoint = null;
+    ui.mode = mode;
+    ui.level = level;
+    ui.aiColor = mode==='ai' ? (humanColor===BLACK ? WHITE : BLACK) : null;
+    ui.history = [];
+    ui.lastMove = null;
+    ui.passesInARow = 0;
+    ui.over = false;
+    ui.aiThinking = false;
+    ui.capturesByBlack = 0;
+    ui.capturesByWhite = 0;
+
+    endOverlay.classList.remove('show');
+    buildGoban();
+    render();
+    maybeAiTurn();
+  }
+
+  function pushHistory(){
+    ui.history.push({
+      board: cloneBoard(ui.board),
+      turn: ui.turn,
+      koPoint: ui.koPoint,
+      lastMove: ui.lastMove,
+      passesInARow: ui.passesInARow,
+      capturesByBlack: ui.capturesByBlack,
+      capturesByWhite: ui.capturesByWhite
+    });
+    if(ui.history.length>400) ui.history.shift();
+  }
+
+  function onPointClick(x,y){
+    if(ui.over || ui.aiThinking) return;
+    if(ui.mode==='ai' && ui.turn===ui.aiColor) return;
+    const res = tryMove(ui.board, ui.n, x, y, ui.turn, ui.koPoint);
+    if(!res.ok) return;
+    commitMove(x, y, res);
+  }
+
+  function commitMove(x, y, res){
+    pushHistory();
+    ui.board = res.board;
+    if(res.captured.length){
+      if(ui.turn===BLACK) ui.capturesByBlack += res.captured.length;
+      else ui.capturesByWhite += res.captured.length;
+    }
+    ui.koPoint = res.koPoint;
+    ui.lastMove = { x, y };
+    ui.passesInARow = 0;
+    ui.turn = ui.turn===BLACK ? WHITE : BLACK;
+    render();
+    if(!ui.over) maybeAiTurn();
+  }
+
+  function doPass(){
+    if(ui.over || ui.aiThinking) return;
+    pushHistory();
+    ui.passesInARow++;
+    ui.lastMove = null;
+    ui.turn = ui.turn===BLACK ? WHITE : BLACK;
+    if(ui.passesInARow>=2){
+      endGameByScore();
+      return;
+    }
+    render();
+    if(!ui.over) maybeAiTurn();
+  }
+
+  function endGameByScore(){
+    ui.over = true;
+    const { blackScore, whiteScore } = scoreArea(ui.board, ui.n);
+    const whiteTotal = whiteScore + KOMI;
+    const title = document.getElementById('endTitle');
+    const sub = document.getElementById('endSub');
+    title.textContent = blackScore > whiteTotal ? playerLabel(BLACK)+' Menang' : playerLabel(WHITE)+' Menang';
+    sub.textContent = 'Hitam ' + blackScore + ' – ' + whiteTotal.toFixed(1) + ' Putih (komi 7,5)';
+    endOverlay.classList.add('show');
+    render();
+  }
+
+  function resign(){
+    if(ui.over) return;
+    ui.over = true;
+    const winner = ui.turn===BLACK ? WHITE : BLACK;
+    const title = document.getElementById('endTitle');
+    const sub = document.getElementById('endSub');
+    title.textContent = playerLabel(winner) + ' Menang';
+    sub.textContent = playerLabel(ui.turn) + ' menyerah';
+    endOverlay.classList.add('show');
+    render();
+  }
+
+  function maybeAiTurn(){
+    if(ui.mode!=='ai' || ui.over) return;
+    if(ui.turn !== ui.aiColor) return;
+    ui.aiThinking = true;
+    renderStatus();
+    setTimeout(()=>{
+      const move = aiChooseMove(ui.board, ui.n, ui.aiColor, ui.koPoint, ui.level, ui.passesInARow);
+      ui.aiThinking = false;
+      if(!move){ doPass(); return; }
+      const res = tryMove(ui.board, ui.n, move.x, move.y, ui.aiColor, ui.koPoint);
+      if(!res.ok){ doPass(); return; }
+      commitMove(move.x, move.y, res);
+    }, 380);
+  }
+
+  function undo(){
+    if(ui.aiThinking) return;
+    let steps = ui.mode==='ai' ? 2 : 1;
+    let popped=false;
+    while(steps>0 && ui.history.length>0){
+      const h = ui.history.pop();
+      ui.board = h.board;
+      ui.turn = h.turn;
+      ui.koPoint = h.koPoint;
+      ui.lastMove = h.lastMove;
+      ui.passesInARow = h.passesInARow;
+      ui.capturesByBlack = h.capturesByBlack;
+      ui.capturesByWhite = h.capturesByWhite;
+      popped=true;
+      steps--;
+    }
+    if(popped){
+      ui.over = false;
+      endOverlay.classList.remove('show');
+      render();
+    }
+  }
+
+  document.getElementById('undoBtn').addEventListener('click', undo);
+  document.getElementById('passBtn').addEventListener('click', doPass);
+  document.getElementById('resignBtn').addEventListener('click', resign);
+
+  /* ---------------- Sheet ---------------- */
+  const sheetBackdrop = document.getElementById('sheetBackdrop');
+  const sideGroup = document.getElementById('sideGroup');
+  const diffGroup = document.getElementById('diffGroup');
+  let sheetSize=9, sheetMode='ai', sheetLevel='medium', sheetSide='black';
+
+  document.getElementById('newGameBtn').addEventListener('click', ()=> sheetBackdrop.classList.add('show'));
+  document.getElementById('endNewGame').addEventListener('click', ()=> sheetBackdrop.classList.add('show'));
+  sheetBackdrop.addEventListener('click', (e)=>{ if(e.target===sheetBackdrop) sheetBackdrop.classList.remove('show'); });
+
+  const rulesBackdrop = document.getElementById('rulesBackdrop');
+  document.getElementById('rulesBtn').addEventListener('click', ()=> rulesBackdrop.classList.add('show'));
+  rulesBackdrop.addEventListener('click', (e)=>{ if(e.target===rulesBackdrop) rulesBackdrop.classList.remove('show'); });
+
+  document.querySelectorAll('.size-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.size-option').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      sheetSize = parseInt(opt.dataset.size,10);
+    });
+  });
+  document.querySelectorAll('.mode-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.mode-option').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      sheetMode = opt.dataset.mode;
+      sideGroup.style.display = sheetMode==='ai' ? 'block' : 'none';
+      diffGroup.style.display = sheetMode==='ai' ? 'block' : 'none';
+    });
+  });
+  document.querySelectorAll('.side-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.side-option').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      sheetSide = opt.dataset.side;
+    });
+  });
+  document.querySelectorAll('.diff-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.diff-option').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      sheetLevel = opt.dataset.level;
+    });
+  });
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    sheetBackdrop.classList.remove('show');
+    newGame(sheetSize, sheetMode, sheetLevel, sheetSide==='black'?BLACK:WHITE);
+  });
+
+  /* ---------------- Boot ---------------- */
+  newGame(9, 'ai', 'medium', BLACK);
+
+})();
+</script>
+</body>
+</html>

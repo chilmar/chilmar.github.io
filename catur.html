@@ -292,6 +292,14 @@
   }
   .mode-option.active, .diff-option.active, .side-option.active{ border-color:var(--gold); }
   .mode-option .name, .diff-option .name, .side-option .name{ font-weight:600; font-size:14px; }
+  .rule-item{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:11px 13px;
+  }
+  .rule-item .desc{ font-size:12px; color:var(--muted); line-height:1.55; }
+  .rule-item .desc b{ color:var(--text); }
   .mode-option .desc, .diff-option .desc{ font-size:11.5px; color:var(--muted); margin-top:2px; }
   .side-row{ display:flex; gap:8px; }
   .side-option{ flex:1; justify-content:center; gap:8px; }
@@ -325,7 +333,10 @@
       <span class="mark">8×8</span>
       <h1>Catur</h1>
     </div>
-    <button class="icon-btn" id="newGameBtn" title="Permainan baru">⟳</button>
+    <div style="display:flex; gap:8px;">
+      <button class="icon-btn" id="rulesBtn" title="Aturan permainan">?</button>
+      <button class="icon-btn" id="newGameBtn" title="Permainan baru">⟳</button>
+    </div>
   </header>
 
   <div class="player-bar" id="topBar">
@@ -406,6 +417,49 @@
     </div>
 
     <button class="start-btn" id="startBtn">Mulai</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="rulesBackdrop">
+  <div class="sheet">
+    <h2>Aturan Permainan Catur</h2>
+
+    <div class="group-label">Tujuan</div>
+    <div class="rule-item">
+      <div class="desc">Membuat raja lawan skak mat — terancam tertangkap (skak) tanpa ada cara untuk menghindarinya.</div>
+    </div>
+
+    <div class="group-label">1. Gerak Bidak</div>
+    <div class="rule-item">
+      <div class="desc"><b>Pion</b> maju 1 kotak (2 kotak di langkah pertama), menangkap secara diagonal. <b>Kuda</b> bergerak membentuk huruf L. <b>Gajah</b> diagonal, <b>Benteng</b> lurus, <b>Menteri</b> gabungan keduanya. <b>Raja</b> satu kotak ke segala arah.</div>
+    </div>
+
+    <div class="group-label">2. Rokade (Castling)</div>
+    <div class="rule-item">
+      <div class="desc">Raja dan benteng boleh bergerak bersamaan sekali dalam satu permainan, jika keduanya belum pernah bergerak, tidak ada bidak di antaranya, dan raja tidak sedang skak atau melewati kotak yang diserang.</div>
+    </div>
+
+    <div class="group-label">3. En Passant</div>
+    <div class="rule-item">
+      <div class="desc">Jika pion lawan baru saja maju 2 kotak dan mendarat di sebelah pion Anda, Anda boleh menangkapnya secara diagonal seolah-olah ia hanya maju 1 kotak — tapi hanya pada giliran berikutnya, tidak bisa ditunda.</div>
+    </div>
+
+    <div class="group-label">4. Promosi Bidak</div>
+    <div class="rule-item">
+      <div class="desc">Pion yang mencapai baris terakhir wajib dipromosikan menjadi Menteri, Benteng, Gajah, atau Kuda (pilihan bebas, tidak harus Menteri).</div>
+    </div>
+
+    <div class="group-label">5. Skak &amp; Skak Mat</div>
+    <div class="rule-item">
+      <div class="desc">Raja yang terancam disebut skak, dan wajib segera diselamatkan pada giliran itu juga. Jika tidak ada cara menghindar, itu skak mat dan permainan berakhir.</div>
+    </div>
+
+    <div class="group-label">6. Buntu (Stalemate)</div>
+    <div class="rule-item">
+      <div class="desc">Jika giliran seorang pemain tapi ia tidak punya langkah legal sama sekali dan rajanya tidak sedang skak, permainan berakhir seri.</div>
+    </div>
+
+    <a href="https://id.wikipedia.org/wiki/Catur" target="_blank" rel="noopener noreferrer" class="start-btn" style="text-decoration:none; text-align:center; display:block;">Baca aturan lengkap di Wikipedia ↗</a>
   </div>
 </div>
 
@@ -1087,6 +1141,9 @@
   document.getElementById('newGameBtn').addEventListener('click', ()=> sheetBackdrop.classList.add('show'));
   document.getElementById('endNewGame').addEventListener('click', ()=> sheetBackdrop.classList.add('show'));
   sheetBackdrop.addEventListener('click', (e)=>{ if(e.target===sheetBackdrop) sheetBackdrop.classList.remove('show'); });
+  const rulesBackdrop = document.getElementById('rulesBackdrop');
+  document.getElementById('rulesBtn').addEventListener('click', ()=> rulesBackdrop.classList.add('show'));
+  rulesBackdrop.addEventListener('click', (e)=>{ if(e.target===rulesBackdrop) rulesBackdrop.classList.remove('show'); });
 
   document.querySelectorAll('.mode-option').forEach(opt=>{
     opt.addEventListener('click', ()=>{
