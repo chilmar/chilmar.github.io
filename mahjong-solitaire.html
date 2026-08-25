@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mahjong Solitaire</title>
+<style>
+  :root{
+    --bg-1:#0f1220;
+    --bg-2:#191d33;
+    --panel:#1c2036;
+    --panel-2:#242a47;
+    --accent:#f2b74c;
+    --accent-2:#5ec9c9;
+    --text:#eef0fb;
+    --text-dim:#9aa0c3;
+    --tile-face:#f4ecd8;
+    --tile-face-2:#fffef8;
+    --tile-border:#8a7550;
+    --tile-select:#f2b74c;
+    --danger:#e8607a;
+    --success:#6fd18a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:radial-gradient(circle at 50% -10%, var(--bg-2), var(--bg-1) 60%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    overflow-x:hidden;
+    user-select:none;
+  }
+  #app{ display:flex; flex-direction:column; min-height:100vh; }
+
+  header{
+    padding:12px 14px 8px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  header h1{
+    margin:0; font-size:1.15rem; letter-spacing:.5px; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header p{ margin:2px 0 0; font-size:.72rem; color:var(--text-dim); }
+
+  #hud{
+    display:flex; justify-content:center; gap:8px;
+    flex-wrap:wrap; padding:6px 10px 4px;
+    flex-shrink:0;
+  }
+  .stat{
+    background:var(--panel); border:1px solid #2c3255;
+    border-radius:10px; padding:6px 10px; min-width:64px; text-align:center;
+  }
+  .stat .v{ font-size:1rem; font-weight:700; color:var(--accent); }
+  .stat .l{ font-size:.62rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; }
+
+  #boardWrap{
+    flex:1; display:flex; align-items:flex-start; justify-content:flex-start;
+    padding:6px 4px 4px; overflow:auto; -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  #boardOuter{ position:relative; margin:0 auto; }
+  #board{ position:relative; transform-origin:0 0; }
+
+  .tile{
+    position:absolute;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:filter .12s, transform .08s;
+  }
+  .tile .face{
+    position:absolute; inset:0;
+    border-radius:8px;
+    background:linear-gradient(155deg, var(--tile-face-2), var(--tile-face) 60%);
+    border:1.5px solid var(--tile-border);
+    box-shadow: 0 2px 0 #6b5c3c, 0 4px 6px rgba(0,0,0,.45);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tile .glyph{
+    font-size:3.1em; line-height:1; color:#26241c;
+    filter:drop-shadow(0 1px 0 rgba(255,255,255,.4));
+  }
+  .tile.covered .face{ filter:brightness(.55) saturate(.7); }
+  .tile.covered{ cursor:default; }
+  .tile.free .face{ filter:brightness(1.03); }
+  .tile.selected .face{
+    border-color:var(--tile-select);
+    box-shadow:0 0 0 2px var(--tile-select), 0 2px 0 #6b5c3c, 0 4px 10px rgba(242,183,76,.5);
+    transform:translateY(-3px);
+  }
+  .tile.hint .face{ animation:pulse .5s ease-in-out 3; }
+  .tile.shake{ animation:shake .3s; }
+  .tile.removing{ animation:pop .25s forwards; }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(94,201,201,.9),0 2px 0 #6b5c3c,0 4px 6px rgba(0,0,0,.45);}
+    50%{ box-shadow:0 0 0 6px rgba(94,201,201,0),0 2px 0 #6b5c3c,0 4px 6px rgba(0,0,0,.45);}
+  }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-4px); }
+    75%{ transform:translateX(4px); }
+  }
+  @keyframes pop{
+    to{ transform:scale(.2); opacity:0; }
+  }
+
+  #controls{
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+    padding:8px 10px 10px; flex-shrink:0;
+  }
+  button{
+    border:none; border-radius:10px; padding:10px 14px;
+    font-size:.8rem; font-weight:700; color:#1a1a1a;
+    background:var(--accent); cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+  }
+  button.secondary{ background:var(--panel-2); color:var(--text); border:1px solid #333a5e; }
+  button:active{ transform:scale(.96); }
+  button:disabled{ opacity:.4; }
+
+  #deadlockBanner{
+    display:none; text-align:center; font-size:.78rem;
+    background:rgba(232,96,122,.15); color:#ffb4c2;
+    border:1px solid rgba(232,96,122,.4); border-radius:10px;
+    margin:0 12px 6px; padding:8px;
+  }
+
+  #legendBtn{
+    position:fixed; top:10px; right:10px; background:var(--panel-2);
+    color:var(--text); width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.85rem; border:1px solid #333a5e; padding:0;
+  }
+
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(6,7,16,.78);
+    display:none; align-items:center; justify-content:center;
+    z-index:50; padding:20px;
+  }
+  .modal-bg.show{ display:flex; }
+  .modal{
+    background:var(--panel); border:1px solid #333a5e;
+    border-radius:16px; padding:22px 20px; max-width:340px; width:100%;
+    text-align:center;
+  }
+  .modal h2{ margin:0 0 6px; color:var(--accent); font-size:1.2rem; }
+  .modal p{ font-size:.85rem; color:var(--text-dim); margin:4px 0 14px; line-height:1.5; }
+  .modal .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:6px;}
+  .legend-grid{ text-align:left; font-size:.78rem; line-height:1.7; max-height:50vh; overflow-y:auto; }
+  .legend-grid b{ color:var(--accent-2); }
+
+  footer{
+    text-align:center; padding:6px 10px 14px;
+    font-size:.68rem; color:var(--text-dim);
+    flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🀄 Mahjong Solitaire</h1>
+    <p>Cocokkan sepasang ubin yang terbuka hingga papan kosong</p>
+  </header>
+
+  <div id="hud">
+    <div class="stat"><div class="v" id="stTiles">144</div><div class="l">Sisa Ubin</div></div>
+    <div class="stat"><div class="v" id="stPairs">0</div><div class="l">Pasangan</div></div>
+    <div class="stat"><div class="v" id="stMoves">0</div><div class="l">Langkah</div></div>
+    <div class="stat"><div class="v" id="stTime">00:00</div><div class="l">Waktu</div></div>
+  </div>
+
+  <div id="deadlockBanner">⚠️ Tidak ada pasangan terbuka yang cocok. Tekan <b>Kocok Ulang</b> untuk melanjutkan.</div>
+
+  <div id="boardWrap">
+    <div id="boardOuter">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="btnRestart">🔄 Main Baru</button>
+    <button class="secondary" id="btnHint">💡 Hint</button>
+    <button class="secondary" id="btnShuffle">🔀 Kocok Ulang</button>
+    <button class="secondary" id="btnUndo">↩️ Undo</button>
+  </div>
+
+  <footer>Ide: Chilmar • Creator: Claude</footer>
+</div>
+
+<button id="legendBtn">?</button>
+
+<div class="modal-bg" id="legendModal">
+  <div class="modal">
+    <h2>Panduan Ubin</h2>
+    <div class="legend-grid">
+      <div><b>Karakter (万)</b> — 9 nilai, cocokkan angka yang sama.</div>
+      <div><b>Bambu (索)</b> — 9 nilai, cocokkan angka yang sama.</div>
+      <div><b>Lingkaran (筒)</b> — 9 nilai, cocokkan angka yang sama.</div>
+      <div><b>Angin</b> — Timur/Selatan/Barat/Utara, cocokkan yang sama persis.</div>
+      <div><b>Naga</b> — Merah/Hijau/Putih, cocokkan yang sama persis.</div>
+      <div><b>Bunga 🌸</b> — sesama Bunga apa pun boleh berpasangan.</div>
+      <div><b>Musim</b> — sesama Musim apa pun boleh berpasangan.</div>
+      <br>
+      <div>Ubin dapat diambil jika <b>tidak tertutup ubin lain di atasnya</b> dan <b>salah satu sisi kiri/kanannya terbuka</b>.</div>
+    </div>
+    <div class="row" style="margin-top:14px;">
+      <button id="closeLegend">Mengerti</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="winModal">
+  <div class="modal">
+    <h2 id="winTitle">🎉 Selesai!</h2>
+    <p id="winText"></p>
+    <div class="row">
+      <button id="winRestart">Main Lagi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Data ubin (Unicode Mahjong Tiles block) ----------
+  const CHAR = [...Array(9)].map((_,i)=>0x1F007+i);   // Karakter 1-9
+  const BAMBOO = [...Array(9)].map((_,i)=>0x1F010+i); // Bambu 1-9
+  const CIRCLE = [...Array(9)].map((_,i)=>0x1F019+i); // Lingkaran 1-9
+  const WINDS = [0x1F000,0x1F001,0x1F002,0x1F003];    // Angin E S W N
+  const DRAGONS = [0x1F004,0x1F005,0x1F006];           // Naga
+  const FLOWERS = [0x1F022,0x1F023,0x1F024,0x1F025];
+  const SEASONS = [0x1F026,0x1F027,0x1F028,0x1F029];
+
+  const MAIN_KINDS = [...CHAR,...BAMBOO,...CIRCLE,...WINDS,...DRAGONS]; // 34 kinds
+  function category(code){
+    if(FLOWERS.includes(code)) return 'flower';
+    if(SEASONS.includes(code)) return 'season';
+    return null;
+  }
+  function isMatch(a,b){
+    if(a===b) return true;
+    const ca=category(a), cb=category(b);
+    return ca && ca===cb;
+  }
+
+  // ---------- Layout: tower 4 level (14x6, 10x4, 6x2, 4x2) = 144 ----------
+  const LAYER_SPECS = [
+    {w:14,h:6},
+    {w:10,h:4},
+    {w:6,h:2},
+    {w:4,h:2}
+  ];
+  const BASE_W = LAYER_SPECS[0].w, BASE_H = LAYER_SPECS[0].h;
+
+  function buildPositions(){
+    const arr = [];
+    LAYER_SPECS.forEach((spec, layer)=>{
+      const offX = (BASE_W - spec.w)/2;
+      const offY = (BASE_H - spec.h)/2;
+      for(let r=0;r<spec.h;r++){
+        for(let c=0;c<spec.w;c++){
+          arr.push({col:c+offX, row:r+offY, layer});
+        }
+      }
+    });
+    return arr;
+  }
+
+  function buildTypePool(){
+    let pool = [];
+    MAIN_KINDS.forEach(k=>{ for(let i=0;i<4;i++) pool.push(k); }); // 34*4 = 136
+    pool = pool.concat(FLOWERS, SEASONS); // +8 = 144
+    return pool;
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------- Geometri render ----------
+  const TW = 66, TH = 86;          // ukuran dasar ubin (px, sebelum scaling)
+  const STAG_X = 11, STAG_Y = -11; // pergeseran visual per level (efek tumpukan)
+
+  // ---------- State ----------
+  let tiles = [];        // {id,col,row,layer,type,removed,el}
+  let selected = [];
+  let history = [];
+  let moves = 0, pairsFound = 0, timeSec = 0, timerHandle = null, started=false;
+  let boardEl, boardOuterEl;
+
+  function newGame(){
+    clearInterval(timerHandle);
+    timeSec = 0; moves = 0; pairsFound = 0; started=false;
+    updateHud();
+    document.getElementById('stTime').textContent = '00:00';
+
+    const positions = buildPositions();
+    const types = shuffle(buildTypePool());
+    tiles = positions.map((p,i)=>({
+      id:i, col:p.col, row:p.row, layer:p.layer,
+      type: types[i], removed:false
+    }));
+    selected = [];
+    history = [];
+    document.getElementById('deadlockBanner').style.display='none';
+    render(true);
+    checkDeadlockAndWarn();
+  }
+
+  function tileAt(col,row,layer){
+    return tiles.find(t=>!t.removed && t.col===col && t.row===row && t.layer===layer);
+  }
+  function isCovered(t){
+    return tiles.some(o=>!o.removed && o.layer>t.layer && o.col===t.col && o.row===t.row);
+  }
+  function isBlockedLeft(t){
+    return tiles.some(o=>!o.removed && o.layer===t.layer && o.row===t.row && o.col===t.col-1);
+  }
+  function isBlockedRight(t){
+    return tiles.some(o=>!o.removed && o.layer===t.layer && o.row===t.row && o.col===t.col+1);
+  }
+  function isFree(t){
+    if(t.removed) return false;
+    if(isCovered(t)) return false;
+    return !isBlockedLeft(t) || !isBlockedRight(t);
+  }
+
+  function freeTiles(){
+    return tiles.filter(t=>!t.removed && isFree(t));
+  }
+
+  function findAvailablePair(){
+    const free = freeTiles();
+    for(let i=0;i<free.length;i++){
+      for(let j=i+1;j<free.length;j++){
+        if(isMatch(free[i].type, free[j].type)) return [free[i],free[j]];
+      }
+    }
+    return null;
+  }
+
+  function checkDeadlockAndWarn(){
+    const banner = document.getElementById('deadlockBanner');
+    const remaining = tiles.filter(t=>!t.removed);
+    if(remaining.length===0){ banner.style.display='none'; return; }
+    const pair = findAvailablePair();
+    banner.style.display = pair ? 'none' : 'block';
+    document.getElementById('btnShuffle').style.outline = pair ? 'none' : '2px solid var(--danger)';
+  }
+
+  // ---------- Render ----------
+  function render(fresh){
+    if(fresh){
+      document.getElementById('board').innerHTML = '';
+      boardOuterEl = document.getElementById('boardOuter');
+      boardEl = document.getElementById('board');
+
+      const maxLayer = LAYER_SPECS.length-1;
+      const boardW = BASE_W*TW + maxLayer*STAG_X + 20;
+      const boardH = BASE_H*TH + maxLayer*Math.abs(STAG_Y) + 20;
+      boardEl.style.width = boardW+'px';
+      boardEl.style.height = boardH+'px';
+
+      tiles.forEach(t=>{
+        const el = document.createElement('div');
+        el.className = 'tile';
+        el.innerHTML = '<div class="face"><span class="glyph"></span></div>';
+        el.addEventListener('click', ()=>onTileClick(t));
+        boardEl.appendChild(el);
+        t.el = el;
+      });
+
+      fitToScreen();
+      window.addEventListener('resize', fitToScreen);
+    }
+    tiles.forEach(t=>{
+      const el = t.el;
+      if(t.removed){ el.style.display='none'; return; }
+      el.style.display='flex';
+      const x = 10 + t.col*TW + t.layer*STAG_X;
+      const y = 10 + t.row*TH + t.layer*STAG_Y;
+      el.style.left = x+'px';
+      el.style.top = y+'px';
+      el.style.width = TW+'px';
+      el.style.height = TH+'px';
+      el.style.zIndex = t.layer*1000 + t.row*10 + t.col;
+      el.querySelector('.glyph').textContent = String.fromCodePoint(t.type);
+
+      const free = isFree(t);
+      el.classList.toggle('covered', !free);
+      el.classList.toggle('free', free);
+      el.classList.toggle('selected', selected.includes(t));
+    });
+    updateHud();
+  }
+
+  const MIN_SCALE = 0.72; // batas bawah agar ubin tidak terlalu kecil; sisanya discroll
+  function fitToScreen(){
+    const wrap = document.getElementById('boardWrap');
+    const availW = wrap.clientWidth - 8;
+    const bw = boardEl.offsetWidth, bh = boardEl.offsetHeight;
+    let scale = Math.min(1, availW/bw);
+    scale = Math.max(scale, MIN_SCALE);
+    boardEl.style.transform = 'scale('+scale+')';
+    boardOuterEl.style.width = (bw*scale)+'px';
+    boardOuterEl.style.height = (bh*scale)+'px';
+  }
+
+  function updateHud(){
+    const remaining = tiles.filter(t=>!t.removed).length;
+    document.getElementById('stTiles').textContent = remaining;
+    document.getElementById('stPairs').textContent = pairsFound;
+    document.getElementById('stMoves').textContent = moves;
+  }
+
+  function startTimerIfNeeded(){
+    if(started) return;
+    started = true;
+    timerHandle = setInterval(()=>{
+      timeSec++;
+      const m = String(Math.floor(timeSec/60)).padStart(2,'0');
+      const s = String(timeSec%60).padStart(2,'0');
+      document.getElementById('stTime').textContent = m+':'+s;
+    },1000);
+  }
+
+  // ---------- Interaksi ----------
+  function onTileClick(t){
+    if(t.removed) return;
+    if(!isFree(t)){
+      t.el.classList.add('shake');
+      setTimeout(()=>t.el.classList.remove('shake'),300);
+      return;
+    }
+    startTimerIfNeeded();
+
+    if(selected.includes(t)){
+      selected = selected.filter(x=>x!==t);
+      render();
+      return;
+    }
+
+    if(selected.length===0){
+      selected = [t];
+      render();
+      return;
+    }
+
+    if(selected.length===1){
+      const a = selected[0];
+      if(isMatch(a.type, t.type)){
+        moves++;
+        pairsFound++;
+        history.push({a:a.id, b:t.id});
+        a.removed = true; t.removed = true;
+        a.el.classList.add('removing'); t.el.classList.add('removing');
+        selected = [];
+        setTimeout(()=>{ render(); afterMove(); }, 220);
+      } else {
+        moves++;
+        t.el.classList.add('shake'); a.el.classList.add('shake');
+        setTimeout(()=>{ a.el.classList.remove('shake'); t.el.classList.remove('shake'); },300);
+        selected = [t];
+        render();
+      }
+    }
+  }
+
+  function afterMove(){
+    const remaining = tiles.filter(x=>!x.removed).length;
+    if(remaining===0){
+      clearInterval(timerHandle);
+      const m = String(Math.floor(timeSec/60)).padStart(2,'0');
+      const s = String(timeSec%60).padStart(2,'0');
+      document.getElementById('winText').textContent =
+        'Papan berhasil dikosongkan dalam '+moves+' langkah dan waktu '+m+':'+s+'.';
+      document.getElementById('winModal').classList.add('show');
+      return;
+    }
+    checkDeadlockAndWarn();
+  }
+
+  function undo(){
+    if(history.length===0) return;
+    const last = history.pop();
+    const a = tiles.find(t=>t.id===last.a);
+    const b = tiles.find(t=>t.id===last.b);
+    a.removed = false; b.removed = false;
+    pairsFound = Math.max(0, pairsFound-1);
+    moves++;
+    selected = [];
+    render();
+    checkDeadlockAndWarn();
+  }
+
+  function hint(){
+    const pair = findAvailablePair();
+    if(!pair){
+      document.getElementById('deadlockBanner').style.display='block';
+      return;
+    }
+    pair.forEach(t=>{
+      t.el.classList.add('hint');
+      setTimeout(()=>t.el.classList.remove('hint'), 1600);
+    });
+  }
+
+  function shuffleRemaining(){
+    const remaining = tiles.filter(t=>!t.removed);
+    if(remaining.length===0) return;
+    let attempts = 0;
+    let types;
+    do{
+      types = shuffle(remaining.map(t=>t.type));
+      remaining.forEach((t,i)=> t.type = types[i]);
+      attempts++;
+    } while(attempts<25 && !findAvailablePair() && remaining.length>1);
+    selected = [];
+    render();
+    checkDeadlockAndWarn();
+  }
+
+  // ---------- Wiring ----------
+  document.getElementById('btnRestart').addEventListener('click', newGame);
+  document.getElementById('winRestart').addEventListener('click', ()=>{
+    document.getElementById('winModal').classList.remove('show');
+    newGame();
+  });
+  document.getElementById('btnHint').addEventListener('click', hint);
+  document.getElementById('btnShuffle').addEventListener('click', ()=>{
+    document.getElementById('btnShuffle').style.outline='none';
+    shuffleRemaining();
+  });
+  document.getElementById('btnUndo').addEventListener('click', undo);
+  document.getElementById('legendBtn').addEventListener('click', ()=>{
+    document.getElementById('legendModal').classList.add('show');
+  });
+  document.getElementById('closeLegend').addEventListener('click', ()=>{
+    document.getElementById('legendModal').classList.remove('show');
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
