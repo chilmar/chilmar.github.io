@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Diary Umrah — Premio Series 09 Hari, Makkah Awal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo:#1b4332;
+    --indigo-2:#24573f;
+    --sand:#F3EEE1;
+    --sand-2:#e9e0c9;
+    --ink:#241F18;
+    --gold:#c9a24d;
+    --gold-2:#ddbb70;
+    --teal:#3f6f78;
+    --rose:#8a3f2e;
+    --paper:#fbf8f0;
+    --line: rgba(36,31,24,0.14);
+    --radius: 14px;
+    --shadow: 0 10px 30px rgba(21,33,64,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(201,162,77,0.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(27,67,50,0.10), transparent 55%),
+      var(--sand);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:64px;
+  }
+  h1,h2,h3,.display{font-family:'Amiri', serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:var(--indigo);
+    color:var(--sand);
+    padding:10px 14px;
+    display:flex; align-items:center; gap:10px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.18);
+  }
+  .topbar .brand{
+    display:flex; flex-direction:column; line-height:1.05; flex:1; min-width:0;
+  }
+  .topbar .brand b{font-family:'Amiri',serif; font-size:16px; letter-spacing:.2px;}
+  .topbar .brand span{font-size:10.5px; color:var(--gold-2); font-family:'JetBrains Mono',monospace;}
+  .iconbtn{
+    background:rgba(255,255,255,0.08); color:var(--sand); border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px; padding:8px 10px; font-size:13px; font-weight:600; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .iconbtn:active{transform:scale(0.97);}
+  .iconbtn.gold{background:var(--gold); color:#241a05; border-color:var(--gold);}
+
+  .daynav{
+    display:flex; gap:6px; overflow-x:auto; padding:8px 12px 12px; background:var(--indigo-2);
+    scrollbar-width:none;
+  }
+  .daynav::-webkit-scrollbar{display:none;}
+  .daynav a{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--sand); text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:12px;
+    border:1.5px solid rgba(255,255,255,0.25);
+  }
+  .daynav a.filled{ background:var(--gold); color:#241a05; border-color:var(--gold); font-weight:700;}
+
+  .status{
+    padding:8px 16px; font-size:11.5px; text-align:center; color:var(--indigo);
+    background:var(--gold-2);
+  }
+  .status.warn{background:#f3d9c9; color:#5c2a17;}
+
+  /* ---------- Cover ---------- */
+  .cover{
+    margin:18px auto 26px; max-width:640px; padding:0 16px;
+  }
+  .cover-card{
+    background:var(--indigo);
+    color:var(--sand);
+    border-radius:18px;
+    padding:30px 24px 26px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .cover-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 12% 20%, rgba(201,162,77,0.16), transparent 40%),
+      radial-gradient(circle at 88% 82%, rgba(63,111,120,0.22), transparent 42%);
+    pointer-events:none;
+  }
+  .cover-eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--gold-2); text-transform:uppercase;}
+  .cover-title{font-size:28px; margin:8px 0 2px; line-height:1.15;}
+  .cover-sub{font-size:13.5px; color:rgba(241,231,211,0.75); margin-bottom:20px;}
+  .cover-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  .cover-field label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--gold-2); margin-bottom:4px;}
+  .cover-field input{
+    width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.22);
+    border-radius:8px; padding:9px 10px; color:var(--sand); font-family:'Inter',sans-serif; font-size:13.5px;
+  }
+  .cover-field input::placeholder{color:rgba(241,231,211,0.4);}
+  .route-strip{
+    display:flex; align-items:center; gap:8px; margin-top:20px; padding-top:16px;
+    border-top:1px dashed rgba(255,255,255,0.25); font-family:'JetBrains Mono',monospace; font-size:12px;
+  }
+  .route-strip .seg{background:rgba(255,255,255,0.08); padding:5px 9px; border-radius:6px;}
+  .route-strip .plane{color:var(--gold-2); font-size:14px;}
+
+  /* ---------- Day cards ---------- */
+  .wrap{max-width:640px; margin:0 auto; padding:0 16px;}
+  .day{
+    background:var(--paper);
+    border-radius:var(--radius);
+    margin-top:18px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    overflow:hidden;
+    scroll-margin-top:90px;
+  }
+  .day-head{
+    display:flex; align-items:center; gap:12px;
+    padding:16px 16px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .stamp{
+    flex:0 0 auto; width:56px; height:56px; border-radius:50%;
+    border:2px dashed var(--gold);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    transform:rotate(-7deg);
+    color:var(--gold);
+    font-family:'JetBrains Mono',monospace;
+    transition:all .2s ease;
+  }
+  .stamp b{font-size:17px; line-height:1;}
+  .stamp span{font-size:8px; letter-spacing:1px;}
+  .day.has-entry .stamp{
+    border-style:solid; color:var(--rose); border-color:var(--rose);
+    box-shadow:0 0 0 3px rgba(168,80,57,0.08);
+  }
+  .day-head-text{flex:1; min-width:0;}
+  .day-head-text .d-date{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--teal); font-weight:600; letter-spacing:.4px;}
+  .day-head-text h2{margin:2px 0 0; font-size:19px; line-height:1.2;}
+
+  .day-body{padding:14px 16px 18px;}
+  .itin{
+    background:var(--sand); border-left:3px solid var(--teal); border-radius:8px;
+    padding:10px 12px; font-size:12.8px; line-height:1.55; color:#3a3327;
+    margin-bottom:14px;
+  }
+  .itin b{color:var(--indigo);}
+
+  .mood-row{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;}
+  .mood{
+    border:1.5px solid var(--line); background:#fff; border-radius:20px;
+    padding:6px 11px; font-size:12.5px; cursor:pointer; display:flex; gap:5px; align-items:center;
+  }
+  .mood.active{background:var(--indigo); color:var(--sand); border-color:var(--indigo);}
+
+  label.field-label{
+    display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px;
+    color:#8a7f68; font-weight:700; margin-bottom:6px;
+  }
+  textarea.diary-input{
+    width:100%; min-height:110px; resize:vertical;
+    border:1.5px solid var(--line); border-radius:10px; padding:11px 12px;
+    font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.6; color:var(--ink);
+    background:#fff;
+  }
+  textarea.diary-input:focus{outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(47,111,99,0.12);}
+  .diary-print{display:none; white-space:pre-wrap; font-size:13px; line-height:1.6; padding:4px 2px;}
+
+  .photo-zone{margin-top:14px;}
+  .photo-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px;
+  }
+  .photo-thumb{
+    position:relative; aspect-ratio:1/1; border-radius:8px; overflow:hidden;
+    border:1px solid var(--line); background:#eee;
+  }
+  .photo-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .photo-thumb button{
+    position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%;
+    background:rgba(21,33,64,0.75); color:#fff; border:none; font-size:12px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .add-photo-btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    border:1.5px dashed var(--teal); color:var(--teal); border-radius:10px;
+    padding:11px; font-size:13px; font-weight:600; cursor:pointer; background:#fff;
+    width:100%;
+  }
+  .add-photo-btn:active{transform:scale(0.99);}
+  input[type=file]{display:none;}
+
+  /* ---------- Footer ---------- */
+  .footer{
+    max-width:640px; margin:26px auto 0; padding:16px 16px 30px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .footer .row{display:flex; gap:8px;}
+  .footer .row .iconbtn{flex:1; justify-content:center; background:#fff; color:var(--indigo); border:1.5px solid var(--line);}
+  .footer .row .iconbtn.gold{background:var(--gold); color:#241a05; border-color:var(--gold);}
+  .foot-note{font-size:11px; color:#8a7f68; text-align:center; line-height:1.5;}
+
+  /* ---------- Cover page for print ---------- */
+  .print-cover{display:none;}
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff; padding:0;}
+    .topbar, .daynav, .status, .add-photo-btn, .photo-thumb button, .mood-row, .footer{display:none !important;}
+    textarea.diary-input{display:none;}
+    .diary-print{display:block;}
+    .cover{display:none;}
+    .print-cover{
+      display:block; padding:40px 10px 30px; text-align:center; page-break-after:always;
+    }
+    .print-cover h1{font-size:30px; margin-bottom:6px;}
+    .print-cover .pe{font-family:'JetBrains Mono',monospace; letter-spacing:2px; font-size:12px; color:var(--teal); text-transform:uppercase;}
+    .print-cover .meta{margin-top:26px; font-size:13px; line-height:2;}
+    .wrap{max-width:100%; padding:0 14px;}
+    .day{box-shadow:none; border:1px solid #ccc; page-break-inside:avoid; break-inside:avoid; margin-top:0; page-break-before:always;}
+    .day:first-of-type{page-break-before:auto;}
+    .itin{background:#f4f1e8;}
+    .photo-grid{grid-template-columns:repeat(3,1fr);}
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <b>📖 Diary Umrah</b>
+      <span>PREMIO 09H · MAKKAH AWAL</span>
+    </div>
+    <button class="iconbtn" id="btnBackup">⇩ Backup</button>
+    <button class="iconbtn gold" id="btnPrint">🖨 PDF</button>
+  </div>
+  <div class="daynav" id="dayNav"></div>
+  <div class="status" id="statusBar">Memuat…</div>
+
+  <!-- Cover on-screen -->
+  <div class="cover">
+    <div class="cover-card">
+      <div class="cover-eyebrow">Buku Catatan Perjalanan</div>
+      <h1 class="cover-title display">Umrah Maqbullah<br>Premio Series 09 Hari</h1>
+      <div class="cover-sub">Makkah Awal · By Garuda Indonesia Direct Jeddah · Dream Tour</div>
+
+      <div class="cover-grid">
+        <div class="cover-field">
+          <label>Nama Jamaah</label>
+          <input type="text" id="inpNama" placeholder="Nama lengkap">
+        </div>
+        <div class="cover-field">
+          <label>Kloter / Grup</label>
+          <input type="text" id="inpGrup" placeholder="mis. Jan-27">
+        </div>
+      </div>
+
+      <div class="route-strip">
+        <span class="seg">CGK</span><span class="plane">✈</span><span class="seg">JED</span>
+        <span style="opacity:.5">→</span>
+        <span class="seg">MAKKAH 4 malam</span>
+        <span class="plane">🚄</span>
+        <span class="seg">MADINAH 3 malam</span>
+        <span style="opacity:.5">→</span>
+        <span class="seg">CGK</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cover for print only -->
+  <div class="print-cover">
+    <div class="pe">Buku Catatan Perjalanan</div>
+    <h1 class="display">Diary Umrah</h1>
+    <div class="pe" style="margin-top:4px;">Premio Series 09 Hari · Makkah Awal</div>
+    <div class="meta" id="printMeta"></div>
+  </div>
+
+  <div class="wrap" id="daysWrap"></div>
+
+  <div class="footer">
+    <div class="row">
+      <button class="iconbtn" id="btnBackup2">⇩ Export Backup (JSON)</button>
+      <button class="iconbtn" id="btnRestore">⇧ Import Backup</button>
+    </div>
+    <div class="row">
+      <button class="iconbtn gold" id="btnPrint2">🖨 Export ke PDF</button>
+    </div>
+    <input type="file" id="restoreFile" accept="application/json" style="display:none;">
+    <div class="foot-note">
+      Catatan &amp; foto tersimpan otomatis selama sesi aplikasi ini aktif. Untuk menyimpan permanen di perangkatmu,
+      gunakan <b>Export Backup</b> secara berkala, atau <b>Export ke PDF</b> setelah perjalanan selesai.<br>
+      Ide: Chilmar • Creator: Claude
+    </div>
+  </div>
+
+<script>
+(function(){
+
+  // ---------------- Itinerary (static, from Dream Tour Premio 09H Makkah Awal) ----------------
+  var ITINERARY = [
+    { day:1, date:"2027-01-07", loc:"Jakarta – Jeddah – Makkah",
+      desc:"Berkumpul di Bandara Soekarno-Hatta 3 jam sebelum keberangkatan menuju Jeddah. Tiba di Bandara King Abdul Aziz Jeddah, jamaah diantar ke Hotel Makkah, menyimpan barang, lalu melaksanakan ibadah Umrah. Kembali ke hotel untuk istirahat." },
+    { day:2, date:"2027-01-08", loc:"Makkah — Free Program",
+      desc:"Setelah sarapan pagi, memperbanyak ibadah di Masjidil Haram." },
+    { day:3, date:"2027-01-09", loc:"Makkah — Ziarah Kota Makkah",
+      desc:"Ziarah mengunjungi Padang Arafah, Jabal Rahmah, Muzdalifah, Mina, dan Jabal Tsur. Berakhir di Tan'im / Masjid Aisyah bagi yang mengambil miqot umrah kedua." },
+    { day:4, date:"2027-01-10", loc:"Makkah — Free Program",
+      desc:"Setelah sarapan pagi, memperbanyak ibadah di Masjidil Haram." },
+    { day:5, date:"2027-01-11", loc:"Makkah → Madinah (Kereta Cepat Haramain)",
+      desc:"Setelah Shalat Subuh dan Thawaf Wada', check out hotel. Naik Kereta Cepat Haramain menuju Madinah. Check in hotel dan memperbanyak ibadah di Masjid Nabawi." },
+    { day:6, date:"2027-01-12", loc:"Madinah",
+      desc:"Ibadah bebas di Masjid Nabawi. Sore hari mengunjungi Masjid Ghamama dan Maqam Baqi. Setelah Isya dan makan malam, ziarah ke Makam Rasulullah SAW & para sahabat, shalat sunnah dan berdoa di Raudah." },
+    { day:7, date:"2027-01-13", loc:"Madinah — Ziarah Kota Madinah",
+      desc:"Ziarah mengunjungi Jabal Uhud, Masjid Quba, dan Pasar Kurma. Kembali ke hotel dan memperbanyak ibadah di Masjid Nabawi." },
+    { day:8, date:"2027-01-14", loc:"Madinah → Airport Madinah",
+      desc:"Sarapan pagi, persiapan check out. Setelah Shalat Dzuhur dan makan siang, berangkat menuju Bandara Madinah untuk penerbangan pulang ke Jakarta." },
+    { day:9, date:"2027-01-15", loc:"Tiba di Jakarta",
+      desc:"Tiba kembali di Jakarta, insyaAllah membawa \"Umrah Maqbullah\" dan kenangan indah bersama Dream Tour." }
+  ];
+
+  var MOODS = [
+    {k:"syukur", e:"🤲", l:"Syukur"},
+    {k:"haru", e:"😢", l:"Haru"},
+    {k:"takjub", e:"✨", l:"Takjub"},
+    {k:"lelah", e:"😴", l:"Lelah"},
+    {k:"bahagia", e:"😊", l:"Bahagia"}
+  ];
+
+  var STORAGE_PREFIX = "umrah-diary-premio-2027";
+  var coverKey = STORAGE_PREFIX + ":cover";
+  function dayKey(d){ return STORAGE_PREFIX + ":day" + d; }
+  var storageOK = null; // null=unknown, true/false after first attempt
+  var saveTimers = {}; // per-key debounce timers
+
+  var data = {
+    nama:"", grup:"",
+    entries:{} // day -> { text, mood, photos:[{id,src}] }
+  };
+
+  function emptyEntry(){ return { text:"", mood:"", photos:[] }; }
+  function getEntry(d){
+    if(!data.entries[d]) data.entries[d] = emptyEntry();
+    return data.entries[d];
+  }
+
+  // ---------------- Storage ----------------
+  // Setiap hari disimpan di slot (key) terpisah, masing-masing berkuota hingga 5MB,
+  // jadi kapasitas foto tidak lagi berbagi jatah dengan hari-hari lain.
+  function setStatus(msg, warn){
+    var el = document.getElementById('statusBar');
+    el.textContent = msg;
+    el.className = 'status' + (warn ? ' warn':'');
+  }
+
+  async function loadData(){
+    if(!window.storage){
+      storageOK = false;
+      setStatus("⚠ Penyimpanan otomatis tidak tersedia di sesi ini — jangan lupa Export Backup / PDF sebelum menutup halaman.", true);
+      return;
+    }
+    storageOK = true;
+    try{
+      var cov = await window.storage.get(coverKey, false);
+      if(cov && cov.value){
+        var covParsed = JSON.parse(cov.value);
+        data.nama = covParsed.nama || "";
+        data.grup = covParsed.grup || "";
+      }
+    }catch(e){ /* belum ada data cover, biarkan default */ }
+
+    for(var d=1; d<=9; d++){
+      try{
+        var res = await window.storage.get(dayKey(d), false);
+        if(res && res.value){
+          data.entries[d] = JSON.parse(res.value);
+        }
+      }catch(e){ /* belum ada catatan hari ini, biarkan default */ }
+    }
+    setStatus("✓ Tersimpan otomatis di penyimpanan aplikasi ini (kuota per hari, hingga 5MB/hari).");
+  }
+
+  function saveKeyDebounced(key, getPayload){
+    clearTimeout(saveTimers[key]);
+    saveTimers[key] = setTimeout(function(){ saveKeyNow(key, getPayload()); }, 500);
+  }
+
+  async function saveKeyNow(key, payload){
+    if(storageOK === false) return; // in-memory only fallback
+    try{
+      await window.storage.set(key, JSON.stringify(payload), false);
+      setStatus("✓ Tersimpan otomatis · " + new Date().toLocaleTimeString('id-ID'));
+    }catch(e){
+      setStatus("⚠ Gagal menyimpan (mungkin kuota hari ini penuh) — gunakan Export Backup agar catatan tidak hilang.", true);
+    }
+  }
+
+  function saveCoverDebounced(){
+    saveKeyDebounced(coverKey, function(){ return { nama:data.nama, grup:data.grup }; });
+  }
+  function saveEntryDebounced(d){
+    saveKeyDebounced(dayKey(d), function(){ return getEntry(d); });
+  }
+
+  // ---------------- Image compression ----------------
+  function readAndCompress(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        var img = new Image();
+        img.onload = function(){
+          var maxW = 1100;
+          var scale = Math.min(1, maxW / img.width);
+          var w = Math.round(img.width * scale);
+          var h = Math.round(img.height * scale);
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.72));
+        };
+        img.onerror = reject;
+        img.src = ev.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------------- Rendering ----------------
+  var daysWrap = document.getElementById('daysWrap');
+  var dayNav = document.getElementById('dayNav');
+
+  function fmtDate(iso){
+    var d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString('id-ID', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  }
+
+  function render(){
+    daysWrap.innerHTML = "";
+    dayNav.innerHTML = "";
+    document.getElementById('inpNama').value = data.nama || "";
+    document.getElementById('inpGrup').value = data.grup || "";
+
+    ITINERARY.forEach(function(it){
+      var entry = getEntry(it.day);
+      var hasEntry = (entry.text && entry.text.trim().length > 0) || (entry.photos && entry.photos.length > 0);
+
+      // nav dot
+      var navA = document.createElement('a');
+      navA.href = "#day" + it.day;
+      navA.textContent = it.day;
+      if(hasEntry) navA.className = "filled";
+      dayNav.appendChild(navA);
+
+      // day card
+      var card = document.createElement('div');
+      card.className = "day" + (hasEntry ? " has-entry" : "");
+      card.id = "day" + it.day;
+
+      var moodChips = MOODS.map(function(m){
+        var active = entry.mood === m.k ? " active" : "";
+        return '<button type="button" class="mood'+active+'" data-day="'+it.day+'" data-mood="'+m.k+'">'+m.e+' '+m.l+'</button>';
+      }).join("");
+
+      var photoThumbs = (entry.photos||[]).map(function(p){
+        return '<div class="photo-thumb"><img src="'+p.src+'" alt="foto hari '+it.day+'">'+
+               '<button type="button" data-day="'+it.day+'" data-pid="'+p.id+'" class="btnDelPhoto">✕</button></div>';
+      }).join("");
+
+      card.innerHTML =
+        '<div class="day-head">'+
+          '<div class="stamp"><b>'+String(it.day).padStart(2,'0')+'</b><span>HARI</span></div>'+
+          '<div class="day-head-text">'+
+            '<div class="d-date">'+fmtDate(it.date)+'</div>'+
+            '<h2>'+it.loc+'</h2>'+
+          '</div>'+
+        '</div>'+
+        '<div class="day-body">'+
+          '<div class="itin"><b>Rencana perjalanan:</b> '+it.desc+'</div>'+
+          '<label class="field-label">Perasaan hari ini</label>'+
+          '<div class="mood-row">'+moodChips+'</div>'+
+          '<label class="field-label">Catatan harian</label>'+
+          '<textarea class="diary-input" data-day="'+it.day+'" placeholder="Tulis pengalaman, doa, atau momen berkesan hari ini…">'+(entry.text||'')+'</textarea>'+
+          '<div class="diary-print">'+ (entry.text ? escapeHtml(entry.text) : '(tidak ada catatan)') +'</div>'+
+          '<div class="photo-zone">'+
+            '<label class="field-label">Foto (opsional)</label>'+
+            '<button type="button" class="add-photo-btn" data-day="'+it.day+'">📷 Tambah Foto</button>'+
+            '<input type="file" class="photoInput" data-day="'+it.day+'" accept="image/*" multiple>'+
+            '<div class="photo-grid">'+photoThumbs+'</div>'+
+          '</div>'+
+        '</div>';
+
+      daysWrap.appendChild(card);
+    });
+
+    // print meta
+    var pm = document.getElementById('printMeta');
+    pm.innerHTML = (data.nama ? ('Jamaah: <b>'+escapeHtml(data.nama)+'</b><br>') : '') +
+      (data.grup ? ('Kloter/Grup: <b>'+escapeHtml(data.grup)+'</b><br>') : '') +
+      'Keberangkatan: <b>07 Januari 2027</b> · Dream Tour — Direct Jeddah (GA)';
+
+    attachHandlers();
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function attachHandlers(){
+    document.querySelectorAll('.diary-input').forEach(function(ta){
+      ta.addEventListener('input', function(){
+        var d = this.getAttribute('data-day');
+        getEntry(d).text = this.value;
+        var card = document.getElementById('day'+d);
+        var pv = card.querySelector('.diary-print');
+        pv.textContent = this.value || '(tidak ada catatan)';
+        updateStampState(d);
+        saveEntryDebounced(d);
+      });
+    });
+
+    document.querySelectorAll('.mood').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var d = this.getAttribute('data-day');
+        var m = this.getAttribute('data-mood');
+        var entry = getEntry(d);
+        entry.mood = (entry.mood === m) ? "" : m;
+        render();
+        saveEntryDebounced(d);
+      });
+    });
+
+    document.querySelectorAll('.add-photo-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var d = this.getAttribute('data-day');
+        document.querySelector('.photoInput[data-day="'+d+'"]').click();
+      });
+    });
+
+    document.querySelectorAll('.photoInput').forEach(function(inp){
+      inp.addEventListener('change', async function(){
+        var d = this.getAttribute('data-day');
+        var files = Array.from(this.files || []);
+        if(!files.length) return;
+        setStatus("Memproses foto…");
+        for(var i=0;i<files.length;i++){
+          try{
+            var src = await readAndCompress(files[i]);
+            getEntry(d).photos.push({ id: 'p'+Date.now()+Math.random().toString(16).slice(2), src: src });
+          }catch(e){}
+        }
+        this.value = "";
+        render();
+        saveEntryDebounced(d);
+      });
+    });
+
+    document.querySelectorAll('.btnDelPhoto').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var d = this.getAttribute('data-day');
+        var pid = this.getAttribute('data-pid');
+        var entry = getEntry(d);
+        entry.photos = entry.photos.filter(function(p){ return p.id !== pid; });
+        render();
+        saveEntryDebounced(d);
+      });
+    });
+  }
+
+  function updateStampState(d){
+    var entry = getEntry(d);
+    var hasEntry = (entry.text && entry.text.trim().length>0) || (entry.photos && entry.photos.length>0);
+    var card = document.getElementById('day'+d);
+    card.classList.toggle('has-entry', hasEntry);
+    var navA = dayNav.querySelector('a[href="#day'+d+'"]');
+    if(navA) navA.classList.toggle('filled', hasEntry);
+  }
+
+  // ---------------- Cover fields ----------------
+  document.getElementById('inpNama').addEventListener('input', function(){
+    data.nama = this.value; saveCoverDebounced();
+    document.getElementById('printMeta').innerHTML = (data.nama ? ('Jamaah: <b>'+escapeHtml(data.nama)+'</b><br>') : '') +
+      (data.grup ? ('Kloter/Grup: <b>'+escapeHtml(data.grup)+'</b><br>') : '') +
+      'Keberangkatan: <b>07 Januari 2027</b> · Dream Tour — Direct Jeddah (GA)';
+  });
+  document.getElementById('inpGrup').addEventListener('input', function(){
+    data.grup = this.value; saveCoverDebounced();
+    document.getElementById('printMeta').innerHTML = (data.nama ? ('Jamaah: <b>'+escapeHtml(data.nama)+'</b><br>') : '') +
+      (data.grup ? ('Kloter/Grup: <b>'+escapeHtml(data.grup)+'</b><br>') : '') +
+      'Keberangkatan: <b>07 Januari 2027</b> · Dream Tour — Direct Jeddah (GA)';
+  });
+
+  // ---------------- Backup / Restore ----------------
+  function doBackup(){
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var tanggal = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = 'diary-umrah-backup-'+tanggal+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('btnBackup').addEventListener('click', doBackup);
+  document.getElementById('btnBackup2').addEventListener('click', doBackup);
+
+  document.getElementById('btnRestore').addEventListener('click', function(){
+    document.getElementById('restoreFile').click();
+  });
+  document.getElementById('restoreFile').addEventListener('change', function(){
+    var file = this.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var parsed = JSON.parse(ev.target.result);
+        data.nama = parsed.nama || "";
+        data.grup = parsed.grup || "";
+        data.entries = parsed.entries || {};
+        render();
+        saveCoverDebounced();
+        for(var d=1; d<=9; d++){ saveEntryDebounced(d); }
+        setStatus("✓ Backup berhasil dimuat.");
+      }catch(e){
+        alert("File backup tidak valid.");
+      }
+    };
+    reader.readAsText(file);
+    this.value = "";
+  });
+
+  // ---------------- Print / PDF ----------------
+  function doPrint(){ window.print(); }
+  document.getElementById('btnPrint').addEventListener('click', doPrint);
+  document.getElementById('btnPrint2').addEventListener('click', doPrint);
+
+  // ---------------- Init ----------------
+  (async function init(){
+    await loadData();
+    render();
+  })();
+
+})();
+</script>
+</body>
+</html>

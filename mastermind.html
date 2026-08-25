@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vault Break — Mastermind</title>
+<style>
+  :root{
+    --bg-1:#0d1321;
+    --bg-2:#141d33;
+    --panel:#1a2540;
+    --panel-2:#20304f;
+    --brass:#c9a24b;
+    --brass-light:#e6c877;
+    --ink:#e9edf5;
+    --ink-dim:#8593b0;
+    --good:#4caf7d;
+    --bad:#d9634f;
+    --line:#2c3a5c;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% -10%, #1c2a4a 0%, var(--bg-1) 55%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0 2px, transparent 2px 6px);
+    color:var(--ink);
+    font-family:'Georgia', 'Times New Roman', serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:18px 12px 40px;
+  }
+  .brand{
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .brand .eyebrow{
+    font-family:'Courier New', monospace;
+    letter-spacing:4px;
+    font-size:11px;
+    color:var(--brass);
+    text-transform:uppercase;
+  }
+  .brand h1{
+    margin:4px 0 2px;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:1px;
+    background:linear-gradient(180deg,var(--brass-light),var(--brass));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .brand .sub{
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+
+  .statusbar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    margin:10px 0 16px;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+  }
+  .statusbar .chip{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:5px 10px;
+    border-radius:20px;
+  }
+  .statusbar .chip b{color:var(--brass-light);}
+
+  .board{
+    width:100%;
+    max-width:420px;
+    background:linear-gradient(180deg, var(--panel), var(--bg-2));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+
+  .rows{
+    display:flex;
+    flex-direction:column-reverse;
+    gap:6px;
+    max-height:46vh;
+    overflow-y:auto;
+    padding-right:2px;
+    margin-bottom:10px;
+  }
+  .rows::-webkit-scrollbar{width:4px;}
+  .rows::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+
+  .row{
+    display:grid;
+    grid-template-columns:24px repeat(4, 1fr) 34px;
+    align-items:center;
+    gap:6px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:6px 8px;
+    opacity:0;
+    transform:translateY(6px);
+    animation:rowIn .35s ease forwards;
+  }
+  .row.active{
+    border-color:var(--brass);
+    box-shadow:0 0 0 1px rgba(201,162,75,0.25);
+  }
+  @keyframes rowIn{ to{opacity:1; transform:translateY(0);} }
+
+  .row .idx{
+    font-family:'Courier New', monospace;
+    font-size:10px;
+    color:var(--ink-dim);
+    text-align:center;
+  }
+
+  .peg-slot{
+    width:100%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2a3a5e, #16223c);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .peg-slot.filled{
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.35), inset 0 2px 3px rgba(255,255,255,0.25);
+  }
+  .peg-slot.active-slot{
+    box-shadow:0 0 0 2px var(--brass);
+  }
+  .row.active .peg-slot:hover{ transform:scale(1.05); }
+
+  .feedback{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    grid-template-rows:repeat(2, 1fr);
+    gap:4px;
+    width:38px;
+    height:38px;
+    margin:0 auto;
+  }
+  .fpeg{
+    position:relative;
+    border-radius:50%;
+    background:transparent;
+  }
+  .fpeg::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    margin:auto;
+    width:60%;
+    height:60%;
+    border-radius:50%;
+    background:#0a1226;
+    border:1px solid var(--line);
+  }
+  .fpeg.black::before{
+    width:100%;
+    height:100%;
+    background:radial-gradient(circle at 35% 30%, #4a4a4a, #0a0a0a);
+    border:1px solid #555;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4);
+  }
+  .fpeg.white::before{
+    width:100%;
+    height:100%;
+    background:radial-gradient(circle at 35% 30%, #ffffff, #d4d4d4);
+    border:1px solid #fff;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.4), inset 0 -2px 3px rgba(0,0,0,0.15);
+  }
+
+  .palette{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .color-btn{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.15);
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+    box-shadow: inset 0 -4px 6px rgba(0,0,0,0.35), inset 0 2px 3px rgba(255,255,255,0.3);
+  }
+  .color-btn:active{ transform:scale(0.9); }
+  .color-btn.selected{
+    box-shadow:0 0 0 3px var(--brass-light), inset 0 -4px 6px rgba(0,0,0,0.35);
+    transform:scale(1.08);
+  }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    width:100%;
+    max-width:420px;
+  }
+  .btn{
+    flex:1;
+    padding:12px 10px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink);
+    font-family:'Courier New', monospace;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+  .btn.primary{
+    background:linear-gradient(180deg, var(--brass-light), var(--brass));
+    color:#1a1204;
+    border:none;
+    font-weight:700;
+  }
+  .btn:disabled{ opacity:0.4; }
+
+  .legend{
+    max-width:420px;
+    width:100%;
+    margin-top:14px;
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    display:flex;
+    gap:14px;
+    justify-content:center;
+  }
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .dotpeg{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(6,9,20,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:10;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background:linear-gradient(180deg, var(--panel), var(--bg-2));
+    border:1px solid var(--brass);
+    border-radius:16px;
+    padding:26px 22px;
+    text-align:center;
+    max-width:320px;
+    width:100%;
+  }
+  .modal h2{
+    margin:0 0 6px;
+    font-size:22px;
+    color:var(--brass-light);
+  }
+  .modal p{
+    color:var(--ink-dim);
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    margin-bottom:14px;
+  }
+  .code-reveal{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .code-reveal .peg-slot{ width:40px; cursor:default; }
+
+  @media (max-width:360px){
+    .color-btn{width:32px; height:32px;}
+    .brand h1{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="brand">
+    <div class="eyebrow">Ide: Chilmar • Creator: Claude</div>
+    <h1>VAULT BREAK</h1>
+    <div class="sub">— pecahkan kode 4 warna sebelum kesempatan habis —</div>
+  </div>
+
+  <div class="statusbar">
+    <div class="chip">Percobaan <b id="attemptCount">0</b>/<b id="maxAttempts">10</b></div>
+    <div class="chip" id="statusChip">Menyusun kode…</div>
+  </div>
+
+  <div class="board">
+    <div class="rows" id="rows"></div>
+
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <div class="actions" id="actionsPlaying">
+    <button class="btn" id="clearBtn">Hapus Baris</button>
+    <button class="btn primary" id="submitBtn" disabled>Kunci Tebakan</button>
+  </div>
+
+  <div class="actions" id="actionsFinished" style="display:none;">
+    <button class="btn primary" id="viewResultBtn" style="width:100%;">Lihat Hasil</button>
+  </div>
+
+  <div class="legend">
+    <span><span class="dotpeg" style="background:#1c1c1c;"></span> Warna &amp; posisi tepat</span>
+    <span><span class="dotpeg" style="background:#eee;"></span> Warna tepat, posisi salah</span>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Vault Terbuka!</h2>
+      <p id="modalSub">Kode rahasia:</p>
+      <div class="code-reveal" id="codeReveal"></div>
+      <button class="btn primary" id="playAgainBtn" style="width:100%;">Main Lagi</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const COLORS = [
+    {name:'Merah',   hex:'#e63946'},
+    {name:'Kuning',  hex:'#f4c430'},
+    {name:'Hijau',   hex:'#2ecc71'},
+    {name:'Biru',    hex:'#2f80ed'},
+    {name:'Oranye',  hex:'#ff8c32'},
+    {name:'Magenta', hex:'#e84393'},
+  ];
+  const CODE_LENGTH = 4;
+  const MAX_ATTEMPTS = 10;
+
+  let secret = [];
+  let attempts = [];          // array of {guess:[idx], feedback:{black,white}}
+  let currentGuess = [null,null,null,null];
+  let activeSlot = 0;
+  let selectedColor = null;
+  let gameOver = false;
+
+  const rowsEl = document.getElementById('rows');
+  const paletteEl = document.getElementById('palette');
+  const attemptCountEl = document.getElementById('attemptCount');
+  const maxAttemptsEl = document.getElementById('maxAttempts');
+  const statusChip = document.getElementById('statusChip');
+  const submitBtn = document.getElementById('submitBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const overlay = document.getElementById('overlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSub = document.getElementById('modalSub');
+  const codeReveal = document.getElementById('codeReveal');
+  const playAgainBtn = document.getElementById('playAgainBtn');
+
+  maxAttemptsEl.textContent = MAX_ATTEMPTS;
+
+  function newSecret(){
+    const s = [];
+    for(let i=0;i<CODE_LENGTH;i++){
+      s.push(Math.floor(Math.random()*COLORS.length));
+    }
+    return s;
+  }
+
+  function initGame(){
+    secret = newSecret();
+    attempts = [];
+    currentGuess = new Array(CODE_LENGTH).fill(null);
+    activeSlot = 0;
+    selectedColor = null;
+    gameOver = false;
+    overlay.classList.remove('show');
+    attemptCountEl.textContent = 0;
+    statusChip.textContent = 'Menyusun kode…';
+    submitBtn.disabled = true;
+    renderPalette();
+    renderRows();
+  }
+
+  function renderPalette(){
+    paletteEl.innerHTML = '';
+    COLORS.forEach((c, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'color-btn' + (selectedColor === idx ? ' selected' : '');
+      btn.style.background = `radial-gradient(circle at 35% 30%, ${lighten(c.hex)}, ${c.hex})`;
+      btn.title = c.name;
+      btn.addEventListener('click', () => {
+        if(gameOver) return;
+        selectedColor = idx;
+        currentGuess[activeSlot] = idx;
+        activeSlot = Math.min(activeSlot + 1, CODE_LENGTH - 1);
+        renderPalette();
+        renderActiveRow();
+        checkSubmitEnabled();
+      });
+      paletteEl.appendChild(btn);
+    });
+  }
+
+  function lighten(hex){
+    // quick lighten for radial highlight
+    return hex + 'cc';
+  }
+
+  function checkSubmitEnabled(){
+    submitBtn.disabled = currentGuess.some(v => v === null) || gameOver;
+  }
+
+  function renderRows(){
+    rowsEl.innerHTML = '';
+    // past attempts (oldest at bottom due to column-reverse, so append in order)
+    attempts.forEach((a, i) => {
+      rowsEl.appendChild(buildRow(a.guess, a.feedback, i + 1, false));
+    });
+    if(!gameOver){
+      rowsEl.appendChild(buildActiveRow());
+    }
+  }
+
+  function buildActiveRow(){
+    const row = buildRow(currentGuess, null, attempts.length + 1, true);
+    row.classList.add('active');
+    return row;
+  }
+
+  function renderActiveRow(){
+    // Re-render just to reflect currentGuess + activeSlot highlight
+    renderRows();
+  }
+
+  function buildRow(guessArr, feedback, rowNumber, isActive){
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.animationDelay = '0s';
+
+    const idx = document.createElement('div');
+    idx.className = 'idx';
+    idx.textContent = rowNumber;
+    row.appendChild(idx);
+
+    guessArr.forEach((val, slotIdx) => {
+      const slot = document.createElement('div');
+      slot.className = 'peg-slot' + (val !== null ? ' filled' : '') + (isActive && slotIdx === activeSlot ? ' active-slot' : '');
+      if(val !== null){
+        slot.style.background = `radial-gradient(circle at 35% 30%, ${lighten(COLORS[val].hex)}, ${COLORS[val].hex})`;
+      }
+      if(isActive){
+        slot.addEventListener('click', () => {
+          activeSlot = slotIdx;
+          renderRows();
+        });
+      }
+      row.appendChild(slot);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    if(feedback){
+      const pegs = [];
+      for(let i=0;i<feedback.black;i++) pegs.push('black');
+      for(let i=0;i<feedback.white;i++) pegs.push('white');
+      while(pegs.length < 4) pegs.push('empty');
+      pegs.forEach(p => {
+        const f = document.createElement('div');
+        f.className = 'fpeg' + (p !== 'empty' ? ' ' + p : '');
+        fb.appendChild(f);
+      });
+    } else {
+      for(let i=0;i<4;i++){
+        const f = document.createElement('div');
+        f.className = 'fpeg';
+        fb.appendChild(f);
+      }
+    }
+    row.appendChild(fb);
+
+    return row;
+  }
+
+  function evaluateGuess(guess){
+    let black = 0;
+    const secretRemain = [];
+    const guessRemain = [];
+    for(let i=0;i<CODE_LENGTH;i++){
+      if(guess[i] === secret[i]){
+        black++;
+      } else {
+        secretRemain.push(secret[i]);
+        guessRemain.push(guess[i]);
+      }
+    }
+    let white = 0;
+    const used = new Array(secretRemain.length).fill(false);
+    guessRemain.forEach(g => {
+      const foundIdx = secretRemain.findIndex((s, i) => s === g && !used[i]);
+      if(foundIdx !== -1){
+        used[foundIdx] = true;
+        white++;
+      }
+    });
+    return {black, white};
+  }
+
+  submitBtn.addEventListener('click', () => {
+    if(currentGuess.some(v => v === null) || gameOver) return;
+    const feedback = evaluateGuess(currentGuess);
+    attempts.push({guess:[...currentGuess], feedback});
+    attemptCountEl.textContent = attempts.length;
+
+    if(feedback.black === CODE_LENGTH){
+      gameOver = true;
+      finishGame(true);
+    } else if(attempts.length >= MAX_ATTEMPTS){
+      gameOver = true;
+      finishGame(false);
+    } else {
+      currentGuess = new Array(CODE_LENGTH).fill(null);
+      activeSlot = 0;
+      statusChip.textContent = `${feedback.black} tepat, ${feedback.white} posisi salah`;
+    }
+    renderRows();
+    checkSubmitEnabled();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    if(gameOver) return;
+    currentGuess = new Array(CODE_LENGTH).fill(null);
+    activeSlot = 0;
+    renderRows();
+    checkSubmitEnabled();
+  });
+
+  let lastResultWon = false;
+
+  function finishGame(won){
+    lastResultWon = won;
+    statusChip.textContent = won
+      ? `Menang dalam ${attempts.length} percobaan — geser papan untuk melihat riwayat`
+      : 'Vault terkunci — geser papan untuk melihat riwayat';
+
+    // Tampilkan tombol "Lihat Hasil" menggantikan tombol aksi bermain,
+    // tanpa langsung menutupi papan dengan overlay.
+    document.getElementById('actionsPlaying').style.display = 'none';
+    document.getElementById('actionsFinished').style.display = 'flex';
+  }
+
+  function openResultModal(){
+    modalTitle.textContent = lastResultWon ? 'Vault Terbuka! 🔓' : 'Vault Terkunci 🔒';
+    modalSub.textContent = lastResultWon
+      ? `Berhasil dalam ${attempts.length} percobaan. Kode rahasia:`
+      : 'Kesempatan habis. Kode rahasia:';
+
+    codeReveal.innerHTML = '';
+    secret.forEach(val => {
+      const slot = document.createElement('div');
+      slot.className = 'peg-slot filled';
+      slot.style.background = `radial-gradient(circle at 35% 30%, ${lighten(COLORS[val].hex)}, ${COLORS[val].hex})`;
+      codeReveal.appendChild(slot);
+    });
+
+    overlay.classList.add('show');
+  }
+
+  document.getElementById('viewResultBtn').addEventListener('click', openResultModal);
+
+  playAgainBtn.addEventListener('click', () => {
+    document.getElementById('actionsPlaying').style.display = 'flex';
+    document.getElementById('actionsFinished').style.display = 'none';
+    initGame();
+  });
+
+  initGame();
+})();
+</script>
+
+</body>
+</html>
