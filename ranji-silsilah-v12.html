@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ranji Rumah Gadang Panca — Silsilah Keluarga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,600;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{
+  --bg:#1a1512; --surface:#221b16; --surface2:#2b221b; --border:#3c3126;
+  --gold:#c9a24b; --gold-soft:#e6cd93; --brick:#9a4c34; --brick-soft:#c96b4d;
+  --text:#ede4d3; --text-muted:#a99b84; --danger:#c15b48; --ok:#7a9a6b;
+  --radius:14px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif; -webkit-font-smoothing:antialiased;}
+body{padding-bottom:90px;}
+h1,h2,h3,.serif{font-family:'Fraunces',serif;}
+::selection{background:var(--gold); color:#1a1512;}
+
+/* HEADER */
+header.top{
+  position:sticky; top:0; z-index:20; background:linear-gradient(180deg,var(--bg) 70%,transparent);
+  padding:22px 18px 10px;
+}
+.brandrow{display:flex; align-items:center; gap:12px;}
+.gunungan{width:34px; height:34px; flex-shrink:0;}
+.brandrow h1{font-size:1.5rem; font-weight:600; margin:0; letter-spacing:0.3px; color:var(--gold-soft);}
+.brandrow .sub{font-size:0.78rem; color:var(--text-muted); margin-top:1px;}
+.statline{margin-top:10px; font-size:0.78rem; color:var(--text-muted); display:flex; gap:14px;}
+.statline b{color:var(--gold);}
+
+/* SEARCH + TABS */
+.controls{padding:14px 18px 4px;}
+.searchbar{position:relative;}
+.searchbar input{
+  width:100%; padding:11px 14px 11px 38px; border-radius:12px; border:1px solid var(--border);
+  background:var(--surface); color:var(--text); font-size:0.92rem; font-family:inherit;
+}
+.searchbar input:focus{outline:none; border-color:var(--gold);}
+.searchbar svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; opacity:0.5;}
+.tabs{display:flex; gap:8px; margin-top:12px;}
+.tab{flex:1; text-align:center; padding:9px 0; border-radius:10px; font-size:0.82rem; font-weight:600;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border); cursor:pointer;}
+.tab.active{color:#1a1512; background:var(--gold); border-color:var(--gold);}
+.menubtn{width:38px; height:38px; border-radius:10px; background:var(--surface); border:1px solid var(--border);
+  color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+
+.controls-row{display:flex; gap:8px; align-items:center;}
+
+/* CONTENT */
+main{padding:16px 18px 10px;}
+.empty{text-align:center; padding:60px 20px; color:var(--text-muted);}
+.empty .gunungan{width:64px; height:64px; margin:0 auto 14px; opacity:0.4;}
+.empty h3{color:var(--gold-soft); font-weight:500; margin:0 0 6px;}
+.empty p{font-size:0.85rem; margin:0 0 18px; line-height:1.5;}
+
+.gen-label{display:flex; align-items:center; gap:8px; margin:22px 0 10px;}
+.gen-label:first-child{margin-top:0;}
+.gen-label .line{flex:1; height:1px; background:var(--border);}
+.gen-label span{font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); white-space:nowrap;}
+
+.tree-node{position:relative; margin-left:0;}
+.tree-children{margin-left:22px; padding-left:14px; border-left:1px dashed var(--border);}
+
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:11px 12px; margin-bottom:8px; display:flex; align-items:center; gap:11px; cursor:pointer;
+  transition:border-color 0.15s;
+}
+.card:active{border-color:var(--gold);}
+.avatar{width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;
+  background:var(--surface2); display:flex; align-items:center; justify-content:center;
+  font-family:'Fraunces',serif; font-weight:600; color:var(--gold); font-size:1.05rem; border:1px solid var(--border);}
+.card .info{min-width:0; flex:1;}
+.card .name{font-family:'Fraunces',serif; font-weight:500; font-size:1rem; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.card .name .nick{color:var(--gold); font-style:italic; font-weight:400; font-size:0.88em;}
+.card .meta{font-size:0.74rem; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.card .deceased{opacity:0.55;}
+.spouse-pill{font-size:0.7rem; color:var(--brick-soft); margin-top:2px;}
+.life-pill{font-size:0.72rem; color:var(--text-muted); margin-top:1px;}
+
+.listview .card{margin-bottom:8px;}
+
+/* FAB */
+.fab{
+  position:fixed; right:18px; bottom:22px; width:56px; height:56px; border-radius:50%;
+  background:var(--gold); color:#1a1512; border:none; font-size:1.6rem; display:flex; align-items:center;
+  justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,0.4); cursor:pointer; z-index:30;
+}
+
+/* SHEET / MODAL */
+.overlay{position:fixed; inset:0; background:rgba(10,8,6,0.72); z-index:50; display:none; align-items:flex-end;}
+.overlay.show{display:flex;}
+.sheet{
+  background:var(--bg); width:100%; max-height:92vh; overflow-y:auto; border-radius:20px 20px 0 0;
+  border-top:1px solid var(--border); padding:16px 18px 26px; animation:slideup 0.22s ease-out;
+}
+@keyframes slideup{from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+.sheet-handle{width:38px; height:4px; background:var(--border); border-radius:3px; margin:0 auto 14px;}
+.sheet-title{font-family:'Fraunces',serif; font-size:1.25rem; font-weight:600; color:var(--gold-soft); margin:0 0 4px;}
+.sheet-close{position:absolute; right:16px; top:14px; width:32px; height:32px; border-radius:50%;
+  background:var(--surface); border:1px solid var(--border); color:var(--text); display:flex; align-items:center;
+  justify-content:center; cursor:pointer;}
+
+/* DETAIL */
+.detail-head{display:flex; flex-direction:column; align-items:center; text-align:center; padding:6px 0 18px;}
+.detail-avatar{width:88px; height:88px; border-radius:50%; object-fit:cover; background:var(--surface2);
+  border:2px solid var(--gold); display:flex; align-items:center; justify-content:center;
+  font-family:'Fraunces',serif; font-weight:600; font-size:2rem; color:var(--gold); margin-bottom:12px;}
+.detail-name{font-family:'Fraunces',serif; font-size:1.4rem; font-weight:600;}
+.detail-date{font-size:0.82rem; color:var(--text-muted); margin-top:2px;}
+.detail-nick{color:var(--gold); font-style:italic; font-size:0.95rem; margin-top:2px;}
+.detail-life{color:var(--text-muted); font-size:0.82rem; margin-top:4px;}
+
+.info-grid{margin:16px 0; display:flex; flex-direction:column; gap:0;}
+.info-row{display:flex; justify-content:space-between; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); font-size:0.86rem;}
+.info-row:last-child{border-bottom:none;}
+.info-row .lbl{color:var(--text-muted); flex-shrink:0;}
+.info-row .val{text-align:right; color:var(--text);}
+
+.rel-section{margin-top:6px;}
+.rel-section h4{font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin:16px 0 8px;}
+.rel-list{display:flex; flex-wrap:wrap; gap:8px;}
+.rel-chip{background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:6px 12px 6px 6px;
+  display:flex; align-items:center; gap:7px; font-size:0.8rem; cursor:pointer;}
+.rel-chip .mini{width:22px; height:22px; border-radius:50%; background:var(--surface2); display:flex; align-items:center;
+  justify-content:center; font-family:'Fraunces',serif; font-size:0.7rem; color:var(--gold);}
+
+.detail-actions{display:flex; gap:10px; margin-top:20px;}
+.btn{flex:1; padding:12px; border-radius:11px; border:1px solid var(--border); background:var(--surface);
+  color:var(--text); font-weight:600; font-size:0.85rem; cursor:pointer; font-family:inherit;}
+.btn.primary{background:var(--gold); color:#1a1512; border-color:var(--gold);}
+.btn.danger{background:transparent; color:var(--danger); border-color:var(--danger);}
+.btn.ghost{background:transparent;}
+
+/* FORM */
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:0.76rem; color:var(--text-muted); margin-bottom:6px; letter-spacing:0.3px;}
+.field label .req{color:var(--brick-soft);}
+.field input[type=text], .field input[type=date], .field textarea, .field select{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface);
+  color:var(--text); font-family:inherit; font-size:0.9rem;
+}
+.field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--gold);}
+.field textarea{resize:vertical; min-height:60px;}
+.field-row{display:flex; gap:10px;}
+.field-row .field{flex:1;}
+.photo-pick{display:flex; align-items:center; gap:14px;}
+.photo-preview{width:64px; height:64px; border-radius:50%; object-fit:cover; background:var(--surface2);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.7rem; text-align:center;}
+.filebtn{padding:9px 14px; border-radius:9px; background:var(--surface2); border:1px solid var(--border); color:var(--text);
+  font-size:0.8rem; cursor:pointer;}
+.hint{font-size:0.72rem; color:var(--text-muted); margin-top:4px; line-height:1.4;}
+
+/* MENU SHEET LIST */
+.menu-item{display:flex; align-items:center; gap:12px; padding:13px 4px; border-bottom:1px solid var(--border); cursor:pointer; font-size:0.9rem;}
+.menu-item:last-child{border-bottom:none;}
+.menu-item svg{width:18px; height:18px; opacity:0.7; flex-shrink:0;}
+.menu-item.danger{color:var(--danger);}
+
+.toast{position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--surface2);
+  border:1px solid var(--gold); color:var(--text); padding:12px 20px; border-radius:14px; font-size:0.86rem; font-weight:600;
+  z-index:80; opacity:0; transition:opacity 0.25s, transform 0.25s; pointer-events:none; white-space:nowrap;
+  box-shadow:0 6px 24px rgba(0,0,0,0.4); display:flex; align-items:center; gap:8px;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+.toast.success{border-color:#5fae6e; background:#1c2e1f; color:#c9f0d0;}
+.toast.error{border-color:var(--danger); background:#2e1c1c; color:#f0c9c9;}
+
+footer.credit{text-align:center; font-size:0.68rem; color:var(--text-muted); padding:20px 0 4px; opacity:0.6;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brandrow">
+    <svg class="gunungan" viewBox="0 0 100 100"><path d="M50 6 L62 30 L78 24 L74 46 L92 50 L74 58 L82 80 L58 70 L54 92 L46 92 L42 70 L18 80 L26 58 L8 50 L26 46 L22 24 L38 30 Z" fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    <div>
+      <h1>Ranji Rumah Gadang Panca</h1>
+      <div class="sub">Silsilah Keluarga</div>
+    </div>
+  </div>
+  <div class="statline" id="statline"><span><b id="statCount">0</b> orang</span><span><b id="statGen">0</b> generasi</span></div>
+</header>
+
+<div class="controls">
+  <div class="searchbar" id="searchbarWrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Cari nama atau panggilan...">
+  </div>
+  <div class="controls-row" style="margin-top:12px;">
+    <div class="tabs" style="flex:1;">
+      <div class="tab active" data-view="tree">Pohon</div>
+      <div class="tab" data-view="list">Daftar</div>
+      <div class="tab" data-view="guide">Panduan</div>
+    </div>
+    <button class="menubtn" id="menuBtn" title="Menu">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></svg>
+    </button>
+  </div>
+  <div class="controls-row" id="genFilterWrap" style="margin-top:8px;">
+    <select id="genFilter" style="flex:1; padding:9px 10px; border-radius:10px; border:1px solid var(--border);
+      background:var(--surface); color:var(--text); font-size:0.85rem; font-family:inherit;">
+      <option value="">Semua Generasi</option>
+    </select>
+  </div>
+</div>
+
+<main id="mainContent"></main>
+
+<button class="fab" id="fabAdd" title="Tambah orang">+</button>
+
+<!-- DETAIL SHEET -->
+<div class="overlay" id="detailOverlay">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="detailClose">✕</button>
+    <div class="sheet-handle"></div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- FORM SHEET -->
+<div class="overlay" id="formOverlay">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="formClose">✕</button>
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title" id="formTitle">Tambah Orang</h3>
+    <div style="height:8px;"></div>
+    <form id="personForm">
+      <div class="field">
+        <label>Nama <span class="req">*wajib</span></label>
+        <input type="text" id="f_name" required>
+      </div>
+      <div class="field">
+        <label>Foto</label>
+        <div class="photo-pick">
+          <div class="photo-preview" id="photoPreview">Tidak ada</div>
+          <input type="file" id="f_photo" accept="image/*" style="display:none;">
+          <label for="f_photo" class="filebtn">Pilih foto</label>
+          <button type="button" class="filebtn" id="removePhoto" style="display:none;">Hapus</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tanggal Lahir</label>
+        <input type="date" id="f_birthdate">
+      </div>
+      <div class="field">
+        <label>Tanggal Wafat <span style="color:var(--text-muted); font-weight:400;">(kosongkan kalau masih hidup)</span></label>
+        <input type="date" id="f_deathdate">
+      </div>
+      <div class="field">
+        <label>Ayah</label>
+        <select id="f_father"><option value="">— Tidak diketahui —</option></select>
+      </div>
+      <div class="field">
+        <label>Ibu</label>
+        <select id="f_mother"><option value="">— Tidak diketahui —</option></select>
+      </div>
+      <div class="field">
+        <label>Pasangan (suami/istri) — bisa lebih dari satu</label>
+        <div id="spouseList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+        <div style="display:flex; gap:6px;">
+          <select id="f_spouse_add" style="flex:1;"><option value="">— Pilih untuk ditambahkan —</option></select>
+          <button type="button" class="btn ghost" id="btnAddSpouse" style="white-space:nowrap; padding:0 14px;">+ Tambah</button>
+        </div>
+        <button type="button" class="filebtn" id="btnToggleNewSpouse" style="margin-top:8px;">+ Orang baru (belum ada di data)</button>
+        <div id="newSpouseBox" style="display:none; margin-top:8px; padding:10px; border:1px dashed var(--border); border-radius:10px;">
+          <div class="field" style="margin-bottom:8px;">
+            <label>Nama pasangan baru</label>
+            <input type="text" id="f_new_spouse_name" placeholder="Nama lengkap">
+          </div>
+          <div class="field" style="margin-bottom:8px;">
+            <label>Foto (opsional)</label>
+            <div class="photo-pick">
+              <div class="photo-preview" id="newSpousePhotoPreview">Tidak ada</div>
+              <input type="file" id="f_new_spouse_photo" accept="image/*" style="display:none;">
+              <label for="f_new_spouse_photo" class="filebtn">Pilih foto</label>
+              <button type="button" class="filebtn" id="removeNewSpousePhoto" style="display:none;">Hapus</button>
+            </div>
+          </div>
+          <button type="button" class="btn ghost" id="btnCreateNewSpouse" style="width:100%;">Buat &amp; Tambahkan sebagai Pasangan</button>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button type="button" class="btn ghost" id="formCancel">Batal</button>
+        <button type="submit" class="btn primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MENU SHEET -->
+<div class="overlay" id="menuOverlay">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="menuClose">✕</button>
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">Menu Data</h3>
+    <div style="height:6px;"></div>
+    <div class="menu-item" id="menuImportJson">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Impor dari JSON (backup lengkap)
+    </div>
+    <div class="menu-item" id="menuImportCsv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Impor dari CSV / Excel
+    </div>
+    <div class="menu-item" id="menuTemplate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Unduh template CSV
+    </div>
+    <div class="menu-item" id="menuExportJson">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Ekspor semua data (JSON)
+    </div>
+    <div class="menu-item danger" id="menuClearAll">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      Hapus semua data
+    </div>
+    <input type="file" id="jsonFileInput" accept=".json" style="display:none;">
+    <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="credit">Ide: Chilmar • Creator: Claude</footer>
+
+<script>
+(function(){
+  const STORE_KEY = 'ranji-people';
+
+  // ---------- STORAGE ADAPTER ----------
+  // window.storage cuma tersedia kalau file ini dibuka lewat Claude
+  // (claude.ai / app Claude). Kalau file di-download lalu dibuka langsung
+  // di browser (klik dua kali dari folder), window.storage tidak ada —
+  // maka dipakai localStorage bawaan browser sebagai cadangan, supaya
+  // data (termasuk foto) tetap tersimpan di perangkat itu.
+  const hasClaudeStorage = typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
+  const storageAPI = hasClaudeStorage ? window.storage : {
+    async get(key){
+      try{
+        const raw = localStorage.getItem('ranji_local_'+key);
+        return raw ? { key, value: raw } : null;
+      }catch(e){ return null; }
+    },
+    async set(key, value){
+      try{
+        localStorage.setItem('ranji_local_'+key, value);
+        return { key, value };
+      }catch(e){ return null; }
+    }
+  };
+  let people = [];
+  let currentView = 'tree';
+  let editingId = null;
+  let currentGenFilter = '';
+
+  // Data awal Rumah Gadang Panca, hasil digitisasi dari file Excel
+  // "Gen_I_-_VII_KEL_RG.xlsx" (Gen I - Gen VII, 232 anggota garis keturunan
+  // + 84 pasangan yang menikah masuk). Hanya dipakai untuk mengisi data
+  // pertama kali jika penyimpanan masih kosong — tidak akan menimpa data
+  // yang sudah pernah disimpan/diedit sebelumnya.
+  const SEED_PEOPLE = [{"id": "p_gycxjkt74d", "name": "Halimah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_grnvd2a25z"], "address": "", "notes": "No. RG: 1 (Gen I)", "marriedIn": false}, {"id": "p_grnvd2a25z", "name": "Aminullah", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_gycxjkt74d"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_4x9xfg21sx", "name": "St Zainab", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "1961-03-28", "fatherId": "p_grnvd2a25z", "motherId": "p_gycxjkt74d", "spouseIds": ["p_4hbuheapee", "p_jo5hl3kn51"], "address": "", "notes": "No. RG: 2 (Gen II)", "marriedIn": false}, {"id": "p_ywyk3rok2o", "name": "Asiah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "1969-12-26", "fatherId": "p_grnvd2a25z", "motherId": "p_gycxjkt74d", "spouseIds": ["p_p6o5u73cvb"], "address": "", "notes": "No. RG: 3 (Gen II)", "marriedIn": false}, {"id": "p_hsj2fc6p49", "name": "Murad Dt Bagindo Labiah", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_grnvd2a25z", "motherId": "p_gycxjkt74d", "spouseIds": [], "address": "", "notes": "No. RG: 4 (Gen II)", "marriedIn": false}, {"id": "p_4hbuheapee", "name": "Musa", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_4x9xfg21sx"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_62393icb1d", "name": "Rawasah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "1981-09-30", "fatherId": "p_4hbuheapee", "motherId": "p_4x9xfg21sx", "spouseIds": ["p_kg68v4zw73", "p_ziyezt3yz7"], "address": "", "notes": "No. RG: 5 (Gen III)", "marriedIn": false}, {"id": "p_jz3fiiklzl", "name": "Tamimi St Putiah", "nickname": "", "gender": "L", "birthDate": "1897-01-01", "deathDate": "1967-07-30", "fatherId": "p_4hbuheapee", "motherId": "p_4x9xfg21sx", "spouseIds": ["p_7z9tw91joz", "p_mwhedl66rh"], "address": "", "notes": "No. RG: 6 (Gen III)", "marriedIn": false}, {"id": "p_jo5hl3kn51", "name": "Nurdin", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_4x9xfg21sx"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_rbmnpegrns", "name": "Dalipah", "nickname": "", "gender": "P", "birthDate": "1910-01-01", "deathDate": "1994-02-12", "fatherId": "p_jo5hl3kn51", "motherId": "p_4x9xfg21sx", "spouseIds": ["p_xy6khl59fu"], "address": "", "notes": "No. RG: 7 (Gen III)", "marriedIn": false}, {"id": "p_p6o5u73cvb", "name": "Aminullah", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_ywyk3rok2o"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_l0hevih3fl", "name": "Amarullah St Pamuntjak", "nickname": "", "gender": "L", "birthDate": "1899-01-01", "deathDate": "1970-01-01", "fatherId": "p_p6o5u73cvb", "motherId": "p_ywyk3rok2o", "spouseIds": [], "address": "", "notes": "No. RG: 8 (Gen III)", "marriedIn": false}, {"id": "p_62jfazrz9h", "name": "Masib Dt Pamuntjak", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "1956-01-01", "fatherId": "p_p6o5u73cvb", "motherId": "p_ywyk3rok2o", "spouseIds": [], "address": "", "notes": "No. RG: 9 (Gen III)", "marriedIn": false}, {"id": "p_us0oip4f1a", "name": "Idris", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_p6o5u73cvb", "motherId": "p_ywyk3rok2o", "spouseIds": [], "address": "", "notes": "No. RG: 10 (Gen III)", "marriedIn": false}, {"id": "p_kg68v4zw73", "name": "Amin", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_62393icb1d"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_z62p7bzqm1", "name": "Dahniar", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_kg68v4zw73", "motherId": "p_62393icb1d", "spouseIds": ["p_5kxddqpnt4"], "address": "", "notes": "No. RG: 11 (Gen IV)", "marriedIn": false}, {"id": "p_ziyezt3yz7", "name": "HM Nur", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_62393icb1d"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_n9cg2zpn2b", "name": "Misnar", "nickname": "", "gender": "P", "birthDate": "1920-01-01", "deathDate": "1984-01-01", "fatherId": "p_ziyezt3yz7", "motherId": "p_62393icb1d", "spouseIds": ["p_px8qh6gso5"], "address": "", "notes": "No. RG: 12 (Gen IV)", "marriedIn": false}, {"id": "p_fby5fjl0de", "name": "Aisyah", "nickname": "", "gender": "P", "birthDate": "1924-01-01", "deathDate": "2006-01-01", "fatherId": "p_ziyezt3yz7", "motherId": "p_62393icb1d", "spouseIds": ["p_7oigai0cxm"], "address": "", "notes": "No. RG: 13 (Gen IV)", "marriedIn": false}, {"id": "p_7z9tw91joz", "name": "Sadiah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_jz3fiiklzl"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_6yutvd9gp0", "name": "Chadidjah", "nickname": "", "gender": "P", "birthDate": "1925-01-01", "deathDate": "2006-01-01", "fatherId": "p_jz3fiiklzl", "motherId": "p_7z9tw91joz", "spouseIds": ["p_xz8ikkytlb"], "address": "", "notes": "No. RG: 14 (Gen IV)", "marriedIn": false}, {"id": "p_d33zgdkdj3", "name": "A Manan", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_jz3fiiklzl", "motherId": "p_7z9tw91joz", "spouseIds": [], "address": "", "notes": "No. RG: 15 (Gen IV)", "marriedIn": false}, {"id": "p_7nv75sc2qo", "name": "A Moeis", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_jz3fiiklzl", "motherId": "p_7z9tw91joz", "spouseIds": ["p_xbcxp29z4p"], "address": "", "notes": "No. RG: 16 (Gen IV)", "marriedIn": false}, {"id": "p_mwhedl66rh", "name": "Atun", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_jz3fiiklzl"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_lbn0bgo9pk", "name": "Hanidar", "nickname": "", "gender": "P", "birthDate": "1933-01-01", "deathDate": "", "fatherId": "p_jz3fiiklzl", "motherId": "p_mwhedl66rh", "spouseIds": [], "address": "", "notes": "No. RG: 17 (Gen IV)", "marriedIn": false}, {"id": "p_px4kzsjiwh", "name": "Sabri", "nickname": "", "gender": "L", "birthDate": "1937-01-01", "deathDate": "1957-01-01", "fatherId": "p_jz3fiiklzl", "motherId": "p_mwhedl66rh", "spouseIds": [], "address": "", "notes": "No. RG: 18 (Gen IV)", "marriedIn": false}, {"id": "p_ltbuqec4ll", "name": "Umar", "nickname": "", "gender": "L", "birthDate": "1943-01-01", "deathDate": "2004-01-01", "fatherId": "p_jz3fiiklzl", "motherId": "p_mwhedl66rh", "spouseIds": ["p_um8e60poo7"], "address": "", "notes": "No. RG: 19 (Gen IV)", "marriedIn": false}, {"id": "p_r7nuioss14", "name": "Warneti", "nickname": "", "gender": "P", "birthDate": "1949-01-01", "deathDate": "", "fatherId": "p_jz3fiiklzl", "motherId": "p_mwhedl66rh", "spouseIds": [], "address": "", "notes": "No. RG: 20 (Gen IV)", "marriedIn": false}, {"id": "p_xy6khl59fu", "name": "Djamin Dt Bagindo", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_rbmnpegrns"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_aw3cz5u28h", "name": "Nurhaida", "nickname": "", "gender": "P", "birthDate": "1933-05-27", "deathDate": "2005-01-01", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_skbl4xmk59"], "address": "", "notes": "No. RG: 21 (Gen IV)", "marriedIn": false}, {"id": "p_2wdgdzi8be", "name": "Ridwan", "nickname": "", "gender": "L", "birthDate": "1934-01-01", "deathDate": "1997-01-01", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_92ypnm4klj"], "address": "", "notes": "No. RG: 22 (Gen IV)", "marriedIn": false}, {"id": "p_3cz746f956", "name": "Yulia", "nickname": "", "gender": "P", "birthDate": "1937-07-07", "deathDate": "", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_xo7w9hdyi6"], "address": "", "notes": "No. RG: 23 (Gen IV)", "marriedIn": false}, {"id": "p_wb07uxs73d", "name": "Darwini", "nickname": "", "gender": "P", "birthDate": "1939-05-13", "deathDate": "2012-04-20", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": [], "address": "", "notes": "No. RG: 24 (Gen IV)", "marriedIn": false}, {"id": "p_miujy1347l", "name": "Djayusman", "nickname": "", "gender": "L", "birthDate": "1941-06-29", "deathDate": "1982-03-26", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_kv5l4ytv2c"], "address": "", "notes": "No. RG: 25 (Gen IV)", "marriedIn": false}, {"id": "p_nppb6rud0k", "name": "Yulfina", "nickname": "", "gender": "P", "birthDate": "1943-07-19", "deathDate": "", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_hal6vrwlox"], "address": "", "notes": "No. RG: 26 (Gen IV)", "marriedIn": false}, {"id": "p_j231jc5f8p", "name": "Syafril", "nickname": "", "gender": "L", "birthDate": "1946-07-02", "deathDate": "", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_5cg0kgvb68"], "address": "", "notes": "No. RG: 27 (Gen IV)", "marriedIn": false}, {"id": "p_d0ybzh6j7c", "name": "Dilzar", "nickname": "", "gender": "L", "birthDate": "1948-12-30", "deathDate": "", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_63j8z9yujc"], "address": "", "notes": "No. RG: 28 (Gen IV)", "marriedIn": false}, {"id": "p_muqvxhlh11", "name": "Mulyati", "nickname": "", "gender": "P", "birthDate": "1951-03-05", "deathDate": "2015-06-14", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": [], "address": "", "notes": "No. RG: 29 (Gen IV)", "marriedIn": false}, {"id": "p_jjdzawi0ot", "name": "Ernawati", "nickname": "", "gender": "P", "birthDate": "1956-01-01", "deathDate": "", "fatherId": "p_xy6khl59fu", "motherId": "p_rbmnpegrns", "spouseIds": ["p_wpumryx5sh"], "address": "", "notes": "No. RG: 30 (Gen IV)", "marriedIn": false}, {"id": "p_5kxddqpnt4", "name": "Darwis", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_z62p7bzqm1"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_k4bj0ar8fe", "name": "Darwina", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_5kxddqpnt4", "motherId": "p_z62p7bzqm1", "spouseIds": [], "address": "", "notes": "No. RG: 31 (Gen V)", "marriedIn": false}, {"id": "p_tl3hqerxem", "name": "Nusyirwan", "nickname": "", "gender": "L", "birthDate": "1943-07-23", "deathDate": "", "fatherId": "p_5kxddqpnt4", "motherId": "p_z62p7bzqm1", "spouseIds": ["p_8u1xybr6lw"], "address": "", "notes": "No. RG: 32 (Gen V)", "marriedIn": false}, {"id": "p_8yy1ly4g14", "name": "Jusnamurti", "nickname": "", "gender": "P", "birthDate": "1946-04-21", "deathDate": "", "fatherId": "p_5kxddqpnt4", "motherId": "p_z62p7bzqm1", "spouseIds": [], "address": "", "notes": "No. RG: 33 (Gen V)", "marriedIn": false}, {"id": "p_bfp5g4qgo4", "name": "Arnon", "nickname": "", "gender": "P", "birthDate": "1951-04-04", "deathDate": "", "fatherId": "p_5kxddqpnt4", "motherId": "p_z62p7bzqm1", "spouseIds": ["p_jes9fwoxl4"], "address": "", "notes": "No. RG: 34 (Gen V)", "marriedIn": false}, {"id": "p_px8qh6gso5", "name": "Djohan Samad", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_n9cg2zpn2b"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_nkioqffxia", "name": "Silvia", "nickname": "", "gender": "P", "birthDate": "1947-01-01", "deathDate": "1987-01-01", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": [], "address": "", "notes": "No. RG: 35 (Gen V)", "marriedIn": false}, {"id": "p_pzdlltdp6g", "name": "Miswita", "nickname": "", "gender": "P", "birthDate": "1949-01-01", "deathDate": "2006-01-01", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": ["p_nha0doyg56"], "address": "", "notes": "No. RG: 36 (Gen V)", "marriedIn": false}, {"id": "p_38ff8vfea1", "name": "Yomi Delita", "nickname": "", "gender": "P", "birthDate": "1952-01-01", "deathDate": "1995-01-01", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": ["p_a2s90jckdp"], "address": "", "notes": "No. RG: 37 (Gen V)", "marriedIn": false}, {"id": "p_w6ghu0fxpn", "name": "Evita Surya", "nickname": "", "gender": "P", "birthDate": "1954-01-01", "deathDate": "", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": ["p_n65pay7krk"], "address": "", "notes": "No. RG: 38 (Gen V)", "marriedIn": false}, {"id": "p_it6chcx785", "name": "Jonimarita", "nickname": "", "gender": "P", "birthDate": "1955-01-01", "deathDate": "", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": [], "address": "", "notes": "No. RG: 39 (Gen V)", "marriedIn": false}, {"id": "p_gmudzxsjlo", "name": "Yulianti", "nickname": "", "gender": "P", "birthDate": "1959-01-01", "deathDate": "", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": [], "address": "", "notes": "No. RG: 40 (Gen V)", "marriedIn": false}, {"id": "p_8notcfyixc", "name": "Yulidar", "nickname": "", "gender": "P", "birthDate": "1963-01-01", "deathDate": "2016-01-01", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": [], "address": "", "notes": "No. RG: 41 (Gen V)", "marriedIn": false}, {"id": "p_4ecjv6ypt6", "name": "Mul Hidayat", "nickname": "", "gender": "L", "birthDate": "1963-01-01", "deathDate": "", "fatherId": "p_px8qh6gso5", "motherId": "p_n9cg2zpn2b", "spouseIds": ["p_m0orcjczgq"], "address": "", "notes": "No. RG: 42 (Gen V)", "marriedIn": false}, {"id": "p_7oigai0cxm", "name": "Adlir", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_fby5fjl0de"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_289tuwz8qx", "name": "Adriano", "nickname": "", "gender": "L", "birthDate": "1951-04-07", "deathDate": "", "fatherId": "p_7oigai0cxm", "motherId": "p_fby5fjl0de", "spouseIds": ["p_s3difav3xq"], "address": "", "notes": "No. RG: 43 (Gen V)", "marriedIn": false}, {"id": "p_f8bujzhezl", "name": "Ardinal", "nickname": "", "gender": "L", "birthDate": "1953-12-02", "deathDate": "", "fatherId": "p_7oigai0cxm", "motherId": "p_fby5fjl0de", "spouseIds": ["p_m0stjo7hvr"], "address": "", "notes": "No. RG: 44 (Gen V)", "marriedIn": false}, {"id": "p_6e02dinnmx", "name": "Emlinarti", "nickname": "", "gender": "P", "birthDate": "1955-09-14", "deathDate": "", "fatherId": "p_7oigai0cxm", "motherId": "p_fby5fjl0de", "spouseIds": ["p_x6i9vpy3dq"], "address": "", "notes": "No. RG: 45 (Gen V)", "marriedIn": false}, {"id": "p_buki053jbn", "name": "Erliza", "nickname": "", "gender": "P", "birthDate": "1961-08-04", "deathDate": "", "fatherId": "p_7oigai0cxm", "motherId": "p_fby5fjl0de", "spouseIds": ["p_lu0r6e6m57"], "address": "", "notes": "No. RG: 46 (Gen V)", "marriedIn": false}, {"id": "p_htba86c8jc", "name": "Yusnelli", "nickname": "", "gender": "P", "birthDate": "1944-01-01", "deathDate": "", "fatherId": null, "motherId": "p_6yutvd9gp0", "spouseIds": ["p_rx9ek1a037"], "address": "", "notes": "No. RG: 47 (Gen V)", "marriedIn": false}, {"id": "p_l5yumsbv53", "name": "Edison", "nickname": "", "gender": "L", "birthDate": "1950-01-01", "deathDate": "", "fatherId": null, "motherId": "p_6yutvd9gp0", "spouseIds": ["p_h1idn3mjz8"], "address": "", "notes": "No. RG: 48 (Gen V)", "marriedIn": false}, {"id": "p_xz8ikkytlb", "name": "H Alwi", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_6yutvd9gp0"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_paostmbj0w", "name": "Yernawati", "nickname": "", "gender": "P", "birthDate": "1953-01-01", "deathDate": "", "fatherId": "p_xz8ikkytlb", "motherId": "p_6yutvd9gp0", "spouseIds": ["p_4t8b5gx1os"], "address": "", "notes": "No. RG: 49 (Gen V)", "marriedIn": false}, {"id": "p_vye5n2fk01", "name": "Alfabetty", "nickname": "", "gender": "P", "birthDate": "1955-01-01", "deathDate": "", "fatherId": "p_xz8ikkytlb", "motherId": "p_6yutvd9gp0", "spouseIds": ["p_ex8rah6jd7"], "address": "", "notes": "No. RG: 50 (Gen V)", "marriedIn": false}, {"id": "p_n1oqp1itst", "name": "Wirzon", "nickname": "", "gender": "L", "birthDate": "1956-01-01", "deathDate": "", "fatherId": "p_xz8ikkytlb", "motherId": "p_6yutvd9gp0", "spouseIds": ["p_zcb3ehzfai"], "address": "", "notes": "No. RG: 51 (Gen V)", "marriedIn": false}, {"id": "p_9nu1g47ivv", "name": "Yanirza", "nickname": "", "gender": "L", "birthDate": "1958-01-01", "deathDate": "", "fatherId": "p_xz8ikkytlb", "motherId": "p_6yutvd9gp0", "spouseIds": ["p_cr6xdlj4ls"], "address": "", "notes": "No. RG: 52 (Gen V)", "marriedIn": false}, {"id": "p_pfn0rn3t94", "name": "Asfinalirman", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_xz8ikkytlb", "motherId": "p_6yutvd9gp0", "spouseIds": ["p_qs78nnqsfx"], "address": "", "notes": "No. RG: 53 (Gen V)", "marriedIn": false}, {"id": "p_xbcxp29z4p", "name": "Syarifah Roekiah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7nv75sc2qo"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_edlygai6bd", "name": "Syarifah Evawita", "nickname": "", "gender": "P", "birthDate": "1950-01-01", "deathDate": "", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": ["p_d106ldx5zt"], "address": "", "notes": "No. RG: 54 (Gen V)", "marriedIn": false}, {"id": "p_3zxcl4b8zy", "name": "Syarifah Erita", "nickname": "", "gender": "P", "birthDate": "1952-01-01", "deathDate": "2002-01-01", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": ["p_24hhecov77"], "address": "", "notes": "No. RG: 55 (Gen V)", "marriedIn": false}, {"id": "p_ybf82upjsr", "name": "Syarifah Fatma", "nickname": "", "gender": "P", "birthDate": "1953-01-01", "deathDate": "", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": ["p_yg1yhk3eee"], "address": "", "notes": "No. RG: 56 (Gen V)", "marriedIn": false}, {"id": "p_kkzdqmfnpg", "name": "Syarifah Farida", "nickname": "", "gender": "P", "birthDate": "1955-01-01", "deathDate": "1993-01-01", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": ["p_b5glaiqk1f"], "address": "", "notes": "No. RG: 57 (Gen V)", "marriedIn": false}, {"id": "p_x5zy42ugg2", "name": "Ridwan", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": [], "address": "", "notes": "No. RG: 58 (Gen V)", "marriedIn": false}, {"id": "p_fr2wdkihya", "name": "Syarifah Fadillah", "nickname": "", "gender": "P", "birthDate": "1960-01-01", "deathDate": "", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": [], "address": "", "notes": "No. RG: 59 (Gen V)", "marriedIn": false}, {"id": "p_v5kjlfplhi", "name": "Syarifah Fauziah", "nickname": "Ipop", "gender": "P", "birthDate": "1962-01-01", "deathDate": "", "fatherId": "p_7nv75sc2qo", "motherId": "p_xbcxp29z4p", "spouseIds": ["p_2ntbonqzce"], "address": "", "notes": "No. RG: 60 (Gen V)", "marriedIn": false}, {"id": "p_um8e60poo7", "name": "Asniwita", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_ltbuqec4ll"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_qs5sur8w4b", "name": "Novra", "nickname": "", "gender": "L", "birthDate": "1983-01-01", "deathDate": "", "fatherId": "p_ltbuqec4ll", "motherId": "p_um8e60poo7", "spouseIds": [], "address": "", "notes": "No. RG: 61 (Gen V)", "marriedIn": false}, {"id": "p_dgkr3t3spa", "name": "Novri", "nickname": "", "gender": "P", "birthDate": "1985-01-01", "deathDate": "", "fatherId": "p_ltbuqec4ll", "motherId": "p_um8e60poo7", "spouseIds": [], "address": "", "notes": "No. RG: 62 (Gen V)", "marriedIn": false}, {"id": "p_skbl4xmk59", "name": "Zainal Rasyid", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_aw3cz5u28h"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_azptlqzq95", "name": "Andriza", "nickname": "", "gender": "P", "birthDate": "1959-01-18", "deathDate": "", "fatherId": "p_skbl4xmk59", "motherId": "p_aw3cz5u28h", "spouseIds": ["p_5ntsvub7jd"], "address": "", "notes": "No. RG: 63 (Gen V)", "marriedIn": false}, {"id": "p_5oop7e12bq", "name": "Sophianti", "nickname": "", "gender": "P", "birthDate": "1960-11-19", "deathDate": "", "fatherId": "p_skbl4xmk59", "motherId": "p_aw3cz5u28h", "spouseIds": ["p_8u1nsw5yu9"], "address": "", "notes": "No. RG: 64 (Gen V)", "marriedIn": false}, {"id": "p_sqob3rrn15", "name": "Syofyan", "nickname": "", "gender": "L", "birthDate": "1963-01-01", "deathDate": "", "fatherId": "p_skbl4xmk59", "motherId": "p_aw3cz5u28h", "spouseIds": ["p_sd8dzyi8oh"], "address": "", "notes": "No. RG: 65 (Gen V)", "marriedIn": false}, {"id": "p_5qe6ur6vq1", "name": "Rahman", "nickname": "", "gender": "L", "birthDate": "1965-01-13", "deathDate": "", "fatherId": "p_skbl4xmk59", "motherId": "p_aw3cz5u28h", "spouseIds": ["p_jb14n346rz"], "address": "", "notes": "No. RG: 66 (Gen V)", "marriedIn": false}, {"id": "p_ntd4e8amvc", "name": "Zanti", "nickname": "", "gender": "P", "birthDate": "1966-01-01", "deathDate": "", "fatherId": "p_skbl4xmk59", "motherId": "p_aw3cz5u28h", "spouseIds": [], "address": "", "notes": "No. RG: 67 (Gen V)", "marriedIn": false}, {"id": "p_92ypnm4klj", "name": "Rufimar", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_2wdgdzi8be"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_8fh1h0myhp", "name": "Rustiyan Harnanda", "nickname": "", "gender": "L", "birthDate": "1963-03-05", "deathDate": "", "fatherId": "p_2wdgdzi8be", "motherId": "p_92ypnm4klj", "spouseIds": ["p_a2dpf11urk"], "address": "", "notes": "No. RG: 68 (Gen V)", "marriedIn": false}, {"id": "p_7j8c62x1ua", "name": "Rinaldi Vivenda", "nickname": "", "gender": "L", "birthDate": "1964-10-16", "deathDate": "", "fatherId": "p_2wdgdzi8be", "motherId": "p_92ypnm4klj", "spouseIds": ["p_8sgqiuzyo7", "p_eswnubi27q"], "address": "", "notes": "No. RG: 69 (Gen V)", "marriedIn": false}, {"id": "p_b11nxwk0au", "name": "Rulli Prihandi", "nickname": "", "gender": "L", "birthDate": "1968-07-24", "deathDate": "", "fatherId": "p_2wdgdzi8be", "motherId": "p_92ypnm4klj", "spouseIds": ["p_ylhmqoivo1"], "address": "", "notes": "No. RG: 70 (Gen V)", "marriedIn": false}, {"id": "p_vtblri0fx4", "name": "Rima Permata", "nickname": "", "gender": "P", "birthDate": "1973-01-01", "deathDate": "", "fatherId": "p_2wdgdzi8be", "motherId": "p_92ypnm4klj", "spouseIds": ["p_br10jd1l4z"], "address": "", "notes": "No. RG: 71 (Gen V)", "marriedIn": false}, {"id": "p_xo7w9hdyi6", "name": "Buchari Ilyas", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_3cz746f956"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_yvoe7djzwf", "name": "Devi Chairani", "nickname": "", "gender": "P", "birthDate": "1964-10-02", "deathDate": "", "fatherId": "p_xo7w9hdyi6", "motherId": "p_3cz746f956", "spouseIds": [], "address": "", "notes": "No. RG: 72 (Gen V)", "marriedIn": false}, {"id": "p_b7j4sbh5z5", "name": "Chatar", "nickname": "", "gender": "L", "birthDate": "1966-01-01", "deathDate": "", "fatherId": "p_xo7w9hdyi6", "motherId": "p_3cz746f956", "spouseIds": ["p_1wx1c0fout"], "address": "", "notes": "No. RG: 73 (Gen V)", "marriedIn": false}, {"id": "p_aj0s7pdkd4", "name": "Chilmar", "nickname": "", "gender": "L", "birthDate": "1967-12-11", "deathDate": "", "fatherId": "p_xo7w9hdyi6", "motherId": "p_3cz746f956", "spouseIds": ["p_k9uod6mpni"], "address": "", "notes": "No. RG: 74 (Gen V)", "marriedIn": false}, {"id": "p_ypekn6a0z1", "name": "Charzini", "nickname": "", "gender": "P", "birthDate": "1969-01-01", "deathDate": "", "fatherId": "p_xo7w9hdyi6", "motherId": "p_3cz746f956", "spouseIds": [], "address": "", "notes": "No. RG: 75 (Gen V)", "marriedIn": false}, {"id": "p_969bbhnub5", "name": "Chustrini", "nickname": "", "gender": "P", "birthDate": "1972-04-08", "deathDate": "", "fatherId": "p_xo7w9hdyi6", "motherId": "p_3cz746f956", "spouseIds": ["p_yt4qu7mf0i"], "address": "", "notes": "No. RG: 76 (Gen V)", "marriedIn": false}, {"id": "p_kv5l4ytv2c", "name": "Farida", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_miujy1347l"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_xko6qgg3s7", "name": "Andika Fajar", "nickname": "", "gender": "L", "birthDate": "1969-10-04", "deathDate": "", "fatherId": "p_miujy1347l", "motherId": "p_kv5l4ytv2c", "spouseIds": ["p_oyjrn4lb43"], "address": "", "notes": "No. RG: 77 (Gen V)", "marriedIn": false}, {"id": "p_zwua63omd2", "name": "Djumatil Fajar", "nickname": "", "gender": "L", "birthDate": "1970-09-18", "deathDate": "", "fatherId": "p_miujy1347l", "motherId": "p_kv5l4ytv2c", "spouseIds": ["p_2qwxq6rpa0"], "address": "", "notes": "No. RG: 78 (Gen V)", "marriedIn": false}, {"id": "p_7351ujh3r9", "name": "Firman Fajar", "nickname": "", "gender": "L", "birthDate": "1972-07-20", "deathDate": "", "fatherId": "p_miujy1347l", "motherId": "p_kv5l4ytv2c", "spouseIds": ["p_ydkck6klm8"], "address": "", "notes": "No. RG: 79 (Gen V)", "marriedIn": false}, {"id": "p_xy9whbuegw", "name": "Katrina /djayusman", "nickname": "", "gender": "P", "birthDate": "1975-01-31", "deathDate": "", "fatherId": "p_miujy1347l", "motherId": "p_kv5l4ytv2c", "spouseIds": ["p_t96i71v5oj"], "address": "", "notes": "No. RG: 80 (Gen V)", "marriedIn": false}, {"id": "p_n64trgtzqq", "name": "Puti Utami", "nickname": "", "gender": "P", "birthDate": "1981-06-11", "deathDate": "", "fatherId": "p_miujy1347l", "motherId": "p_kv5l4ytv2c", "spouseIds": ["p_4mooesfedc"], "address": "", "notes": "No. RG: 81 (Gen V)", "marriedIn": false}, {"id": "p_hal6vrwlox", "name": "Bisanto K", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_nppb6rud0k"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_akex15ryd4", "name": "Evianti", "nickname": "", "gender": "P", "birthDate": "1974-08-23", "deathDate": "", "fatherId": "p_hal6vrwlox", "motherId": "p_nppb6rud0k", "spouseIds": ["p_u0rlne6598"], "address": "", "notes": "No. RG: 82 (Gen V)", "marriedIn": false}, {"id": "p_ifqg8rctvp", "name": "Chairani", "nickname": "", "gender": "P", "birthDate": "1978-03-28", "deathDate": "", "fatherId": "p_hal6vrwlox", "motherId": "p_nppb6rud0k", "spouseIds": ["p_08bvab7f6q"], "address": "", "notes": "No. RG: 83 (Gen V)", "marriedIn": false}, {"id": "p_kj4demv83k", "name": "Emilio", "nickname": "", "gender": "L", "birthDate": "1981-01-16", "deathDate": "", "fatherId": "p_hal6vrwlox", "motherId": "p_nppb6rud0k", "spouseIds": ["p_6vdude9twx"], "address": "", "notes": "No. RG: 84 (Gen V)", "marriedIn": false}, {"id": "p_5cg0kgvb68", "name": "Kris", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_j231jc5f8p"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_n890u1w9os", "name": "Ardiansyah", "nickname": "", "gender": "L", "birthDate": "1981-01-01", "deathDate": "", "fatherId": "p_j231jc5f8p", "motherId": "p_5cg0kgvb68", "spouseIds": [], "address": "", "notes": "No. RG: 85 (Gen V)", "marriedIn": false}, {"id": "p_g2e3y870yz", "name": "Lisnawati", "nickname": "", "gender": "P", "birthDate": "1982-09-08", "deathDate": "", "fatherId": "p_j231jc5f8p", "motherId": "p_5cg0kgvb68", "spouseIds": [], "address": "", "notes": "No. RG: 86 (Gen V)", "marriedIn": false}, {"id": "p_63j8z9yujc", "name": "Yunarifa", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_d0ybzh6j7c"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_ywldz6lgbe", "name": "Riza Rulman", "nickname": "", "gender": "L", "birthDate": "1985-09-01", "deathDate": "", "fatherId": "p_d0ybzh6j7c", "motherId": "p_63j8z9yujc", "spouseIds": [], "address": "", "notes": "No. RG: 87 (Gen V)", "marriedIn": false}, {"id": "p_3lblxn54to", "name": "Rendi Rizki", "nickname": "", "gender": "L", "birthDate": "1987-09-29", "deathDate": "", "fatherId": "p_d0ybzh6j7c", "motherId": "p_63j8z9yujc", "spouseIds": [], "address": "", "notes": "No. RG: 88 (Gen V)", "marriedIn": false}, {"id": "p_6ihdqv3cqh", "name": "Difa Rchmanisa", "nickname": "", "gender": "P", "birthDate": "1992-10-07", "deathDate": "", "fatherId": "p_d0ybzh6j7c", "motherId": "p_63j8z9yujc", "spouseIds": [], "address": "", "notes": "No. RG: 89 (Gen V)", "marriedIn": false}, {"id": "p_wpumryx5sh", "name": "Listyo Gunarso", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_jjdzawi0ot"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_1oqe0tlg9u", "name": "Sasi", "nickname": "", "gender": "P", "birthDate": "1984-06-01", "deathDate": "", "fatherId": "p_wpumryx5sh", "motherId": "p_jjdzawi0ot", "spouseIds": [], "address": "", "notes": "No. RG: 90 (Gen V)", "marriedIn": false}, {"id": "p_8u1xybr6lw", "name": "Dewani R", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_tl3hqerxem"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_n96waj4rxu", "name": "Darnila", "nickname": "", "gender": "P", "birthDate": "1977-01-01", "deathDate": "", "fatherId": "p_tl3hqerxem", "motherId": "p_8u1xybr6lw", "spouseIds": ["p_21k0xfhdwd"], "address": "", "notes": "No. RG: 91 (Gen VI)", "marriedIn": false}, {"id": "p_2wkuyrvk8j", "name": "M A Imron", "nickname": "", "gender": "L", "birthDate": "1981-01-01", "deathDate": "", "fatherId": "p_tl3hqerxem", "motherId": "p_8u1xybr6lw", "spouseIds": [], "address": "", "notes": "No. RG: 92 (Gen VI)", "marriedIn": false}, {"id": "p_sttxkk39n6", "name": "M Muswardan", "nickname": "", "gender": "L", "birthDate": "1982-01-01", "deathDate": "", "fatherId": "p_tl3hqerxem", "motherId": "p_8u1xybr6lw", "spouseIds": ["p_qn4rh307vf"], "address": "", "notes": "No. RG: 93 (Gen VI)", "marriedIn": false}, {"id": "p_jes9fwoxl4", "name": "Benny S", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_bfp5g4qgo4"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_afz01bkksd", "name": "Arintho Soebandrio", "nickname": "", "gender": "L", "birthDate": "1975-10-23", "deathDate": "", "fatherId": "p_jes9fwoxl4", "motherId": "p_bfp5g4qgo4", "spouseIds": ["p_xe1nfijjl0"], "address": "", "notes": "No. RG: 94 (Gen VI)", "marriedIn": false}, {"id": "p_0aa1l5qyi1", "name": "Bayurim0", "nickname": "", "gender": "L", "birthDate": "1977-06-22", "deathDate": "", "fatherId": "p_jes9fwoxl4", "motherId": "p_bfp5g4qgo4", "spouseIds": ["p_d450x8yc50"], "address": "", "notes": "No. RG: 95 (Gen VI)", "marriedIn": false}, {"id": "p_qtt914u389", "name": "Cinta Dewi Putri", "nickname": "", "gender": "P", "birthDate": "1983-03-01", "deathDate": "", "fatherId": "p_jes9fwoxl4", "motherId": "p_bfp5g4qgo4", "spouseIds": ["p_yz4uu0jb1w"], "address": "", "notes": "No. RG: 96 (Gen VI)", "marriedIn": false}, {"id": "p_nha0doyg56", "name": "Asnir", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_pzdlltdp6g"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_uf5ucgjt0i", "name": "Ami Safitrinaldi", "nickname": "", "gender": "L", "birthDate": "1978-09-12", "deathDate": "", "fatherId": "p_nha0doyg56", "motherId": "p_pzdlltdp6g", "spouseIds": ["p_u6ur69mjo9"], "address": "", "notes": "No. RG: 97 (Gen VI)", "marriedIn": false}, {"id": "p_y7g4diofth", "name": "Charlie Budiman", "nickname": "", "gender": "L", "birthDate": "1979-09-28", "deathDate": "", "fatherId": "p_nha0doyg56", "motherId": "p_pzdlltdp6g", "spouseIds": [], "address": "", "notes": "No. RG: 98 (Gen VI)", "marriedIn": false}, {"id": "p_7c8h91h929", "name": "Deswitria Rahmi", "nickname": "", "gender": "P", "birthDate": "1982-12-08", "deathDate": "", "fatherId": "p_nha0doyg56", "motherId": "p_pzdlltdp6g", "spouseIds": ["p_msluitodcc", "p_lggsaori6c"], "address": "", "notes": "No. RG: 99 (Gen VI)", "marriedIn": false}, {"id": "p_a2s90jckdp", "name": "Herman", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_38ff8vfea1"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_wy4yjla5lx", "name": "Eko Wahyudi", "nickname": "", "gender": "L", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_a2s90jckdp", "motherId": "p_38ff8vfea1", "spouseIds": ["p_92rwbm1acp"], "address": "", "notes": "No. RG: 100 (Gen VI)", "marriedIn": false}, {"id": "p_e619ir98e8", "name": "Radiyansyah", "nickname": "", "gender": "L", "birthDate": "1980-07-25", "deathDate": "", "fatherId": "p_a2s90jckdp", "motherId": "p_38ff8vfea1", "spouseIds": [], "address": "", "notes": "No. RG: 101 (Gen VI)", "marriedIn": false}, {"id": "p_srk7gt9bpl", "name": "Lusia", "nickname": "", "gender": "P", "birthDate": "1987-06-30", "deathDate": "", "fatherId": "p_a2s90jckdp", "motherId": "p_38ff8vfea1", "spouseIds": ["p_5vxj3e5qpd"], "address": "", "notes": "No. RG: 102 (Gen VI)", "marriedIn": false}, {"id": "p_n65pay7krk", "name": "Taufik Ismail", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_w6ghu0fxpn"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_70pnwbdn08", "name": "Adi Fatkurahman", "nickname": "", "gender": "L", "birthDate": "1983-08-29", "deathDate": "", "fatherId": "p_n65pay7krk", "motherId": "p_w6ghu0fxpn", "spouseIds": ["p_ajdfdzdbn5"], "address": "", "notes": "No. RG: 103 (Gen VI)", "marriedIn": false}, {"id": "p_gp7m9sdvze", "name": "Utari Hanifah", "nickname": "", "gender": "P", "birthDate": "1988-09-04", "deathDate": "", "fatherId": "p_n65pay7krk", "motherId": "p_w6ghu0fxpn", "spouseIds": ["p_dzeeahgxd8"], "address": "", "notes": "No. RG: 104 (Gen VI)", "marriedIn": false}, {"id": "p_m0orcjczgq", "name": "Emmita", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_4ecjv6ypt6"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_661ewjqdf4", "name": "Indriani Puspita Sari", "nickname": "", "gender": "P", "birthDate": "1998-11-28", "deathDate": "", "fatherId": "p_4ecjv6ypt6", "motherId": "p_m0orcjczgq", "spouseIds": [], "address": "", "notes": "No. RG: 105 (Gen VI)", "marriedIn": false}, {"id": "p_sxqhiaqmkl", "name": "Nakita Amelia Astuti", "nickname": "", "gender": "P", "birthDate": "2003-10-05", "deathDate": "", "fatherId": "p_4ecjv6ypt6", "motherId": "p_m0orcjczgq", "spouseIds": [], "address": "", "notes": "No. RG: 106 (Gen VI)", "marriedIn": false}, {"id": "p_s3difav3xq", "name": "Suharty", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_289tuwz8qx"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_72nwp5ubug", "name": "Ariadi", "nickname": "", "gender": "L", "birthDate": "1981-03-07", "deathDate": "", "fatherId": "p_289tuwz8qx", "motherId": "p_s3difav3xq", "spouseIds": ["p_5syp94e6o5", "p_rxjx3hzcxn"], "address": "", "notes": "No. RG: 107 (Gen VI)", "marriedIn": false}, {"id": "p_z3t4yer0lg", "name": "Arvino", "nickname": "", "gender": "L", "birthDate": "1983-03-30", "deathDate": "", "fatherId": "p_289tuwz8qx", "motherId": "p_s3difav3xq", "spouseIds": [], "address": "", "notes": "No. RG: 108 (Gen VI)", "marriedIn": false}, {"id": "p_dbin8mepl9", "name": "Gita Arenda", "nickname": "", "gender": "P", "birthDate": "1988-04-11", "deathDate": "", "fatherId": "p_289tuwz8qx", "motherId": "p_s3difav3xq", "spouseIds": [], "address": "", "notes": "No. RG: 109 (Gen VI)", "marriedIn": false}, {"id": "p_m0stjo7hvr", "name": "Rachmaniar", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_f8bujzhezl"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_jn0xi7z045", "name": "Ina Fitria", "nickname": "", "gender": "P", "birthDate": "1981-08-12", "deathDate": "", "fatherId": "p_f8bujzhezl", "motherId": "p_m0stjo7hvr", "spouseIds": ["p_n025rvjqx0"], "address": "", "notes": "No. RG: 110 (Gen VI)", "marriedIn": false}, {"id": "p_fldjw9l3ro", "name": "Andry", "nickname": "", "gender": "L", "birthDate": "1982-08-12", "deathDate": "", "fatherId": "p_f8bujzhezl", "motherId": "p_m0stjo7hvr", "spouseIds": ["p_kaoijbld4x"], "address": "", "notes": "No. RG: 111 (Gen VI)", "marriedIn": false}, {"id": "p_2g22seundl", "name": "Riki Rahardi", "nickname": "", "gender": "L", "birthDate": "1985-12-08", "deathDate": "", "fatherId": "p_f8bujzhezl", "motherId": "p_m0stjo7hvr", "spouseIds": [], "address": "", "notes": "No. RG: 112 (Gen VI)", "marriedIn": false}, {"id": "p_x6i9vpy3dq", "name": "Hendri Syarwanto", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_6e02dinnmx"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_aeyapmghkt", "name": "Oka Fitrio", "nickname": "", "gender": "L", "birthDate": "1986-06-27", "deathDate": "", "fatherId": "p_x6i9vpy3dq", "motherId": "p_6e02dinnmx", "spouseIds": ["p_q0on2zucyr"], "address": "", "notes": "No. RG: 113 (Gen VI)", "marriedIn": false}, {"id": "p_g3lr02q8px", "name": "M Priyodhia", "nickname": "", "gender": "L", "birthDate": "1990-11-14", "deathDate": "", "fatherId": "p_x6i9vpy3dq", "motherId": "p_6e02dinnmx", "spouseIds": [], "address": "", "notes": "No. RG: 114 (Gen VI)", "marriedIn": false}, {"id": "p_lu0r6e6m57", "name": "Gustaf", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_buki053jbn"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_ub16uhe2xb", "name": "Fajarivandi", "nickname": "", "gender": "L", "birthDate": "1992-03-01", "deathDate": "", "fatherId": "p_lu0r6e6m57", "motherId": "p_buki053jbn", "spouseIds": [], "address": "", "notes": "No. RG: 115 (Gen VI)", "marriedIn": false}, {"id": "p_rt9ap7s1cw", "name": "Carissa Octagiovani", "nickname": "", "gender": "P", "birthDate": "1993-10-18", "deathDate": "", "fatherId": "p_lu0r6e6m57", "motherId": "p_buki053jbn", "spouseIds": [], "address": "", "notes": "No. RG: 116 (Gen VI)", "marriedIn": false}, {"id": "p_zj45zrpwn9", "name": "Clarima Flourenza", "nickname": "", "gender": "P", "birthDate": "1996-03-07", "deathDate": "", "fatherId": "p_lu0r6e6m57", "motherId": "p_buki053jbn", "spouseIds": [], "address": "", "notes": "No. RG: 117 (Gen VI)", "marriedIn": false}, {"id": "p_pe2c1vnway", "name": "Clarinta Mourenza", "nickname": "", "gender": "P", "birthDate": "1996-03-07", "deathDate": "", "fatherId": "p_lu0r6e6m57", "motherId": "p_buki053jbn", "spouseIds": [], "address": "", "notes": "No. RG: 118 (Gen VI)", "marriedIn": false}, {"id": "p_rx9ek1a037", "name": "Azwar", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_htba86c8jc"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_3wovqxz1nv", "name": "Arius Vanel", "nickname": "", "gender": "L", "birthDate": "1971-01-01", "deathDate": "", "fatherId": "p_rx9ek1a037", "motherId": "p_htba86c8jc", "spouseIds": [], "address": "", "notes": "No. RG: 119 (Gen VI)", "marriedIn": false}, {"id": "p_75jkde3evz", "name": "Yusward.H", "nickname": "", "gender": "L", "birthDate": "1972-01-01", "deathDate": "", "fatherId": "p_rx9ek1a037", "motherId": "p_htba86c8jc", "spouseIds": [], "address": "", "notes": "No. RG: 120 (Gen VI)", "marriedIn": false}, {"id": "p_2ypaxdocol", "name": "Era Yunita", "nickname": "", "gender": "P", "birthDate": "1975-01-01", "deathDate": "", "fatherId": "p_rx9ek1a037", "motherId": "p_htba86c8jc", "spouseIds": [], "address": "", "notes": "No. RG: 121 (Gen VI)", "marriedIn": false}, {"id": "p_b40bmzpdo3", "name": "Elsi Yulianti", "nickname": "", "gender": "P", "birthDate": "1976-01-01", "deathDate": "", "fatherId": "p_rx9ek1a037", "motherId": "p_htba86c8jc", "spouseIds": [], "address": "", "notes": "No. RG: 122 (Gen VI)", "marriedIn": false}, {"id": "p_628eexjfyh", "name": "Irwan Kurniawan", "nickname": "", "gender": "L", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_rx9ek1a037", "motherId": "p_htba86c8jc", "spouseIds": [], "address": "", "notes": "No. RG: 123 (Gen VI)", "marriedIn": false}, {"id": "p_h1idn3mjz8", "name": "Upik", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_l5yumsbv53"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_36db4zkymt", "name": "Budi Arisandi", "nickname": "", "gender": "L", "birthDate": "1976-01-01", "deathDate": "", "fatherId": "p_l5yumsbv53", "motherId": "p_h1idn3mjz8", "spouseIds": [], "address": "", "notes": "No. RG: 124 (Gen VI)", "marriedIn": false}, {"id": "p_ryzhsyr7n9", "name": "Hendri Wijaya", "nickname": "", "gender": "L", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_l5yumsbv53", "motherId": "p_h1idn3mjz8", "spouseIds": [], "address": "", "notes": "No. RG: 125 (Gen VI)", "marriedIn": false}, {"id": "p_pqxwd9sv50", "name": "Yuniarti", "nickname": "", "gender": "P", "birthDate": "1980-01-01", "deathDate": "", "fatherId": "p_l5yumsbv53", "motherId": "p_h1idn3mjz8", "spouseIds": [], "address": "", "notes": "No. RG: 126 (Gen VI)", "marriedIn": false}, {"id": "p_4t8b5gx1os", "name": "Fachruddin Chan", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_paostmbj0w"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_u9gcp1kuoa", "name": "Ferce Primula", "nickname": "", "gender": "P", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_4t8b5gx1os", "motherId": "p_paostmbj0w", "spouseIds": [], "address": "", "notes": "No. RG: 127 (Gen VI)", "marriedIn": false}, {"id": "p_hqafzobalm", "name": "Faren", "nickname": "", "gender": "P", "birthDate": "1981-01-01", "deathDate": "", "fatherId": "p_4t8b5gx1os", "motherId": "p_paostmbj0w", "spouseIds": [], "address": "", "notes": "No. RG: 128 (Gen VI)", "marriedIn": false}, {"id": "p_rjmgpqfc5x", "name": "Faliandy", "nickname": "", "gender": "L", "birthDate": "1985-01-01", "deathDate": "", "fatherId": "p_4t8b5gx1os", "motherId": "p_paostmbj0w", "spouseIds": [], "address": "", "notes": "No. RG: 129 (Gen VI)", "marriedIn": false}, {"id": "p_ex8rah6jd7", "name": "Yuwono Jan H", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_vye5n2fk01"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_42ng7fjmjb", "name": "Yudhi Rusdiyanto", "nickname": "", "gender": "L", "birthDate": "1980-01-01", "deathDate": "", "fatherId": "p_ex8rah6jd7", "motherId": "p_vye5n2fk01", "spouseIds": [], "address": "", "notes": "No. RG: 130 (Gen VI)", "marriedIn": false}, {"id": "p_ekvx4cqr2j", "name": "Yogi Dwi Riyanto", "nickname": "", "gender": "L", "birthDate": "1981-01-01", "deathDate": "", "fatherId": "p_ex8rah6jd7", "motherId": "p_vye5n2fk01", "spouseIds": [], "address": "", "notes": "No. RG: 131 (Gen VI)", "marriedIn": false}, {"id": "p_qulq0ut31x", "name": "Bobby Triyanto", "nickname": "", "gender": "L", "birthDate": "1986-01-01", "deathDate": "", "fatherId": "p_ex8rah6jd7", "motherId": "p_vye5n2fk01", "spouseIds": [], "address": "", "notes": "No. RG: 132 (Gen VI)", "marriedIn": false}, {"id": "p_03ndabf9ir", "name": "Evira Viviranda", "nickname": "", "gender": "P", "birthDate": "1991-01-01", "deathDate": "", "fatherId": "p_ex8rah6jd7", "motherId": "p_vye5n2fk01", "spouseIds": [], "address": "", "notes": "No. RG: 133 (Gen VI)", "marriedIn": false}, {"id": "p_zcb3ehzfai", "name": "Mahyeni", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_n1oqp1itst"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_tjn1bhy4d9", "name": "Rian Fitra Apriandi", "nickname": "", "gender": "P", "birthDate": "1990-01-01", "deathDate": "", "fatherId": "p_n1oqp1itst", "motherId": "p_zcb3ehzfai", "spouseIds": [], "address": "", "notes": "No. RG: 134 (Gen VI)", "marriedIn": false}, {"id": "p_iezbvt6tmc", "name": "Rezona Mayendra", "nickname": "", "gender": "L", "birthDate": "1993-01-01", "deathDate": "2016-01-01", "fatherId": "p_n1oqp1itst", "motherId": "p_zcb3ehzfai", "spouseIds": [], "address": "", "notes": "No. RG: 135 (Gen VI)", "marriedIn": false}, {"id": "p_cr6xdlj4ls", "name": "Deswati", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_9nu1g47ivv"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_9ljrloaje5", "name": "Alfo Zamdeka", "nickname": "", "gender": "L", "birthDate": "1992-01-01", "deathDate": "", "fatherId": "p_9nu1g47ivv", "motherId": "p_cr6xdlj4ls", "spouseIds": [], "address": "", "notes": "No. RG: 136 (Gen VI)", "marriedIn": false}, {"id": "p_jac0jsvh68", "name": "Alfi yandra", "nickname": "", "gender": "L", "birthDate": "1995-01-01", "deathDate": "", "fatherId": "p_9nu1g47ivv", "motherId": "p_cr6xdlj4ls", "spouseIds": [], "address": "", "notes": "No. RG: 137 (Gen VI)", "marriedIn": false}, {"id": "p_ardesdgo7b", "name": "Dahlia Tamimi", "nickname": "", "gender": "P", "birthDate": "1999-01-01", "deathDate": "", "fatherId": "p_9nu1g47ivv", "motherId": "p_cr6xdlj4ls", "spouseIds": [], "address": "", "notes": "No. RG: 138 (Gen VI)", "marriedIn": false}, {"id": "p_hi707wgcxy", "name": "Deta Tamimi", "nickname": "", "gender": "L", "birthDate": "2000-01-01", "deathDate": "", "fatherId": "p_9nu1g47ivv", "motherId": "p_cr6xdlj4ls", "spouseIds": [], "address": "", "notes": "No. RG: 139 (Gen VI)", "marriedIn": false}, {"id": "p_nqgk4x04yk", "name": "Feldi Tamimi", "nickname": "", "gender": "L", "birthDate": "2005-01-01", "deathDate": "", "fatherId": "p_9nu1g47ivv", "motherId": "p_cr6xdlj4ls", "spouseIds": [], "address": "", "notes": "No. RG: 140 (Gen VI)", "marriedIn": false}, {"id": "p_qs78nnqsfx", "name": "Arny Wiyani U", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_pfn0rn3t94"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_8b0i7lltb1", "name": "Afianty Meica Thama", "nickname": "", "gender": "P", "birthDate": "1991-01-01", "deathDate": "", "fatherId": "p_pfn0rn3t94", "motherId": "p_qs78nnqsfx", "spouseIds": [], "address": "", "notes": "No. RG: 141 (Gen VI)", "marriedIn": false}, {"id": "p_d106ldx5zt", "name": "Baharuddin", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_edlygai6bd"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_l3io5izu91", "name": "Hawabita", "nickname": "", "gender": "L", "birthDate": "1972-01-01", "deathDate": "", "fatherId": "p_d106ldx5zt", "motherId": "p_edlygai6bd", "spouseIds": [], "address": "", "notes": "No. RG: 142 (Gen VI)", "marriedIn": false}, {"id": "p_24hhecov77", "name": "Yarman", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_3zxcl4b8zy"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_kc6z2x0ie9", "name": "Yarnita", "nickname": "", "gender": "P", "birthDate": "1974-01-01", "deathDate": "", "fatherId": "p_24hhecov77", "motherId": "p_3zxcl4b8zy", "spouseIds": [], "address": "", "notes": "No. RG: 143 (Gen VI)", "marriedIn": false}, {"id": "p_yg1yhk3eee", "name": "Syam", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_ybf82upjsr"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_73gs6xbwzh", "name": "Syaemi Amanda", "nickname": "", "gender": "P", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_yg1yhk3eee", "motherId": "p_ybf82upjsr", "spouseIds": ["p_ui3jfn4zg7"], "address": "", "notes": "No. RG: 144 (Gen VI)", "marriedIn": false}, {"id": "p_kftshm074g", "name": "Dimiria Hapsari", "nickname": "", "gender": "P", "birthDate": "1980-01-01", "deathDate": "", "fatherId": "p_yg1yhk3eee", "motherId": "p_ybf82upjsr", "spouseIds": ["p_sqbdoxyx2c"], "address": "", "notes": "No. RG: 145 (Gen VI)", "marriedIn": false}, {"id": "p_sp5vfx5z6p", "name": "Syarsam Pramudia", "nickname": "", "gender": "L", "birthDate": "1983-01-01", "deathDate": "", "fatherId": "p_yg1yhk3eee", "motherId": "p_ybf82upjsr", "spouseIds": [], "address": "", "notes": "No. RG: 146 (Gen VI)", "marriedIn": false}, {"id": "p_b5glaiqk1f", "name": "Cecep Sunarya", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_kkzdqmfnpg"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_os96qavxd6", "name": "Nurul Ayu Utami", "nickname": "", "gender": "P", "birthDate": "1983-01-01", "deathDate": "", "fatherId": "p_b5glaiqk1f", "motherId": "p_kkzdqmfnpg", "spouseIds": [], "address": "", "notes": "No. RG: 147 (Gen VI)", "marriedIn": false}, {"id": "p_w2kjjmm0to", "name": "Herwin Rizaldi Kusuma", "nickname": "", "gender": "L", "birthDate": "1978-01-01", "deathDate": "", "fatherId": "p_b5glaiqk1f", "motherId": "p_kkzdqmfnpg", "spouseIds": [], "address": "", "notes": "No. RG: 148 (Gen VI)", "marriedIn": false}, {"id": "p_2ntbonqzce", "name": "Sutikna Adiwinata", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_v5kjlfplhi"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_p1kny7k1k7", "name": "Selly", "nickname": "", "gender": "P", "birthDate": "1994-01-01", "deathDate": "", "fatherId": "p_2ntbonqzce", "motherId": "p_v5kjlfplhi", "spouseIds": [], "address": "", "notes": "No. RG: 149 (Gen VI)", "marriedIn": false}, {"id": "p_5ntsvub7jd", "name": "M Yafiz", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_azptlqzq95"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_l739lxovqe", "name": "Hanifa", "nickname": "", "gender": "P", "birthDate": "1988-01-01", "deathDate": "", "fatherId": "p_5ntsvub7jd", "motherId": "p_azptlqzq95", "spouseIds": [], "address": "", "notes": "No. RG: 150 (Gen VI)", "marriedIn": false}, {"id": "p_8u1nsw5yu9", "name": "Delwizar", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_5oop7e12bq"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_5oqv7kmj4g", "name": "Maisita", "nickname": "", "gender": "P", "birthDate": "1990-01-01", "deathDate": "", "fatherId": "p_8u1nsw5yu9", "motherId": "p_5oop7e12bq", "spouseIds": [], "address": "", "notes": "No. RG: 151 (Gen VI)", "marriedIn": false}, {"id": "p_sd8dzyi8oh", "name": "Yusniati", "nickname": "", "gender": "P", "birthDate": "1962-12-22", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_sqob3rrn15"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_fz15or8y4e", "name": "Muhammad Ihsan", "nickname": "", "gender": "L", "birthDate": "1992-01-19", "deathDate": "", "fatherId": "p_sqob3rrn15", "motherId": "p_sd8dzyi8oh", "spouseIds": [], "address": "", "notes": "No. RG: 152 (Gen VI)", "marriedIn": false}, {"id": "p_mdvd6htuit", "name": "Nisa Sofnia", "nickname": "", "gender": "P", "birthDate": "1994-07-19", "deathDate": "", "fatherId": "p_sqob3rrn15", "motherId": "p_sd8dzyi8oh", "spouseIds": [], "address": "", "notes": "No. RG: 153 (Gen VI)", "marriedIn": false}, {"id": "p_6u2fsaf6ro", "name": "M.Berdauno", "nickname": "", "gender": "L", "birthDate": "1999-06-14", "deathDate": "", "fatherId": "p_sqob3rrn15", "motherId": "p_sd8dzyi8oh", "spouseIds": [], "address": "", "notes": "No. RG: 154 (Gen VI)", "marriedIn": false}, {"id": "p_jb14n346rz", "name": "R R Grisdiati", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_5qe6ur6vq1"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_1zybxn5gt3", "name": "Eka Putri R.R", "nickname": "", "gender": "P", "birthDate": "1996-03-15", "deathDate": "", "fatherId": "p_5qe6ur6vq1", "motherId": "p_jb14n346rz", "spouseIds": [], "address": "", "notes": "No. RG: 155 (Gen VI)", "marriedIn": false}, {"id": "p_kivqie6jbk", "name": "Puspita Dewi R.R", "nickname": "", "gender": "P", "birthDate": "1997-12-17", "deathDate": "", "fatherId": "p_5qe6ur6vq1", "motherId": "p_jb14n346rz", "spouseIds": [], "address": "", "notes": "No. RG: 156 (Gen VI)", "marriedIn": false}, {"id": "p_a2dpf11urk", "name": "Fenny", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_8fh1h0myhp"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_rwvybfvxyw", "name": "Imanisa", "nickname": "", "gender": "P", "birthDate": "1996-03-05", "deathDate": "", "fatherId": "p_8fh1h0myhp", "motherId": "p_a2dpf11urk", "spouseIds": [], "address": "", "notes": "No. RG: 157 (Gen VI)", "marriedIn": false}, {"id": "p_nxte0uqnky", "name": "Riandani Afra", "nickname": "", "gender": "P", "birthDate": "1997-07-28", "deathDate": "", "fatherId": "p_8fh1h0myhp", "motherId": "p_a2dpf11urk", "spouseIds": [], "address": "", "notes": "No. RG: 158 (Gen VI)", "marriedIn": false}, {"id": "p_hmafr1dyx7", "name": "Ferushanda Ramadhan", "nickname": "", "gender": "L", "birthDate": "2001-11-24", "deathDate": "", "fatherId": "p_8fh1h0myhp", "motherId": "p_a2dpf11urk", "spouseIds": [], "address": "", "notes": "No. RG: 159 (Gen VI)", "marriedIn": false}, {"id": "p_8sgqiuzyo7", "name": "Treesnawati", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7j8c62x1ua"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_9j05x43e03", "name": "Rahadian Khirsya Akbar", "nickname": "", "gender": "L", "birthDate": "1995-01-01", "deathDate": "", "fatherId": "p_7j8c62x1ua", "motherId": "p_8sgqiuzyo7", "spouseIds": [], "address": "", "notes": "No. RG: 160 (Gen VI)", "marriedIn": false}, {"id": "p_eswnubi27q", "name": "Sutji Arianti", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7j8c62x1ua"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_2ar3x14itm", "name": "Afit Afani", "nickname": "", "gender": "L", "birthDate": "1998-01-01", "deathDate": "", "fatherId": "p_7j8c62x1ua", "motherId": "p_eswnubi27q", "spouseIds": [], "address": "", "notes": "No. RG: 161 (Gen VI)", "marriedIn": false}, {"id": "p_ylhmqoivo1", "name": "Dewi", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_b11nxwk0au"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_rs2fmxjw5a", "name": "Reynova Ramadhan", "nickname": "", "gender": "L", "birthDate": "1994-11-11", "deathDate": "", "fatherId": "p_b11nxwk0au", "motherId": "p_ylhmqoivo1", "spouseIds": [], "address": "", "notes": "No. RG: 162 (Gen VI)", "marriedIn": false}, {"id": "p_3oj10pls19", "name": "Ryano Rahmanza", "nickname": "", "gender": "L", "birthDate": "1997-05-27", "deathDate": "", "fatherId": "p_b11nxwk0au", "motherId": "p_ylhmqoivo1", "spouseIds": [], "address": "", "notes": "No. RG: 163 (Gen VI)", "marriedIn": false}, {"id": "p_3jw2ovgr4x", "name": "Razita Rahmanisa", "nickname": "", "gender": "P", "birthDate": "2001-01-01", "deathDate": "", "fatherId": "p_b11nxwk0au", "motherId": "p_ylhmqoivo1", "spouseIds": [], "address": "", "notes": "No. RG: 164 (Gen VI)", "marriedIn": false}, {"id": "p_0zusbuzv36", "name": "Rayhanna Rahmanisa", "nickname": "", "gender": "P", "birthDate": "2008-03-01", "deathDate": "", "fatherId": "p_b11nxwk0au", "motherId": "p_ylhmqoivo1", "spouseIds": [], "address": "", "notes": "No. RG: 165 (Gen VI)", "marriedIn": false}, {"id": "p_br10jd1l4z", "name": "Irfan", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_vtblri0fx4"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_lkl9hcz6bv", "name": "Zakkiya Nasywa Arifah", "nickname": "", "gender": "P", "birthDate": "2017-04-25", "deathDate": "", "fatherId": "p_br10jd1l4z", "motherId": "p_vtblri0fx4", "spouseIds": [], "address": "", "notes": "No. RG: 166 (Gen VI)", "marriedIn": false}, {"id": "p_3qj85jl351", "name": "Amanda Yulianisa", "nickname": "", "gender": "P", "birthDate": "1996-07-01", "deathDate": "", "fatherId": null, "motherId": "p_yvoe7djzwf", "spouseIds": [], "address": "", "notes": "No. RG: 167 (Gen VI)", "marriedIn": false}, {"id": "p_1wx1c0fout", "name": "Yati Rachmayanti", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_b7j4sbh5z5"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_427jg6y3rj", "name": "Tasha Fitri Amalia", "nickname": "", "gender": "P", "birthDate": "1996-02-05", "deathDate": "", "fatherId": "p_b7j4sbh5z5", "motherId": "p_1wx1c0fout", "spouseIds": [], "address": "", "notes": "No. RG: 168 (Gen VI)", "marriedIn": false}, {"id": "p_734ziuio2w", "name": "Khalid Ahmad Syaifullah", "nickname": "", "gender": "L", "birthDate": "2001-04-20", "deathDate": "", "fatherId": "p_b7j4sbh5z5", "motherId": "p_1wx1c0fout", "spouseIds": [], "address": "", "notes": "No. RG: 169 (Gen VI)", "marriedIn": false}, {"id": "p_uomt29zjd0", "name": "Khairal Ahmad Yusuf", "nickname": "", "gender": "L", "birthDate": "2002-09-02", "deathDate": "", "fatherId": "p_b7j4sbh5z5", "motherId": "p_1wx1c0fout", "spouseIds": [], "address": "", "notes": "No. RG: 170 (Gen VI)", "marriedIn": false}, {"id": "p_k9uod6mpni", "name": "Vitria Pragesjvara", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_aj0s7pdkd4"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_3bf1zjzfnv", "name": "Avicenna Wisesa", "nickname": "", "gender": "L", "birthDate": "1997-09-21", "deathDate": "", "fatherId": "p_aj0s7pdkd4", "motherId": "p_k9uod6mpni", "spouseIds": [], "address": "", "notes": "No. RG: 171 (Gen VI)", "marriedIn": false}, {"id": "p_rux9jiiulk", "name": "Algazel Aqilla", "nickname": "", "gender": "L", "birthDate": "2001-09-10", "deathDate": "", "fatherId": "p_aj0s7pdkd4", "motherId": "p_k9uod6mpni", "spouseIds": [], "address": "", "notes": "No. RG: 172 (Gen VI)", "marriedIn": false}, {"id": "p_yt4qu7mf0i", "name": "Hedy P. Jaya", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_969bbhnub5"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_n5gc47pscb", "name": "Rifany Rizki Salsabila", "nickname": "", "gender": "P", "birthDate": "2001-02-14", "deathDate": "", "fatherId": "p_yt4qu7mf0i", "motherId": "p_969bbhnub5", "spouseIds": [], "address": "", "notes": "No. RG: 173 (Gen VI)", "marriedIn": false}, {"id": "p_oyjrn4lb43", "name": "Yani Diyani R", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_xko6qgg3s7"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_dqit1kqb5q", "name": "Anisah", "nickname": "", "gender": "P", "birthDate": "1994-02-02", "deathDate": "", "fatherId": "p_xko6qgg3s7", "motherId": "p_oyjrn4lb43", "spouseIds": [], "address": "", "notes": "No. RG: 174 (Gen VI)", "marriedIn": false}, {"id": "p_amhaalp3ju", "name": "Shofura", "nickname": "", "gender": "P", "birthDate": "1996-02-10", "deathDate": "", "fatherId": "p_xko6qgg3s7", "motherId": "p_oyjrn4lb43", "spouseIds": [], "address": "", "notes": "No. RG: 175 (Gen VI)", "marriedIn": false}, {"id": "p_g3m3txj5i8", "name": "Muhammad Hilmi", "nickname": "", "gender": "L", "birthDate": "1999-09-25", "deathDate": "", "fatherId": "p_xko6qgg3s7", "motherId": "p_oyjrn4lb43", "spouseIds": [], "address": "", "notes": "No. RG: 176 (Gen VI)", "marriedIn": false}, {"id": "p_49vwweu8bj", "name": "Muhammad Azzam", "nickname": "", "gender": "L", "birthDate": "2002-02-26", "deathDate": "", "fatherId": "p_xko6qgg3s7", "motherId": "p_oyjrn4lb43", "spouseIds": [], "address": "", "notes": "No. RG: 177 (Gen VI)", "marriedIn": false}, {"id": "p_2qwxq6rpa0", "name": "Mami", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_zwua63omd2"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_ecofqj59q9", "name": "Fatimah", "nickname": "", "gender": "P", "birthDate": "1998-04-27", "deathDate": "", "fatherId": "p_zwua63omd2", "motherId": "p_2qwxq6rpa0", "spouseIds": [], "address": "", "notes": "No. RG: 178 (Gen VI)", "marriedIn": false}, {"id": "p_8t6l18roba", "name": "Muhammad Ramadhan", "nickname": "", "gender": "L", "birthDate": "2000-12-15", "deathDate": "", "fatherId": "p_zwua63omd2", "motherId": "p_2qwxq6rpa0", "spouseIds": [], "address": "", "notes": "No. RG: 179 (Gen VI)", "marriedIn": false}, {"id": "p_ydkck6klm8", "name": "Mariani", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7351ujh3r9"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_uf3ec219mb", "name": "Marwa Sholihah", "nickname": "", "gender": "P", "birthDate": "2000-12-06", "deathDate": "", "fatherId": "p_7351ujh3r9", "motherId": "p_ydkck6klm8", "spouseIds": [], "address": "", "notes": "No. RG: 180 (Gen VI)", "marriedIn": false}, {"id": "p_vtoa2tx0j0", "name": "Aisyah Sholihah", "nickname": "", "gender": "P", "birthDate": "2003-12-18", "deathDate": "", "fatherId": "p_7351ujh3r9", "motherId": "p_ydkck6klm8", "spouseIds": [], "address": "", "notes": "No. RG: 181 (Gen VI)", "marriedIn": false}, {"id": "p_a6wi4i9k65", "name": "Yusuf Sholih", "nickname": "", "gender": "L", "birthDate": "2006-09-17", "deathDate": "", "fatherId": "p_7351ujh3r9", "motherId": "p_ydkck6klm8", "spouseIds": [], "address": "", "notes": "No. RG: 182 (Gen VI)", "marriedIn": false}, {"id": "p_mgz607tp68", "name": "Nailah Solihah", "nickname": "", "gender": "P", "birthDate": "2008-05-02", "deathDate": "", "fatherId": "p_7351ujh3r9", "motherId": "p_ydkck6klm8", "spouseIds": [], "address": "", "notes": "No. RG: 183 (Gen VI)", "marriedIn": false}, {"id": "p_t96i71v5oj", "name": "Wawang Buang", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_xy9whbuegw"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_q920sn2qcz", "name": "Ismail", "nickname": "", "gender": "L", "birthDate": "2001-07-07", "deathDate": "", "fatherId": "p_t96i71v5oj", "motherId": "p_xy9whbuegw", "spouseIds": [], "address": "", "notes": "No. RG: 184 (Gen VI)", "marriedIn": false}, {"id": "p_7skgychwh7", "name": "Ibrahim", "nickname": "", "gender": "L", "birthDate": "2008-01-01", "deathDate": "", "fatherId": "p_t96i71v5oj", "motherId": "p_xy9whbuegw", "spouseIds": [], "address": "", "notes": "No. RG: 185 (Gen VI)", "marriedIn": false}, {"id": "p_xh4elu38ee", "name": "Muhammad", "nickname": "", "gender": "L", "birthDate": "2015-06-16", "deathDate": "", "fatherId": "p_t96i71v5oj", "motherId": "p_xy9whbuegw", "spouseIds": [], "address": "", "notes": "No. RG: 186 (Gen VI)", "marriedIn": false}, {"id": "p_4mooesfedc", "name": "Zulfikar Achmad", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_n64trgtzqq"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_tiqsc27xkf", "name": "Zahara Fajaria Achmad", "nickname": "", "gender": "P", "birthDate": "2007-07-06", "deathDate": "", "fatherId": "p_4mooesfedc", "motherId": "p_n64trgtzqq", "spouseIds": [], "address": "", "notes": "No. RG: 187 (Gen VI)", "marriedIn": false}, {"id": "p_7375jwirbu", "name": "Yusuf Khazainul Ardi", "nickname": "", "gender": "L", "birthDate": "2009-08-20", "deathDate": "", "fatherId": "p_4mooesfedc", "motherId": "p_n64trgtzqq", "spouseIds": [], "address": "", "notes": "No. RG: 188 (Gen VI)", "marriedIn": false}, {"id": "p_u0rlne6598", "name": "Diden", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_akex15ryd4"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_wn750e6wgx", "name": "Raisya", "nickname": "", "gender": "P", "birthDate": "2004-07-09", "deathDate": "", "fatherId": "p_u0rlne6598", "motherId": "p_akex15ryd4", "spouseIds": [], "address": "", "notes": "No. RG: 189 (Gen VI)", "marriedIn": false}, {"id": "p_08bvab7f6q", "name": "Taswin", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_ifqg8rctvp"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_vv47vc0un2", "name": "Rasyid", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_08bvab7f6q", "motherId": "p_ifqg8rctvp", "spouseIds": [], "address": "", "notes": "No. RG: 190 (Gen VI)", "marriedIn": false}, {"id": "p_6vdude9twx", "name": "Ani Khairani", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_kj4demv83k"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_s7iha8rkqr", "name": "Fathan Q", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 191 (Gen VI)", "marriedIn": false}, {"id": "p_adp2suta1l", "name": "Khalifah A", "nickname": "", "gender": "L", "birthDate": "2007-07-08", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 192 (Gen VI)", "marriedIn": false}, {"id": "p_g9s1uwmd2x", "name": "Qaulan T", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 193 (Gen VI)", "marriedIn": false}, {"id": "p_cfycje8dkg", "name": "Ziyada T", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 194 (Gen VI)", "marriedIn": false}, {"id": "p_7ihyj1orbz", "name": "Arfa H", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 195 (Gen VI)", "marriedIn": false}, {"id": "p_g08jbkay2s", "name": "Nurin A", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_kj4demv83k", "motherId": "p_6vdude9twx", "spouseIds": [], "address": "", "notes": "No. RG: 196 (Gen VI)", "marriedIn": false}, {"id": "p_vnppaly3zo", "name": "M Mikail Azzaki", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_ywldz6lgbe", "motherId": null, "spouseIds": [], "address": "", "notes": "No. RG: 201 (Gen VI)", "marriedIn": false}, {"id": "p_21k0xfhdwd", "name": "Yoga N", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_n96waj4rxu"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_42optb7iiv", "name": "Khansa Nazhefa", "nickname": "", "gender": "", "birthDate": "2003-02-27", "deathDate": "", "fatherId": "p_21k0xfhdwd", "motherId": "p_n96waj4rxu", "spouseIds": [], "address": "", "notes": "No. RG: 202 (Gen VII)", "marriedIn": false}, {"id": "p_q1lybr2k1s", "name": "Athallah Tsagif", "nickname": "", "gender": "", "birthDate": "2005-11-11", "deathDate": "", "fatherId": "p_21k0xfhdwd", "motherId": "p_n96waj4rxu", "spouseIds": [], "address": "", "notes": "No. RG: 203 (Gen VII)", "marriedIn": false}, {"id": "p_qn4rh307vf", "name": "Maya Y", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_sttxkk39n6"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_hatkb7t8j4", "name": "Aisha Aleema", "nickname": "", "gender": "", "birthDate": "2007-01-01", "deathDate": "", "fatherId": "p_sttxkk39n6", "motherId": "p_qn4rh307vf", "spouseIds": [], "address": "", "notes": "No. RG: 209 (Gen VII)", "marriedIn": false}, {"id": "p_xe1nfijjl0", "name": "Rani Dewi Anggraeni", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_afz01bkksd"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_awu9xd8rgp", "name": "Adelia Sabiya", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_afz01bkksd", "motherId": "p_xe1nfijjl0", "spouseIds": [], "address": "", "notes": "No. RG: 212 (Gen VII)", "marriedIn": false}, {"id": "p_bsyylz8nn1", "name": "Athifa Kasih", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_afz01bkksd", "motherId": "p_xe1nfijjl0", "spouseIds": [], "address": "", "notes": "No. RG: 213 (Gen VII)", "marriedIn": false}, {"id": "p_qto1wh3od7", "name": "Alvaro Ghazali", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": "p_afz01bkksd", "motherId": "p_xe1nfijjl0", "spouseIds": [], "address": "", "notes": "No. RG: 214 (Gen VII)", "marriedIn": false}, {"id": "p_d450x8yc50", "name": "Fathaya Rozana", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_0aa1l5qyi1"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_n30n7hquis", "name": "Ayska Yunia Morin", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_0aa1l5qyi1", "motherId": "p_d450x8yc50", "spouseIds": [], "address": "", "notes": "No. RG: 215 (Gen VII)", "marriedIn": false}, {"id": "p_p11gxbybo5", "name": "Arkana Nail Abiya", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_0aa1l5qyi1", "motherId": "p_d450x8yc50", "spouseIds": [], "address": "", "notes": "No. RG: 216 (Gen VII)", "marriedIn": false}, {"id": "p_yz4uu0jb1w", "name": "Dani M Malik", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_qtt914u389"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_yt5d0kdgme", "name": "Annisa Qadriya Maulida Sabila", "nickname": "", "gender": "", "birthDate": "", "deathDate": "", "fatherId": "p_yz4uu0jb1w", "motherId": "p_qtt914u389", "spouseIds": [], "address": "", "notes": "No. RG: 217 (Gen VII)", "marriedIn": false}, {"id": "p_u6ur69mjo9", "name": "Yudith Tiara", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_uf5ucgjt0i"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_egn6j420mg", "name": "Laisa Adnindia", "nickname": "", "gender": "", "birthDate": "2007-12-15", "deathDate": "", "fatherId": "p_uf5ucgjt0i", "motherId": "p_u6ur69mjo9", "spouseIds": [], "address": "", "notes": "No. RG: 219 (Gen VII)", "marriedIn": false}, {"id": "p_hdkws0rtmi", "name": "Dzaky Hafuza Aldira", "nickname": "", "gender": "", "birthDate": "2009-12-21", "deathDate": "", "fatherId": "p_uf5ucgjt0i", "motherId": "p_u6ur69mjo9", "spouseIds": [], "address": "", "notes": "No. RG: 220 (Gen VII)", "marriedIn": false}, {"id": "p_msluitodcc", "name": "Bambang", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7c8h91h929"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_p3udhu5c1y", "name": "M. Fahril Riansyah", "nickname": "", "gender": "L", "birthDate": "2008-04-18", "deathDate": "", "fatherId": "p_msluitodcc", "motherId": "p_7c8h91h929", "spouseIds": [], "address": "", "notes": "No. RG: 221 (Gen VII)", "marriedIn": false}, {"id": "p_02qygguv6l", "name": "M.  Eris Rhamsyah", "nickname": "", "gender": "L", "birthDate": "2010-04-17", "deathDate": "", "fatherId": "p_msluitodcc", "motherId": "p_7c8h91h929", "spouseIds": [], "address": "", "notes": "No. RG: 222 (Gen VII)", "marriedIn": false}, {"id": "p_lggsaori6c", "name": "Abdi", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_7c8h91h929"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_7yn97pg3zr", "name": "Ibrahim", "nickname": "", "gender": "L", "birthDate": "2017-01-01", "deathDate": "", "fatherId": "p_lggsaori6c", "motherId": "p_7c8h91h929", "spouseIds": [], "address": "", "notes": "No. RG: 223 (Gen VII)", "marriedIn": false}, {"id": "p_92rwbm1acp", "name": "Herlina", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_wy4yjla5lx"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_f54farhtl5", "name": "Nayla Sabai Delita", "nickname": "", "gender": "", "birthDate": "2009-01-01", "deathDate": "", "fatherId": "p_wy4yjla5lx", "motherId": "p_92rwbm1acp", "spouseIds": [], "address": "", "notes": "No. RG: 224 (Gen VII)", "marriedIn": false}, {"id": "p_82cmes91kj", "name": "Saifana Mumtaz Aleah", "nickname": "", "gender": "", "birthDate": "2012-01-01", "deathDate": "", "fatherId": "p_wy4yjla5lx", "motherId": "p_92rwbm1acp", "spouseIds": [], "address": "", "notes": "No. RG: 225 (Gen VII)", "marriedIn": false}, {"id": "p_5vxj3e5qpd", "name": "Yulan", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_srk7gt9bpl"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_yh43ogpsrg", "name": "Lathifa Maryan Shabira", "nickname": "", "gender": "", "birthDate": "2017-05-23", "deathDate": "", "fatherId": "p_5vxj3e5qpd", "motherId": "p_srk7gt9bpl", "spouseIds": [], "address": "", "notes": "No. RG: 226 (Gen VII)", "marriedIn": false}, {"id": "p_ajdfdzdbn5", "name": "Endah", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_70pnwbdn08"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_gzxfxhqzkt", "name": "Radithia Gazi W", "nickname": "", "gender": "", "birthDate": "2011-02-12", "deathDate": "", "fatherId": "p_70pnwbdn08", "motherId": "p_ajdfdzdbn5", "spouseIds": [], "address": "", "notes": "No. RG: 227 (Gen VII)", "marriedIn": false}, {"id": "p_a6ozun0zh9", "name": "Anisa Gantari A", "nickname": "", "gender": "", "birthDate": "2013-03-06", "deathDate": "", "fatherId": "p_70pnwbdn08", "motherId": "p_ajdfdzdbn5", "spouseIds": [], "address": "", "notes": "No. RG: 228 (Gen VII)", "marriedIn": false}, {"id": "p_dzeeahgxd8", "name": "MS Yogi W", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_gp7m9sdvze"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_rxuujfc49d", "name": "MS Adam Abdurrozaq", "nickname": "", "gender": "L", "birthDate": "2016-01-01", "deathDate": "", "fatherId": "p_dzeeahgxd8", "motherId": "p_gp7m9sdvze", "spouseIds": [], "address": "", "notes": "No. RG: 229 (Gen VII)", "marriedIn": false}, {"id": "p_5syp94e6o5", "name": "Arimbi", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_72nwp5ubug"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_l74daq1xe5", "name": "Kanaya Azzahra", "nickname": "", "gender": "P", "birthDate": "2009-06-05", "deathDate": "", "fatherId": "p_72nwp5ubug", "motherId": "p_5syp94e6o5", "spouseIds": [], "address": "", "notes": "No. RG: 232 (Gen VII)", "marriedIn": false}, {"id": "p_rxjx3hzcxn", "name": "Alita Dewi Angraeni", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_72nwp5ubug"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_yki2ud1qjp", "name": "M Ken Abdulrahman", "nickname": "", "gender": "L", "birthDate": "2014-01-01", "deathDate": "", "fatherId": "p_72nwp5ubug", "motherId": "p_rxjx3hzcxn", "spouseIds": [], "address": "", "notes": "No. RG: None (Gen VII)", "marriedIn": false}, {"id": "p_n025rvjqx0", "name": "Cak", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_jn0xi7z045"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_khbbglmdgk", "name": "Khairiya Andini Denan", "nickname": "", "gender": "P", "birthDate": "2008-10-05", "deathDate": "", "fatherId": "p_n025rvjqx0", "motherId": "p_jn0xi7z045", "spouseIds": [], "address": "", "notes": "No. RG: 233 (Gen VII)", "marriedIn": false}, {"id": "p_6d6f089dw5", "name": "Haikal Izzaki Denan", "nickname": "", "gender": "L", "birthDate": "2010-10-16", "deathDate": "", "fatherId": "p_n025rvjqx0", "motherId": "p_jn0xi7z045", "spouseIds": [], "address": "", "notes": "No. RG: 234 (Gen VII)", "marriedIn": false}, {"id": "p_op6s8q5s4n", "name": "Maulana Yusralfan Denan", "nickname": "", "gender": "L", "birthDate": "2012-05-24", "deathDate": "", "fatherId": "p_n025rvjqx0", "motherId": "p_jn0xi7z045", "spouseIds": [], "address": "", "notes": "No. RG: 235 (Gen VII)", "marriedIn": false}, {"id": "p_kaoijbld4x", "name": "Reni", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_fldjw9l3ro"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_b03f28fxyh", "name": "Zahra Zafira Reanda", "nickname": "", "gender": "P", "birthDate": "2009-10-17", "deathDate": "", "fatherId": "p_fldjw9l3ro", "motherId": "p_kaoijbld4x", "spouseIds": [], "address": "", "notes": "No. RG: 236 (Gen VII)", "marriedIn": false}, {"id": "p_bsekxur29f", "name": "Hana Mehrnaz Reanda", "nickname": "", "gender": "P", "birthDate": "2015-02-22", "deathDate": "", "fatherId": "p_fldjw9l3ro", "motherId": "p_kaoijbld4x", "spouseIds": [], "address": "", "notes": "No. RG: 237 (Gen VII)", "marriedIn": false}, {"id": "p_zltenioajr", "name": "Khalila Rizwanda Reanda", "nickname": "", "gender": "P", "birthDate": "2019-09-01", "deathDate": "", "fatherId": "p_fldjw9l3ro", "motherId": "p_kaoijbld4x", "spouseIds": [], "address": "", "notes": "No. RG: None (Gen VII)", "marriedIn": false}, {"id": "p_q0on2zucyr", "name": "Indah Rizki", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_aeyapmghkt"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_cguekiqg0e", "name": "M Nakhla Alvaro", "nickname": "", "gender": "L", "birthDate": "2012-05-30", "deathDate": "", "fatherId": "p_aeyapmghkt", "motherId": "p_q0on2zucyr", "spouseIds": [], "address": "", "notes": "No. RG: 238 (Gen VII)", "marriedIn": false}, {"id": "p_nemt71p46r", "name": "Zafran Atha Khairi", "nickname": "", "gender": "L", "birthDate": "2013-11-04", "deathDate": "", "fatherId": "p_aeyapmghkt", "motherId": "p_q0on2zucyr", "spouseIds": [], "address": "", "notes": "No. RG: 239 (Gen VII)", "marriedIn": false}, {"id": "p_jmgdgi0kuz", "name": "Kharul Adam Rafka", "nickname": "", "gender": "L", "birthDate": "2019-01-01", "deathDate": "", "fatherId": "p_aeyapmghkt", "motherId": "p_q0on2zucyr", "spouseIds": [], "address": "", "notes": "No. RG: None (Gen VII)", "marriedIn": false}, {"id": "p_ui3jfn4zg7", "name": "Cornelis Suharyanto", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_73gs6xbwzh"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_1iprmaoryx", "name": "Amaya Ardhanareswari", "nickname": "", "gender": "P", "birthDate": "2009-01-01", "deathDate": "", "fatherId": "p_ui3jfn4zg7", "motherId": "p_73gs6xbwzh", "spouseIds": [], "address": "", "notes": "No. RG: 240 (Gen VII)", "marriedIn": false}, {"id": "p_04ohc0takd", "name": "Janitra Haryanti", "nickname": "", "gender": "P", "birthDate": "2013-01-01", "deathDate": "", "fatherId": "p_ui3jfn4zg7", "motherId": "p_73gs6xbwzh", "spouseIds": [], "address": "", "notes": "No. RG: 241 (Gen VII)", "marriedIn": false}, {"id": "p_sqbdoxyx2c", "name": "Indra S Sulisto", "nickname": "", "gender": "L", "birthDate": "", "deathDate": "", "fatherId": null, "motherId": null, "spouseIds": ["p_kftshm074g"], "address": "", "notes": "Menikah dengan garis RG (data pasangan minim).", "marriedIn": true}, {"id": "p_mbtby78klx", "name": "Naira Jahzara Sulisto", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_sqbdoxyx2c", "motherId": "p_kftshm074g", "spouseIds": [], "address": "", "notes": "No. RG: 242 (Gen VII)", "marriedIn": false}, {"id": "p_b5uwogexwe", "name": "Rhea Sadya Sulisto", "nickname": "", "gender": "P", "birthDate": "", "deathDate": "", "fatherId": "p_sqbdoxyx2c", "motherId": "p_kftshm074g", "spouseIds": [], "address": "", "notes": "No. RG: 243 (Gen VII)", "marriedIn": false}];
+
+  // ---------- STORAGE ----------
+  function migratePeople(list){
+    // konversi data lama (spouseId tunggal) menjadi spouseIds (array),
+    // supaya mendukung lebih dari satu pernikahan tanpa kehilangan data lama.
+    list.forEach(p=>{
+      if(!Array.isArray(p.spouseIds)){
+        p.spouseIds = p.spouseId ? [p.spouseId] : [];
+      }
+      if(p.spouseId !== undefined) delete p.spouseId;
+    });
+    // pastikan tautan pasangan dua arah (kalau A punya B tapi B tidak punya A)
+    list.forEach(p=>{
+      p.spouseIds.forEach(sid=>{
+        const sp = list.find(x=>x.id===sid);
+        if(sp && !sp.spouseIds.includes(p.id)) sp.spouseIds.push(p.id);
+      });
+    });
+    return list;
+  }
+  async function loadData(){
+    try{
+      const res = await storageAPI.get(STORE_KEY, false);
+      people = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){ people = []; }
+    if(!people.length && SEED_PEOPLE.length){
+      people = JSON.parse(JSON.stringify(SEED_PEOPLE));
+      migratePeople(people);
+      try{ await storageAPI.set(STORE_KEY, JSON.stringify(people), false); }catch(e){}
+    } else if(people.length){
+      const before = JSON.stringify(people);
+      migratePeople(people);
+      if(JSON.stringify(people) !== before){
+        try{ await storageAPI.set(STORE_KEY, JSON.stringify(people), false); }catch(e){}
+      }
+    }
+    render();
+  }
+  async function saveData(){
+    // Mengembalikan true/false supaya pemanggil TAHU apakah penyimpanan
+    // benar-benar berhasil. Tidak cuma percaya hasil set() — langsung
+    // dibaca ulang (verifikasi) supaya benar-benar yakin datanya masuk,
+    // bukan cuma "sepertinya berhasil".
+    const payload = JSON.stringify(people);
+    try{
+      const res = await storageAPI.set(STORE_KEY, payload, false);
+      if(!res){ showToast('Gagal menyimpan data — coba lagi', 'error'); return false; }
+    }catch(e){
+      showToast('Gagal menyimpan data — coba lagi', 'error');
+      return false;
+    }
+    // verifikasi: baca ulang, pastikan benar-benar tersimpan dan sesuai
+    try{
+      const check = await storageAPI.get(STORE_KEY, false);
+      if(!check || check.value !== payload){
+        showToast('Tersimpan tapi verifikasi gagal — coba muat ulang halaman untuk memastikan', 'error');
+        return false;
+      }
+    }catch(e){
+      showToast('Tersimpan tapi tidak bisa diverifikasi — coba muat ulang halaman untuk memastikan', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  // ---------- HELPERS ----------
+  function uid(){ return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function getP(id){ return people.find(p=>p.id===id); }
+  function initials(name){
+    return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  }
+  function fmtDate(d){
+    if(!d) return '';
+    const dt = new Date(d+'T00:00:00');
+    if(isNaN(dt)) return d;
+    return dt.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  }
+  function lifespanStr(p){
+    const by = p.birthDate ? new Date(p.birthDate).getFullYear() : null;
+    const dy = p.deathDate ? new Date(p.deathDate).getFullYear() : null;
+    if(by && dy) return by+' – '+dy;
+    if(by) return 'lahir '+by;
+    if(dy) return 'wafat '+dy;
+    return '';
+  }
+  function children(id){ return people.filter(p=>p.fatherId===id || p.motherId===id); }
+  function spousePeople(p){ return (p.spouseIds||[]).map(id=>getP(id)).filter(Boolean); }
+  function spousePerson(p){ const arr = spousePeople(p); return arr.length ? arr[0] : null; }
+  function showToast(msg, type){
+    const t = document.getElementById('toast');
+    const icon = type==='success' ? '✓ ' : type==='error' ? '⚠ ' : '';
+    t.textContent = icon + msg;
+    t.className = 'toast show' + (type ? ' '+type : '');
+    clearTimeout(t._to);
+    const duration = type ? 3500 : 2200;
+    t._to = setTimeout(()=>t.classList.remove('show'), duration);
+  }
+
+  function computeGeneration(id, memo, guard){
+    guard = guard || new Set();
+    if(memo.has(id)) return memo.get(id);
+    if(guard.has(id)) return 0; // cycle guard
+    guard.add(id);
+    const p = getP(id);
+    if(!p){ memo.set(id,0); return 0; }
+    if(!p.fatherId && !p.motherId){
+      // Tidak diketahui orang tuanya. Jika ini pasangan yang menikah masuk,
+      // samakan generasinya dengan pasangan (suami/istri), bukan otomatis Generasi 1.
+      const spIds = (p.spouseIds||[]).filter(sid=>getP(sid) && !guard.has(sid));
+      if(spIds.length){
+        const g = computeGeneration(spIds[0], memo, guard);
+        memo.set(id, g);
+        return g;
+      }
+      memo.set(id,0); return 0;
+    }
+    let g = 0;
+    if(p.fatherId && getP(p.fatherId)) g = Math.max(g, computeGeneration(p.fatherId, memo, guard)+1);
+    if(p.motherId && getP(p.motherId)) g = Math.max(g, computeGeneration(p.motherId, memo, guard)+1);
+    memo.set(id, g);
+    return g;
+  }
+
+  // ---------- RENDER ----------
+  function render(){
+    updateStats();
+    populateGenFilter();
+    const main = document.getElementById('mainContent');
+    const searchWrap = document.getElementById('searchbarWrap');
+    const genWrap = document.getElementById('genFilterWrap');
+
+    if(currentView === 'guide'){
+      searchWrap.style.display = 'none';
+      genWrap.style.display = 'none';
+      main.innerHTML = guideHtml();
+      return;
+    }
+    searchWrap.style.display = '';
+    genWrap.style.display = '';
+
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    if(people.length===0){
+      main.innerHTML = emptyStateHtml();
+      return;
+    }
+    if(q){
+      renderSearchResults(q);
+      return;
+    }
+    if(currentGenFilter !== ''){
+      main.innerHTML = genFilteredHtml(parseInt(currentGenFilter,10));
+      attachCardHandlers();
+      return;
+    }
+    main.innerHTML = currentView==='tree' ? treeViewHtml() : listViewHtml();
+    attachCardHandlers();
+  }
+
+  function guideHtml(){
+    return `<div class="listview" style="line-height:1.65;">
+      <h3 class="serif" style="color:var(--gold-soft); margin-bottom:2px;">Panduan Penggunaan Ranji</h3>
+      <p style="color:var(--text-muted); margin-top:0;">Aplikasi silsilah keluarga — semua data tersimpan di perangkat/akun kamu.</p>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">1. Melihat Silsilah</h4>
+      <p><b>Tab Pohon</b> — menampilkan silsilah berbentuk pohon bertingkat, anak-anak tersusun di bawah orang tuanya.</p>
+      <p><b>Tab Daftar</b> — menampilkan semua orang sebagai daftar, dikelompokkan dan diurutkan per generasi.</p>
+      <p><b>Filter Generasi</b> — pilih generasi tertentu di dropdown "Semua Generasi" untuk hanya menampilkan orang-orang di generasi itu saja. Pilih kembali "Semua Generasi" untuk kembali normal.</p>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">2. Mencari Orang</h4>
+      <p>Ketik nama atau nama panggilan di kotak pencarian di bagian atas. Hasil pencarian bisa digabung dengan filter generasi.</p>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">3. Melihat Detail</h4>
+      <p>Ketuk kartu nama seseorang untuk membuka detail lengkap: pasangan, orang tua, dan anak-anaknya. Dari sini juga bisa mengedit atau menghapus data orang tersebut.</p>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">4. Menambah / Mengedit Orang</h4>
+      <p>Ketuk tombol <b>+</b> di kanan bawah untuk menambah orang baru. Isi nama, lalu pilih ayah dan ibu dari daftar yang sudah ada (kosongkan jika belum diketahui). Untuk pasangan, pilih dari dropdown lalu ketuk "+ Tambah" — bisa ditambahkan lebih dari satu kalau orang tersebut menikah lebih dari sekali. Foto opsional.</p>
+<p>Kalau pasangannya <b>belum ada di data</b> (mis. menantu baru), ketuk "+ Orang baru (belum ada di data)" di bagian Pasangan — isi nama dan foto (opsional) langsung dari situ, tidak perlu bikin data orang terpisah dulu.</p>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">5. Menu (ikon titik tiga)</h4>
+      <ul style="padding-left:18px; margin:6px 0;">
+        <li><b>Impor dari CSV/Excel</b> — unggah file CSV dengan kolom name, father_name, mother_name, spouse_name (isi spouse_name dengan lebih dari satu nama dipisah tanda titik koma " ; " kalau menikah lebih dari sekali).</li>
+        <li><b>Unduh template CSV</b> — contoh format file CSV untuk impor massal.</li>
+        <li><b>Impor JSON</b> — mengunggah kembali file cadangan (backup) data.</li>
+        <li><b>Ekspor JSON</b> — mengunduh seluruh data sebagai file JSON, untuk cadangan atau dipindah ke perangkat lain.</li>
+        <li><b>Hapus Semua Data</b> — mengosongkan seluruh silsilah. Gunakan hati-hati, lakukan ekspor JSON dulu sebagai cadangan.</li>
+      </ul>
+
+      <h4 class="serif" style="color:var(--gold); margin-bottom:4px;">6. Tips</h4>
+      <ul style="padding-left:18px; margin:6px 0;">
+        <li>Generasi dihitung otomatis oleh aplikasi berdasarkan hubungan orang tua–anak, bukan diinput manual.</li>
+        <li>Suami/istri yang menikah masuk ke keluarga ditampilkan sebagai label pada kartu pasangannya, bukan sebagai baris generasi tersendiri, supaya jumlah per generasi mencerminkan garis keturunan yang sebenarnya.</li>
+        <li>Sebaiknya lakukan Ekspor JSON secara berkala sebagai cadangan data.</li>
+        <li>Data yang sama antara "Pohon", "Daftar", dan hasil pencarian selalu sinkron — hanya cara tampilannya yang berbeda.</li>
+      </ul>
+    </div>`;
+  }
+
+  function populateGenFilter(){
+    const sel = document.getElementById('genFilter');
+    if(!sel) return;
+    const memo = new Map();
+    let maxGen = 0;
+    people.forEach(p=> maxGen = Math.max(maxGen, computeGeneration(p.id, memo)));
+    const prev = currentGenFilter;
+    const needed = people.length ? maxGen+1 : 0;
+    if(sel.dataset.built === String(needed)) { sel.value = prev; return; }
+    let opts = '<option value="">Semua Generasi</option>';
+    for(let g=0; g<needed; g++){ opts += `<option value="${g}">Generasi ${g+1}</option>`; }
+    sel.innerHTML = opts;
+    sel.dataset.built = String(needed);
+    sel.value = prev;
+  }
+
+  function genFilteredHtml(gen){
+    const memo = new Map();
+    const list = people
+      .filter(p => !p.marriedIn && computeGeneration(p.id, memo) === gen)
+      .sort((a,b)=> (a.name||'').localeCompare(b.name||'', 'id'));
+    if(!list.length) return emptyStateHtml();
+    let html = `<div class="gen-label"><span>Generasi ${gen+1} · ${list.length} orang</span><div class="line"></div></div>`;
+    html += `<div class="listview">${list.map(cardHtml).join('')}</div>`;
+    return html;
+  }
+
+  function updateStats(){
+    document.getElementById('statCount').textContent = people.length;
+    if(people.length===0){ document.getElementById('statGen').textContent = 0; return; }
+    const memo = new Map();
+    let maxGen = 0;
+    people.forEach(p=> maxGen = Math.max(maxGen, computeGeneration(p.id, memo)));
+    document.getElementById('statGen').textContent = maxGen+1;
+  }
+
+  function emptyStateHtml(){
+    return `<div class="empty">
+      <svg class="gunungan" viewBox="0 0 100 100"><path d="M50 6 L62 30 L78 24 L74 46 L92 50 L74 58 L82 80 L58 70 L54 92 L46 92 L42 70 L18 80 L26 58 L8 50 L26 46 L22 24 L38 30 Z" fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      <h3>Belum ada silsilah</h3>
+      <p>Mulai dengan menambahkan anggota keluarga secara manual,<br>atau impor data dari file JSON / CSV lewat menu.</p>
+    </div>`;
+  }
+
+  function cardHtml(p){
+    const avatar = p.photo
+      ? `<img class="avatar" src="${p.photo}">`
+      : `<div class="avatar">${initials(p.name)}</div>`;
+    const spouses = spousePeople(p);
+    const spousePills = spouses.map(sp=>`<div class="spouse-pill">⚭ ${escapeHtml(sp.name)}</div>`).join('');
+    const life = lifespanStr(p);
+    const lifeHtml = life ? `<div class="life-pill">${escapeHtml(life)}</div>` : '';
+    return `<div class="card" data-id="${p.id}">
+      ${avatar}
+      <div class="info">
+        <div class="name">${escapeHtml(p.name)}</div>
+        ${lifeHtml}
+        ${spousePills}
+      </div>
+    </div>`;
+  }
+
+  function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+  function treeViewHtml(){
+    // roots = anggota garis keturunan RG yang tidak diketahui orang tuanya
+    // (mis. Halimah). Pasangan yang menikah masuk (marriedIn) tidak dianggap
+    // akar pohon sendiri — mereka tampil menempel di kartu pasangannya.
+    const isRoot = p => !p.fatherId && !p.motherId && !p.marriedIn;
+    const roots = people.filter(isRoot);
+    const shown = new Set();
+    let html = '';
+    roots.forEach(r=>{
+      if(shown.has(r.id)) return;
+      html += renderNode(r, shown, 0);
+    });
+    // sisa: kerabat/pasangan yang tautannya tidak lengkap (mis. pernikahan
+    // sebelumnya yang datanya minim) — tetap ditampilkan agar tidak hilang.
+    const leftovers = people.filter(p=>!shown.has(p.id));
+    if(leftovers.length){
+      html += `<div class="gen-label"><span>Pasangan / kerabat lain (data terbatas)</span><div class="line"></div></div>`;
+      leftovers.forEach(p=>{ html += renderNode(p, shown, 0); });
+    }
+    return html || emptyStateHtml();
+  }
+
+  function renderNode(p, shown, depth){
+    if(shown.has(p.id)) return '';
+    shown.add(p.id);
+    spousePeople(p).forEach(sp=> shown.add(sp.id));
+    let html = cardHtml(p);
+    const kids = children(p.id);
+    if(kids.length){
+      html += `<div class="tree-children">`;
+      kids.forEach(k=>{ html += renderNode(k, shown, depth+1); });
+      html += `</div>`;
+    }
+    return `<div class="tree-node">${html}</div>`;
+  }
+
+  function listViewHtml(){
+    const memo = new Map();
+    const sorted = people
+      .filter(p => !p.marriedIn)
+      .sort((a,b)=>{
+        const ga = computeGeneration(a.id, memo), gb = computeGeneration(b.id, memo);
+        if(ga!==gb) return ga-gb;
+        return (a.name||'').localeCompare(b.name||'', 'id');
+      });
+    let html = ''; let lastGen = null;
+    sorted.forEach(p=>{
+      const g = computeGeneration(p.id, memo);
+      if(g!==lastGen){ html += `<div class="gen-label"><span>Generasi ${g+1}</span><div class="line"></div></div>`; lastGen = g; }
+      html += cardHtml(p);
+    });
+    return `<div class="listview">${html}</div>`;
+  }
+
+  function renderSearchResults(q){
+    const memo = new Map();
+    let results = people.filter(p =>
+      (p.name||'').toLowerCase().includes(q) || (p.nickname||'').toLowerCase().includes(q)
+    );
+    if(currentGenFilter !== ''){
+      const gen = parseInt(currentGenFilter,10);
+      results = results.filter(p => computeGeneration(p.id, memo) === gen);
+    }
+    const main = document.getElementById('mainContent');
+    main.innerHTML = results.length
+      ? results.map(cardHtml).join('')
+      : `<div class="empty"><h3>Tidak ditemukan</h3><p>Coba kata kunci lain.</p></div>`;
+    attachCardHandlers();
+  }
+
+  function attachCardHandlers(){
+    document.querySelectorAll('.card').forEach(el=>{
+      el.addEventListener('click', ()=> openDetail(el.dataset.id));
+    });
+  }
+
+  // ---------- DETAIL SHEET ----------
+  function openDetail(id){
+    const p = getP(id);
+    if(!p) return;
+    const father = p.fatherId ? getP(p.fatherId) : null;
+    const mother = p.motherId ? getP(p.motherId) : null;
+    const spouses = spousePeople(p);
+    const kids = children(p.id);
+    const siblings = people.filter(s => s.id!==p.id && ((p.fatherId && s.fatherId===p.fatherId) || (p.motherId && s.motherId===p.motherId)));
+
+    const avatar = p.photo ? `<img class="detail-avatar" src="${p.photo}">` : `<div class="detail-avatar">${initials(p.name)}</div>`;
+
+    function chip(rel){ return rel ? `<div class="rel-chip" data-id="${rel.id}"><span class="mini">${initials(rel.name)}</span>${escapeHtml(rel.name)}</div>` : ''; }
+
+    let relHtml = '';
+    if(father || mother){
+      relHtml += `<div class="rel-section"><h4>Orang Tua</h4><div class="rel-list">${chip(father) || '<span style="color:var(--text-muted);font-size:0.82rem;">Ayah tidak diketahui</span>'}${chip(mother) || (father?'':'<span style="color:var(--text-muted);font-size:0.82rem;">Ibu tidak diketahui</span>')}</div></div>`;
+    }
+    if(spouses.length){
+      const label = spouses.length>1 ? `Pasangan (${spouses.length})` : 'Pasangan';
+      relHtml += `<div class="rel-section"><h4>${label}</h4><div class="rel-list">${spouses.map(chip).join('')}</div></div>`;
+    }
+    if(siblings.length){
+      relHtml += `<div class="rel-section"><h4>Saudara Kandung</h4><div class="rel-list">${siblings.map(chip).join('')}</div></div>`;
+    }
+    if(kids.length){
+      relHtml += `<div class="rel-section"><h4>Anak (${kids.length})</h4><div class="rel-list">${kids.map(chip).join('')}</div></div>`;
+    }
+
+    // baris tanggal lahir/wafat lengkap (tanggal-bulan-tahun kalau tersedia,
+    // fallback ke tahun saja kalau datanya cuma tahun)
+    let dateLine = '';
+    if(p.birthDate || p.deathDate){
+      const b = p.birthDate ? fmtDate(p.birthDate) : '';
+      const d = p.deathDate ? fmtDate(p.deathDate) : '';
+      if(b && d) dateLine = `Lahir ${b} · Wafat ${d}`;
+      else if(b) dateLine = `Lahir ${b}`;
+      else if(d) dateLine = `Wafat ${d}`;
+    }
+    const dateHtml = dateLine ? `<div class="detail-date">${escapeHtml(dateLine)}</div>` : '';
+
+    document.getElementById('detailBody').innerHTML = `
+      <div class="detail-head">
+        ${avatar}
+        <div class="detail-name">${escapeHtml(p.name)}</div>
+        ${dateHtml}
+      </div>
+      ${relHtml}
+      <div class="detail-actions">
+        <button class="btn danger" id="btnDeletePerson">Hapus</button>
+        <button class="btn primary" id="btnEditPerson">Edit</button>
+      </div>
+    `;
+    document.getElementById('detailBody').querySelectorAll('.rel-chip').forEach(el=>{
+      el.addEventListener('click', ()=> openDetail(el.dataset.id));
+    });
+    document.getElementById('btnEditPerson').addEventListener('click', ()=>{ closeOverlay('detailOverlay'); openForm(p.id); });
+    document.getElementById('btnDeletePerson').addEventListener('click', ()=> deletePersonConfirm(p.id));
+    openOverlay('detailOverlay');
+  }
+  function rowHtml(lbl,val){ return `<div class="info-row"><span class="lbl">${lbl}</span><span class="val">${escapeHtml(val)}</span></div>`; }
+
+  async function deletePersonConfirm(id){
+    const p = getP(id);
+    if(!confirm(`Hapus "${p.name}" dari silsilah? Data anak akan tetap ada tapi tautan ke orang tua ini akan dihapus.`)) return;
+    people.forEach(x=>{
+      if(x.fatherId===id) x.fatherId = null;
+      if(x.motherId===id) x.motherId = null;
+      if(Array.isArray(x.spouseIds) && x.spouseIds.includes(id)) x.spouseIds = x.spouseIds.filter(s=>s!==id);
+    });
+    people = people.filter(x=>x.id!==id);
+    const ok = await saveData();
+    closeOverlay('detailOverlay'); render();
+    if(ok) showToast('Data berhasil dihapus', 'success');
+  }
+
+  // ---------- FORM ----------
+  function populateSelects(excludeId){
+    const opts = people.filter(p=>p.id!==excludeId)
+      .sort((a,b)=>(a.name||'').localeCompare(b.name||'','id'))
+      .map(p=>`<option value="${p.id}">${escapeHtml(p.name)}${p.nickname?' ('+escapeHtml(p.nickname)+')':''}</option>`).join('');
+    ['f_father','f_mother'].forEach(id=>{
+      const sel = document.getElementById(id);
+      const placeholder = sel.options[0];
+      sel.innerHTML = ''; sel.appendChild(placeholder);
+      sel.insertAdjacentHTML('beforeend', opts);
+    });
+    refreshSpouseAddSelect();
+  }
+
+  let pendingSpouseIds = [];
+  let pendingNewSpouseDrafts = []; // { tempId, name, photo }
+  let newSpousePhotoPending = null;
+
+  function refreshSpouseAddSelect(){
+    const sel = document.getElementById('f_spouse_add');
+    const opts = people.filter(p=>p.id!==editingId && !pendingSpouseIds.includes(p.id))
+      .sort((a,b)=>(a.name||'').localeCompare(b.name||'','id'))
+      .map(p=>`<option value="${p.id}">${escapeHtml(p.name)}${p.nickname?' ('+escapeHtml(p.nickname)+')':''}</option>`).join('');
+    sel.innerHTML = '<option value="">— Pilih untuk ditambahkan —</option>' + opts;
+  }
+
+  function renderSpouseList(){
+    const wrap = document.getElementById('spouseList');
+    if(!pendingSpouseIds.length && !pendingNewSpouseDrafts.length){
+      wrap.innerHTML = `<div style="color:var(--text-muted); font-size:0.82rem;">Belum ada pasangan ditambahkan.</div>`;
+      return;
+    }
+    const existingHtml = pendingSpouseIds.map(sid=>{
+      const sp = getP(sid);
+      const label = sp ? sp.name : '(tidak dikenal)';
+      return `<div style="display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 10px;">
+        <span>⚭ ${escapeHtml(label)}</span>
+        <button type="button" class="filebtn spouse-remove" data-id="${sid}" style="padding:2px 10px;">Hapus</button>
+      </div>`;
+    }).join('');
+    const draftHtml = pendingNewSpouseDrafts.map(d=>{
+      const avatar = d.photo
+        ? `<img src="${d.photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;">`
+        : '';
+      return `<div style="display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border:1px solid var(--gold); border-radius:10px; padding:8px 10px;">
+        <span>${avatar}⚭ ${escapeHtml(d.name)} <span style="color:var(--gold); font-size:0.72rem;">· baru</span></span>
+        <button type="button" class="filebtn draft-spouse-remove" data-tempid="${d.tempId}" style="padding:2px 10px;">Hapus</button>
+      </div>`;
+    }).join('');
+    wrap.innerHTML = existingHtml + draftHtml;
+    wrap.querySelectorAll('.spouse-remove').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        pendingSpouseIds = pendingSpouseIds.filter(id=>id!==btn.dataset.id);
+        renderSpouseList();
+        refreshSpouseAddSelect();
+      });
+    });
+    wrap.querySelectorAll('.draft-spouse-remove').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        pendingNewSpouseDrafts = pendingNewSpouseDrafts.filter(d=>d.tempId!==btn.dataset.tempid);
+        renderSpouseList();
+      });
+    });
+  }
+
+  function updateNewSpousePhotoPreview(){
+    const prev = document.getElementById('newSpousePhotoPreview');
+    const rm = document.getElementById('removeNewSpousePhoto');
+    if(newSpousePhotoPending){ prev.innerHTML = `<img src="${newSpousePhotoPending}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`; rm.style.display='inline-block'; }
+    else { prev.textContent = 'Tidak ada'; rm.style.display='none'; }
+  }
+
+  document.getElementById('btnToggleNewSpouse').addEventListener('click', ()=>{
+    const box = document.getElementById('newSpouseBox');
+    box.style.display = box.style.display==='none' ? 'block' : 'none';
+  });
+
+  document.getElementById('f_new_spouse_photo').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = new Image();
+      img.onload = function(){
+        const maxW = 200;
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width*scale; canvas.height = img.height*scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        newSpousePhotoPending = canvas.toDataURL('image/jpeg', 0.65);
+        updateNewSpousePhotoPreview();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('removeNewSpousePhoto').addEventListener('click', ()=>{
+    newSpousePhotoPending = null; updateNewSpousePhotoPreview();
+    document.getElementById('f_new_spouse_photo').value = '';
+  });
+
+  document.getElementById('btnCreateNewSpouse').addEventListener('click', ()=>{
+    const nameInput = document.getElementById('f_new_spouse_name');
+    const name = nameInput.value.trim();
+    if(!name){ showToast('Nama pasangan baru wajib diisi'); return; }
+    pendingNewSpouseDrafts.push({ tempId: 'draft_'+uid(), name, photo: newSpousePhotoPending });
+    nameInput.value = '';
+    newSpousePhotoPending = null;
+    document.getElementById('f_new_spouse_photo').value = '';
+    updateNewSpousePhotoPreview();
+    document.getElementById('newSpouseBox').style.display = 'none';
+    renderSpouseList();
+    showToast('Pasangan baru siap ditambahkan — jangan lupa Simpan di bawah');
+  });
+
+  document.getElementById('btnAddSpouse').addEventListener('click', ()=>{
+    const sel = document.getElementById('f_spouse_add');
+    const id = sel.value;
+    if(!id) return;
+    if(!pendingSpouseIds.includes(id)) pendingSpouseIds.push(id);
+    renderSpouseList();
+    refreshSpouseAddSelect();
+  });
+
+  let pendingPhoto = null;
+
+  function openForm(id){
+    editingId = id || null;
+    const p = id ? getP(id) : null;
+    document.getElementById('formTitle').textContent = p ? 'Edit Orang' : 'Tambah Orang';
+    pendingSpouseIds = p ? [...(p.spouseIds||[])] : [];
+    pendingNewSpouseDrafts = [];
+    newSpousePhotoPending = null;
+    document.getElementById('f_new_spouse_name').value = '';
+    document.getElementById('f_new_spouse_photo').value = '';
+    document.getElementById('newSpouseBox').style.display = 'none';
+    updateNewSpousePhotoPreview();
+    populateSelects(id);
+    document.getElementById('f_name').value = p ? p.name||'' : '';
+    document.getElementById('f_birthdate').value = p ? p.birthDate||'' : '';
+    document.getElementById('f_deathdate').value = p ? p.deathDate||'' : '';
+    document.getElementById('f_father').value = p ? p.fatherId||'' : '';
+    document.getElementById('f_mother').value = p ? p.motherId||'' : '';
+    renderSpouseList();
+    pendingPhoto = p ? p.photo||null : null;
+    updatePhotoPreview();
+    openOverlay('formOverlay');
+  }
+
+  function updatePhotoPreview(){
+    const prev = document.getElementById('photoPreview');
+    const rm = document.getElementById('removePhoto');
+    if(pendingPhoto){ prev.innerHTML = `<img src="${pendingPhoto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`; rm.style.display='inline-block'; }
+    else { prev.textContent = 'Tidak ada'; rm.style.display='none'; }
+  }
+
+  document.getElementById('f_photo').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = new Image();
+      img.onload = function(){
+        // Kompresi ketat: foto cuma tampil sebagai avatar bulat kecil
+        // (maks. 88px di halaman detail), jadi 200px + kualitas 65% sudah
+        // lebih dari cukup jernih untuk layar HP, dengan ukuran file jauh
+        // lebih hemat dibanding resolusi penuh.
+        const maxW = 200;
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width*scale; canvas.height = img.height*scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        pendingPhoto = canvas.toDataURL('image/jpeg', 0.65);
+        updatePhotoPreview();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('removePhoto').addEventListener('click', ()=>{ pendingPhoto=null; updatePhotoPreview(); document.getElementById('f_photo').value=''; });
+
+  function withTimeout(promise, ms, label){
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(()=> reject(new Error(`${label} tidak merespons dalam ${ms/1000} detik`)), ms))
+    ]);
+  }
+
+  document.getElementById('personForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ showToast('Nama wajib diisi'); return; }
+
+    const submitBtn = document.querySelector('#personForm button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Menyimpan...';
+
+    try{
+      // Pengaman: kalau ada nama pasangan baru yang sudah diketik tapi
+      // BELUM diklik "Buat & Tambahkan sebagai Pasangan", anggap saja
+      // dia mau ditambahkan — supaya tidak hilang begitu saja kalau
+      // langkah itu terlewat.
+      const leftoverName = document.getElementById('f_new_spouse_name').value.trim();
+      if(leftoverName){
+        pendingNewSpouseDrafts.push({ tempId: 'draft_'+uid(), name: leftoverName, photo: newSpousePhotoPending });
+        document.getElementById('f_new_spouse_name').value = '';
+        newSpousePhotoPending = null;
+      }
+
+      // buat dulu orang baru dari draf pasangan (yang belum ada di data)
+      const newSpouseIds = pendingNewSpouseDrafts.map(d=>{
+        const np = {
+          id: uid(), name: d.name, nickname:'', gender:'', birthDate:'', deathDate:'',
+          fatherId: null, motherId: null, spouseIds: [], address:'', notes:'',
+          photo: d.photo || null,
+        };
+        people.push(np);
+        return np.id;
+      });
+
+      const data = {
+        name,
+        birthDate: document.getElementById('f_birthdate').value || '',
+        deathDate: document.getElementById('f_deathdate').value || '',
+        fatherId: document.getElementById('f_father').value || null,
+        motherId: document.getElementById('f_mother').value || null,
+        spouseIds: [...pendingSpouseIds.filter(id=>id!==editingId), ...newSpouseIds],
+        photo: pendingPhoto || null,
+      };
+      if(data.fatherId===editingId) data.fatherId=null;
+      if(data.motherId===editingId) data.motherId=null;
+
+      let selfId = editingId;
+      if(editingId){
+        const p = getP(editingId);
+        Object.assign(p, data);
+      } else {
+        const np = { id: uid(), ...data };
+        people.push(np);
+        selfId = np.id;
+      }
+      // pastikan tautan pasangan dua arah untuk semua pasangan yang dipilih,
+      // dan lepaskan tautan dari pasangan lama yang sudah dihapus dari daftar.
+      people.forEach(x=>{
+        if(x.id===selfId) return;
+        const shouldLink = data.spouseIds.includes(x.id);
+        const isLinked = Array.isArray(x.spouseIds) && x.spouseIds.includes(selfId);
+        if(shouldLink && !isLinked){ x.spouseIds = [...(x.spouseIds||[]), selfId]; }
+        else if(!shouldLink && isLinked){ x.spouseIds = x.spouseIds.filter(id=>id!==selfId); }
+      });
+
+      const ok = await withTimeout(saveData(), 8000, 'Penyimpanan');
+      if(ok){
+        closeOverlay('formOverlay');
+        render();
+        showToast('Data berhasil disimpan', 'success');
+      } else {
+        // gagal simpan: JANGAN tutup form, supaya input tidak hilang dan
+        // orang bisa coba simpan ulang. Toast kegagalan sudah ditampilkan
+        // oleh saveData().
+        render();
+      }
+    }catch(err){
+      // Pengaman terakhir: apa pun errornya, JANGAN gagal diam-diam.
+      // Tampilkan pesannya supaya bisa dilacak, dan form tetap terbuka
+      // supaya input tidak hilang.
+      console.error('Gagal menyimpan orang:', err);
+      showToast('Gagal menyimpan: ' + (err && err.message ? err.message : 'terjadi kesalahan tak terduga'), 'error');
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Simpan';
+    }
+  });
+
+  // ---------- IMPORT / EXPORT ----------
+  function exportJson(){
+    const blob = new Blob([JSON.stringify(people, null, 2)], {type:'application/json'});
+    downloadBlob(blob, 'ranji-silsilah.json');
+  }
+  function downloadTemplate(){
+    const header = 'name,father_name,mother_name,spouse_name\n';
+    const example1 = 'Siti Aminah,Kartono,Marsih,Slamet Riyadi\n';
+    const example2 = 'Kartono,,,Marsih;Ratna Sari\n';
+    const blob = new Blob([header+example1+example2], {type:'text/csv'});
+    downloadBlob(blob, 'template-ranji.csv');
+  }
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importJsonFile(file){
+    const reader = new FileReader();
+    reader.onload = async (e)=>{
+      try{
+        const incoming = JSON.parse(e.target.result);
+        if(!Array.isArray(incoming)) throw new Error('format tidak sesuai');
+        const idMap = {};
+        incoming.forEach(raw=>{
+          const existing = raw.id ? getP(raw.id) : null;
+          if(existing){
+            Object.assign(existing, raw);
+            idMap[raw.id] = raw.id;
+          } else {
+            const newId = uid();
+            idMap[raw.id || newId] = newId;
+            people.push({...raw, id:newId});
+          }
+        });
+        // remap father/mother/spouse ids for newly created ones referencing old ids not yet in idMap resolution pass
+        people.forEach(p=>{
+          if(p.fatherId && idMap[p.fatherId]) p.fatherId = idMap[p.fatherId];
+          if(p.motherId && idMap[p.motherId]) p.motherId = idMap[p.motherId];
+          if(Array.isArray(p.spouseIds)) p.spouseIds = p.spouseIds.map(sid=>idMap[sid]||sid);
+        });
+        migratePeople(people);
+        const ok = await saveData(); render();
+        if(ok) showToast(`Impor JSON berhasil (${incoming.length} data)`, 'success');
+      }catch(err){ showToast('Gagal membaca file JSON', 'error'); }
+    };
+    reader.readAsText(file);
+  }
+
+  function findOrCreateByName(name){
+    if(!name) return null;
+    const trimmed = name.trim();
+    if(!trimmed) return null;
+    let existing = people.find(p=>(p.name||'').trim().toLowerCase()===trimmed.toLowerCase());
+    if(existing) return existing.id;
+    const np = { id: uid(), name: trimmed, nickname:'', gender:'', birthDate:'', deathDate:'', fatherId:null, motherId:null, spouseIds:[], address:'', notes:'' };
+    people.push(np);
+    return np.id;
+  }
+
+  function importCsvFile(file){
+    Papa.parse(file, {
+      header:true, skipEmptyLines:true,
+      complete: async function(results){
+        let count = 0;
+        results.data.forEach(row=>{
+          const name = (row.name||'').trim();
+          if(!name) return;
+          let existing = people.find(p=>(p.name||'').trim().toLowerCase()===name.toLowerCase());
+          const rec = existing || { id: uid(), name };
+          if(!existing) people.push(rec);
+          if(row.father_name && row.father_name.trim()) rec.fatherId = findOrCreateByName(row.father_name);
+          if(row.mother_name && row.mother_name.trim()) rec.motherId = findOrCreateByName(row.mother_name);
+          if(row.spouse_name && row.spouse_name.trim()){
+            if(!Array.isArray(rec.spouseIds)) rec.spouseIds = [];
+            // dukung lebih dari satu pasangan: pisahkan dengan " ; " di kolom spouse_name
+            row.spouse_name.split(';').map(s=>s.trim()).filter(Boolean).forEach(spouseName=>{
+              const spId = findOrCreateByName(spouseName);
+              if(!rec.spouseIds.includes(spId)) rec.spouseIds.push(spId);
+              const sp = getP(spId);
+              if(sp){ if(!Array.isArray(sp.spouseIds)) sp.spouseIds = []; if(!sp.spouseIds.includes(rec.id)) sp.spouseIds.push(rec.id); }
+            });
+          }
+          count++;
+        });
+        const ok = await saveData(); render();
+        if(ok) showToast(`Impor CSV berhasil (${count} baris)`, 'success');
+      },
+      error: function(){ showToast('Gagal membaca file CSV', 'error'); }
+    });
+  }
+
+  async function clearAll(){
+    if(!confirm('Yakin ingin menghapus SEMUA data silsilah? Tindakan ini tidak dapat dibatalkan. Disarankan ekspor data dulu.')) return;
+    people = [];
+    const ok = await saveData(); render();
+    if(ok) showToast('Semua data berhasil dihapus', 'success');
+  }
+
+  // ---------- OVERLAY HELPERS ----------
+  function openOverlay(id){ document.getElementById(id).classList.add('show'); }
+  function closeOverlay(id){ document.getElementById(id).classList.remove('show'); }
+
+  document.getElementById('detailClose').addEventListener('click', ()=>closeOverlay('detailOverlay'));
+  document.getElementById('formClose').addEventListener('click', ()=>closeOverlay('formOverlay'));
+  document.getElementById('formCancel').addEventListener('click', ()=>closeOverlay('formOverlay'));
+  document.getElementById('menuClose').addEventListener('click', ()=>closeOverlay('menuOverlay'));
+  ['detailOverlay','formOverlay','menuOverlay'].forEach(id=>{
+    document.getElementById(id).addEventListener('click', (e)=>{ if(e.target.id===id) closeOverlay(id); });
+  });
+
+  document.getElementById('fabAdd').addEventListener('click', ()=> openForm(null));
+  document.getElementById('menuBtn').addEventListener('click', ()=> openOverlay('menuOverlay'));
+
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      currentView = tab.dataset.view;
+      render();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', render);
+  document.getElementById('genFilter').addEventListener('change', (e)=>{ currentGenFilter = e.target.value; render(); });
+
+  document.getElementById('menuImportJson').addEventListener('click', ()=>{ closeOverlay('menuOverlay'); document.getElementById('jsonFileInput').click(); });
+  document.getElementById('menuImportCsv').addEventListener('click', ()=>{ closeOverlay('menuOverlay'); document.getElementById('csvFileInput').click(); });
+  document.getElementById('menuTemplate').addEventListener('click', ()=>{ closeOverlay('menuOverlay'); downloadTemplate(); });
+  document.getElementById('menuExportJson').addEventListener('click', ()=>{ closeOverlay('menuOverlay'); exportJson(); });
+  document.getElementById('menuClearAll').addEventListener('click', ()=>{ closeOverlay('menuOverlay'); clearAll(); });
+  document.getElementById('jsonFileInput').addEventListener('change', (e)=>{ if(e.target.files[0]) importJsonFile(e.target.files[0]); e.target.value=''; });
+  document.getElementById('csvFileInput').addEventListener('change', (e)=>{ if(e.target.files[0]) importCsvFile(e.target.files[0]); e.target.value=''; });
+
+  loadData();
+})();
+</script>
+</body>
+</html>
