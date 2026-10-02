@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Asmaul Husna Memory Quest v2.2.1</title>
+<style>
+:root{--bg:#0b1020;--card:#141b31;--card2:#1a2340;--text:#f7f8ff;--muted:#aab4d0;--line:#2a3559;--accent:#ffd66b;--ok:#72e3a6;--bad:#ff8e8e}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0a0f1e,#111831);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:760px;margin:auto;padding:18px 16px 100px} h1{font-size:26px;margin:6px 0} .sub{color:var(--muted);line-height:1.5}
+.hero{padding:20px;border:1px solid var(--line);border-radius:22px;background:rgba(20,27,49,.9);margin-bottom:16px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,12,24,.96);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:760px;margin:auto;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:20}
+.nav button{padding:7px 2px;font-size:11px;line-height:1.2;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:12px}.nav button i{font-style:normal;font-size:18px}
+.nav button,.btn{border:0;border-radius:14px;background:var(--card2);color:var(--text);padding:12px 14px;font-weight:700;cursor:pointer}
+.nav button.active,.btn.primary{background:var(--accent);color:#251d00}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px} .tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;min-height:92px;cursor:pointer}
+.tile.done{outline:2px solid var(--ok)} .num{color:var(--muted);font-size:12px} .arabic{font-family:"Geeza Pro","Noto Naskh Arabic",serif;font-size:27px;direction:rtl;margin:5px 0} .latin{font-size:13px;font-weight:800}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin:12px 0} .bigArabic{font-family:"Geeza Pro","Noto Naskh Arabic",serif;font-size:46px;text-align:center;direction:rtl;line-height:1.8} .bigLatin{font-size:25px;text-align:center;font-weight:800} .meaning{font-size:19px;text-align:center;color:var(--accent);margin:8px 0 18px}
+.icon{font-size:62px;text-align:center;margin:6px} .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:16px} .story{line-height:1.6}
+.row{display:flex;gap:9px;flex-wrap:wrap} .row>*{flex:1}
+.progressbar{height:10px;background:#242d4a;border-radius:99px;overflow:hidden} .progressbar span{display:block;height:100%;background:var(--ok)}
+.quizChoice{display:block;width:100%;text-align:left;margin:8px 0;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:15px} .quizChoice.correct{border-color:var(--ok)} .quizChoice.wrong{border-color:var(--bad)}
+.hidden{display:none} input{width:100%;border:1px solid var(--line);border-radius:14px;padding:14px;background:#0d1428;color:white;font-size:16px}
+.small{font-size:12px;color:var(--muted);line-height:1.5} .pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:12px}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}.app{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<section id="home">
+  <div class="hero">
+    <div class="pill">MFQ-style memory flow</div>
+    <h1>Asmaul Husna Memory Quest <span style='font-size:13px;color:var(--muted)'>v2.2.1</span></h1>
+    <p class="sub">Hafalkan 99 Asmaul Husna melalui alur <b>Visual Trigger → Scene → Story → Meaning → Recall</b>, lalu perkuat dengan kuis berulang.</p>
+    <div class="label">Progress</div>
+    <div class="progressbar"><span id="homeProgress" style="width:0%"></span></div>
+    <p id="homeProgressText" class="small">0 / 99 dikuasai</p>
+  </div>
+  <div class="row">
+    <button class="btn primary" onclick="startNext()">Lanjutkan Hafalan</button>
+    <button class="btn" onclick="showPage('list')">Lihat 99 Nama</button>
+  </div>
+  <div class="card">
+    <b>Cara pakai</b>
+    <p class="small">1. Lihat simbol. 2. Bayangkan scene. 3. Baca short story. 4. Sambungkan nama ke arti. 5. Tutup bantuan dan recall. 6. Tandai “Sudah Ingat”.</p>
+    <p class="small">Mnemonic pada versi ini menggunakan <b>dataset Asmaul Husna v1.10 — Freeze Ready</b>. Simbol hanya berfungsi sebagai pemicu ingatan, bukan bagian dari makna aqidah, bukan tafsir, dan <b>bukan representasi Allah</b>.</p>
+  </div>
+</section>
+
+<section id="list" class="hidden">
+  <div class="hero"><h1>99 Asmaul Husna</h1><input id="search" placeholder="Cari nama atau arti…" oninput="renderGrid()"></div>
+  <div id="grid" class="grid"></div>
+</section>
+
+<section id="learn" class="hidden">
+  <button class="btn" onclick="showPage('list')">← Daftar</button>
+  <div class="card">
+    <div id="learnNum" class="num"></div>
+    <div id="learnArabic" class="bigArabic"></div>
+    <div id="learnLatin" class="bigLatin"></div>
+    <div id="learnMeaning" class="meaning"></div>
+    <div id="learnIcon" class="icon"></div>
+    <div class="label">Scene</div><div id="learnScene" class="story"></div>
+    <div class="label">Short Story / Bridge</div><div id="learnStory" class="story"></div>
+    <div id="learnClueBox" class="hidden"><div class="label">Clue Pembeda</div><div id="learnClue" class="story" style="color:var(--accent)"></div><span id="learnGroup" class="pill" style="margin-top:8px"></span></div>
+    <div class="label">Doa Singkat</div><div id="learnPrayer" class="story"></div>
+    <div id="learnPairBox" class="hidden"><div class="label">Pasangan</div><button id="learnPair" class="btn" style="width:100%;text-align:left;margin-top:6px"></button><p class="small">Nama ini dianjurkan disebut bersama pasangannya agar maknanya tidak dipahami sepihak.</p></div>
+  </div>
+  <div class="row">
+    <button class="btn" onclick="toggleRecall()">Mode Recall</button>
+    <button id="masterBtn" class="btn primary" onclick="toggleMaster()">Sudah Ingat ✓</button>
+  </div>
+  <div id="recallBox" class="card hidden">
+    <div class="label">Recall</div>
+    <div id="recallPrompt" class="bigArabic"></div>
+    <p class="small">Sebutkan nama latin dan artinya tanpa melihat kartu utama. Setelah itu tekan “Tampilkan Jawaban”.</p>
+    <button class="btn primary" onclick="revealRecall()">Tampilkan Jawaban</button>
+    <div id="recallAnswer" class="meaning hidden"></div>
+  </div>
+  <div class="row"><button class="btn" onclick="prevName()">← Sebelumnya</button><button class="btn" onclick="nextName()">Berikutnya →</button></div>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="hero"><h1>Recall Quiz</h1><p class="sub">10 soal acak. Pilih arti yang sesuai.</p>
+<div class="row">
+<button class="btn primary" onclick="startQuiz()">Mulai Kuis</button>
+<button class="btn" onclick="showPage('meaningquiz')">Arti → Nama</button>
+<button class="btn" onclick="showPage('symbolquiz')">Simbol → Nama</button>
+<button class="btn" onclick="showPage('confusion')">Confusion Pair Quiz</button>
+</div></div>
+  <div id="quizBox" class="card hidden">
+    <div id="qCount" class="num"></div>
+    <div id="qArabic" class="bigArabic"></div><div id="qLatin" class="bigLatin"></div>
+    <div id="choices"></div>
+    <div id="feedback" class="meaning"></div>
+    <button id="nextQ" class="btn primary hidden" onclick="nextQuestion()">Soal Berikut</button>
+  </div>
+
+</section>
+
+
+
+<section id="meaningquiz" class="hidden">
+  <div class="hero">
+    <h1>Quiz Arti → Nama</h1>
+    <p class="sub">Lihat arti Asmaul Husna, lalu pilih nama yang sesuai.</p>
+    <button class="btn primary" onclick="startMeaningQuiz()">Mulai Quiz Arti</button>
+  </div>
+  <div id="meaningQuizBox" class="card hidden">
+    <div id="mqCount" class="num"></div>
+    <div class="label">Arti</div>
+    <div id="mqMeaning" class="meaning" style="font-size:26px"></div>
+    <div id="mqChoices"></div>
+    <div id="mqFeedback" class="meaning"></div>
+    <button id="mqNext" class="btn primary hidden" onclick="nextMeaningQuestion()">Soal Berikut</button>
+  </div>
+</section>
+
+<section id="symbolquiz" class="hidden">
+  <div class="hero">
+    <h1>Quiz Simbol → Nama</h1>
+    <p class="sub">Lihat simbol mnemonic, lalu pilih nama Asmaul Husna yang sesuai.</p>
+    <button class="btn primary" onclick="startSymbolQuiz()">Mulai Quiz Simbol</button>
+  </div>
+  <div id="symbolQuizBox" class="card hidden">
+    <div id="sqCount" class="num"></div>
+    <div class="label">Simbol Mnemonic</div>
+    <div id="sqSymbol" class="icon"></div>
+    <div id="sqChoices"></div>
+    <div id="sqFeedback" class="meaning"></div>
+    <button id="sqNext" class="btn primary hidden" onclick="nextSymbolQuestion()">Soal Berikut</button>
+  </div>
+</section>
+
+<section id="confusion" class="hidden">
+  <div class="hero">
+    <h1>Confusion Pair Quiz</h1>
+    <p class="sub">Latihan khusus <span id="pairCount"></span> pasangan dengan arti Indonesia yang sama: <span id="pairList"></span>.</p>
+    <p class="small">Soal bergantian menguji pembeda <b>makna</b> dan <b>simbol</b>.</p>
+    <button class="btn primary" onclick="startConfusionQuiz()">Mulai Confusion Quiz</button>
+  </div>
+  <div id="confusionBox" class="card hidden">
+    <div id="cqCount" class="num"></div>
+    <div id="cqType" class="pill"></div>
+    <div id="cqPrompt" class="bigLatin" style="margin-top:16px"></div>
+    <div id="cqSymbol" class="icon hidden"></div>
+    <div id="cqChoices"></div>
+    <div id="cqFeedback" class="meaning"></div>
+    <button id="cqNext" class="btn primary hidden" onclick="nextConfusionQuestion()">Soal Berikut</button>
+  </div>
+</section>
+
+<section id="progress" class="hidden">
+ <div class="hero"><h1>Progress</h1><div class="progressbar"><span id="pbar" style="width:0%"></span></div><p id="ptext" class="sub"></p></div>
+ <div class="card"><b>Prinsip mastery</b><p class="small">Nama dianggap dikuasai bila Anda sendiri menandai “Sudah Ingat”. Progress tersimpan lokal di browser perangkat ini.</p><button class="btn" onclick="resetProgress()">Reset Progress</button></div>
+</section>
+</div>
+
+<div class="nav">
+<button id="nav-home" class="active" onclick="showPage('home')"><i>⌂</i>Home</button>
+<button id="nav-list" onclick="showPage('list')"><i>📖</i>99 Nama</button>
+<button id="nav-quiz" onclick="showPage('quiz')"><i>❓</i>Quiz</button>
+<button id="nav-meaningquiz" onclick="showPage('meaningquiz')"><i>🔤</i>Arti</button>
+<button id="nav-symbolquiz" onclick="showPage('symbolquiz')"><i>🔣</i>Simbol</button>
+<button id="nav-confusion" onclick="showPage('confusion')"><i>🔀</i>Pair</button>
+<button id="nav-progress" onclick="showPage('progress')"><i>📈</i>Progress</button>
+</div>
+
+<script>
+const DATA=[{"n": 1, "arabic": "الرَّحْمَنُ", "latin": "Ar-Rahman", "meaning": "Yang Maha Pengasih", "icon": "🌧️", "scene": "Hujan turun merata ke seluruh kota, mengenai rumah, jalan, kebun, dan semua orang tanpa pilih kasih.", "story": "Hujan rahmat turun ke seluruh kota tanpa memilih siapa pun. Semua menerima kebaikan yang luas. Ar-Rahman — Yang Maha Pengasih.", "prayer": "Ya Ar-Rahman, limpahkan rahmat-Mu kepada kami dan keluarga kami.", "pair": null, "clue": "Rahmat yang luas, merata kepada semua makhluk.", "group": "Rahmat & Kasih"}, {"n": 2, "arabic": "الرَّحِيمُ", "latin": "Ar-Rahim", "meaning": "Yang Maha Penyayang", "icon": "🪺", "scene": "Sarang burung melindungi dan merawat anak-anak burung dengan dekat sampai tumbuh kuat.", "story": "Anak burung yang lemah dirawat di dalam sarang sampai tumbuh kuat. Ar-Rahim — Yang Maha Penyayang.", "prayer": "Ya Ar-Rahim, sayangilah kami dan kuatkan kami dalam kebaikan.", "pair": null, "clue": "Kasih sayang khusus yang dekat dan terus merawat, terutama bagi orang beriman.", "group": "Rahmat & Kasih"}, {"n": 3, "arabic": "الْمَلِكُ", "latin": "Al-Malik", "meaning": "Yang Maha Merajai", "icon": "👑🏰", "scene": "Sebuah mahkota berada di atas kerajaan luas dengan semua wilayah berada di bawah kekuasaannya.", "story": "Satu mahkota menaungi seluruh kerajaan. Tidak ada wilayah yang berada di luar kekuasaannya. Al-Malik — Yang Maha Merajai.", "prayer": "Ya Al-Malik, aturlah urusan hidup kami dengan ketetapan-Mu yang terbaik.", "pair": null, "clue": "Raja; kekuasaan-Nya mutlak tanpa tandingan.", "group": "Kerajaan & Perlindungan"}, {"n": 4, "arabic": "الْقُدُّوسُ", "latin": "Al-Quddus", "meaning": "Yang Maha Suci", "icon": "✨🤍", "scene": "Cahaya putih bersih melintas di ruangan berdebu tanpa ternoda sedikit pun.", "story": "Debu beterbangan di seluruh ruangan, tetapi cahaya putih itu tidak pernah ternoda sedikit pun. Al-Quddus — Yang Maha Suci.", "prayer": "Ya Al-Quddus, sucikan hati kami dari dosa dan akhlak yang buruk.", "pair": null, "clue": null, "group": null}, {"n": 5, "arabic": "السَّلَامُ", "latin": "As-Salam", "meaning": "Yang Maha Memberi Keselamatan", "icon": "🕊️🌿", "scene": "Seekor merpati terbang di atas taman yang tenang, aman, dan damai.", "story": "Setelah suasana gaduh, seekor merpati turun dan taman menjadi tenang serta damai. As-Salam — Yang Maha Memberi Keselamatan.", "prayer": "Ya As-Salam, karuniakan keselamatan, kedamaian, dan ketenangan kepada kami.", "pair": null, "clue": null, "group": null}, {"n": 6, "arabic": "الْمُؤْمِنُ", "latin": "Al-Mu’min", "meaning": "Yang Maha Memberi Keamanan", "icon": "🔐🏠", "scene": "Sebuah rumah tertutup rapat oleh kunci yang membuat penghuninya merasa aman.", "story": "Malam gelap datang, tetapi pintu rumah terkunci kuat dan penghuninya merasa aman. Al-Mu’min — Yang Maha Memberi Keamanan.", "prayer": "Ya Al-Mu’min, berikan keamanan pada hati, keluarga, dan kehidupan kami.", "pair": null, "clue": null, "group": null}, {"n": 7, "arabic": "الْمُهَيْمِنُ", "latin": "Al-Muhaimin", "meaning": "Yang Maha Memelihara dan Mengawasi", "icon": "🛰️", "scene": "Satelit memantau seluruh wilayah bumi dari atas tanpa ada bagian yang luput.", "story": "Satelit berputar mengelilingi bumi dan seluruh wilayah tetap terpantau. Al-Muhaimin — Yang Maha Memelihara dan Mengawasi.", "prayer": "Ya Al-Muhaimin, peliharalah kami dan awasilah langkah kami dalam kebaikan.", "pair": null, "clue": "Memelihara sekaligus mengawasi seluruh makhluk.", "group": "Pemeliharaan & Pengawasan"}, {"n": 8, "arabic": "الْعَزِيزُ", "latin": "Al-‘Aziz", "meaning": "Yang Maha Perkasa", "icon": "💎🦁", "scene": "Berlian kokoh dijaga singa kuat, melambangkan kemuliaan dan kekuatan yang tak tertandingi.", "story": "Berlian yang sangat berharga tetap utuh meski dikelilingi ancaman. Al-‘Aziz — Yang Maha Perkasa.", "prayer": "Ya Al-‘Aziz, muliakan kami dengan iman dan kuatkan kami dalam kebenaran.", "pair": null, "clue": "Perkasa dan mulia, tak terkalahkan oleh apa pun.", "group": "Kekuatan & Kuasa"}, {"n": 9, "arabic": "الْجَبَّارُ", "latin": "Al-Jabbar", "meaning": "Yang Maha Kuasa", "icon": "🦾", "scene": "Lengan mekanik yang sangat kuat mengangkat, menegakkan, dan memperbaiki struktur yang patah.", "story": "Sebuah struktur besar patah dan tidak mampu diperbaiki manusia. Lengan kuat mengangkat lalu menegakkannya kembali. Al-Jabbar — Yang Maha Kuasa.", "prayer": "Ya Al-Jabbar, tegakkan hati kami dan perbaikilah apa yang rusak dalam diri kami.", "pair": null, "clue": "Memperbaiki yang patah lalu menegakkannya kembali.", "group": "Kekuatan & Kuasa"}, {"n": 10, "arabic": "الْمُتَكَبِّرُ", "latin": "Al-Mutakabbir", "meaning": "Yang Maha Megah", "icon": "🪐✨", "scene": "Planet raksasa bercahaya tampak melampaui benda-benda kecil di sekitarnya, menggambarkan kemegahan.", "story": "Benda-benda besar tampak kecil di samping planet raksasa yang bercahaya. Al-Mutakabbir — Yang Maha Megah.", "prayer": "Ya Al-Mutakabbir, jauhkan kami dari kesombongan dan tundukkan hati kami kepada-Mu.", "pair": null, "clue": "Megah; kebesaran sejati hanya milik-Nya.", "group": "Keagungan & Ketinggian"}, {"n": 11, "arabic": "الْخَالِقُ", "latin": "Al-Khaliq", "meaning": "Yang Maha Pencipta", "icon": "🌌🪄", "scene": "Alam semesta muncul dari ketiadaan sebagai gambaran penciptaan.", "story": "Ruang yang semula kosong tiba-tiba dipenuhi bintang, planet, dan kehidupan. Al-Khaliq — Yang Maha Pencipta.", "prayer": "Ya Al-Khaliq, ciptakan dalam diri kami akhlak yang baik dan kehidupan yang Engkau ridhai.", "pair": null, "clue": "Mencipta dari ketiadaan.", "group": "Penciptaan"}, {"n": 12, "arabic": "الْبَارِئُ", "latin": "Al-Bari’", "meaning": "Yang Maha Mengadakan", "icon": "🧬🧩", "scene": "Potongan unsur tersusun menjadi makhluk yang utuh dan teratur.", "story": "Bagian-bagian terpisah tersusun rapi menjadi satu ciptaan yang lengkap. Al-Bari’ — Yang Maha Mengadakan.", "prayer": "Ya Al-Bari’, adakan bagi kami kebaikan dan sempurnakan urusan kami.", "pair": null, "clue": "Mengadakan dan menyusun ciptaan menjadi utuh dan serasi.", "group": "Penciptaan"}, {"n": 13, "arabic": "الْمُصَوِّرُ", "latin": "Al-Mushawwir", "meaning": "Yang Maha Membentuk Rupa", "icon": "🎨🦋", "scene": "Kuas membentuk beragam warna dan pola pada sayap kupu-kupu.", "story": "Kanvas kosong berubah menjadi bentuk-bentuk indah dan berbeda. Al-Mushawwir — Yang Maha Membentuk Rupa.", "prayer": "Ya Al-Mushawwir, indahkan akhlak kami sebagaimana Engkau membentuk ciptaan dengan indah.", "pair": null, "clue": "Memberi rupa dan bentuk yang berbeda-beda.", "group": "Penciptaan"}, {"n": 14, "arabic": "الْغَفَّارُ", "latin": "Al-Ghaffar", "meaning": "Yang Maha Pengampun", "icon": "🧽🔁", "scene": "Noda yang muncul berulang kali selalu dibersihkan kembali.", "story": "Kaca berkali-kali terkena noda, dan setiap kali noda itu dibersihkan lagi. Al-Ghaffar — Yang Maha Pengampun.", "prayer": "Ya Al-Ghaffar, ampunilah dosa-dosa kami yang berulang dan bimbing kami untuk berubah.", "pair": null, "clue": "Mengampuni berulang kali, sebanyak apa pun kesalahannya.", "group": "Ampunan"}, {"n": 15, "arabic": "الْقَهَّارُ", "latin": "Al-Qahhar", "meaning": "Yang Maha Menundukkan", "icon": "🧎⚔️", "scene": "Pedang-pedang yang terangkat akhirnya diletakkan dan semua kekuatan tunduk.", "story": "Pasukan kuat mengangkat senjata, tetapi akhirnya semua menunduk dan meletakkannya. Al-Qahhar — Yang Maha Menundukkan.", "prayer": "Ya Al-Qahhar, tundukkan hawa nafsu kami agar taat kepada-Mu.", "pair": null, "clue": "Menundukkan segala sesuatu hingga semuanya tunduk.", "group": "Kekuatan & Kuasa"}, {"n": 16, "arabic": "الْوَهَّابُ", "latin": "Al-Wahhab", "meaning": "Yang Maha Pemberi Karunia", "icon": "🎁✨", "scene": "Hadiah datang tanpa diminta imbalan.", "story": "Seseorang membuka pintu dan menemukan hadiah indah tanpa pernah memesannya. Al-Wahhab — Yang Maha Pemberi Karunia.", "prayer": "Ya Al-Wahhab, anugerahkan kepada kami karunia yang membawa kebaikan.", "pair": null, "clue": "Memberi karunia tanpa diminta dan tanpa balasan.", "group": "Pemberian & Kecukupan"}, {"n": 17, "arabic": "الرَّزَّاقُ", "latin": "Ar-Razzaq", "meaning": "Yang Maha Pemberi Rezeki", "icon": "🍞🌾", "scene": "Roti dan hasil panen tersedia untuk memenuhi kebutuhan hidup.", "story": "Lumbung yang kosong terisi gandum dan meja mendapat makanan. Ar-Razzaq — Yang Maha Pemberi Rezeki.", "prayer": "Ya Ar-Razzaq, karuniakan rezeki yang halal, baik, dan penuh keberkahan.", "pair": null, "clue": "Memberi rezeki yang menjadi kebutuhan hidup.", "group": "Pemberian & Kecukupan"}, {"n": 18, "arabic": "الْفَتَّاحُ", "latin": "Al-Fattah", "meaning": "Yang Maha Membuka", "icon": "🚪🔓", "scene": "Pintu besi yang terkunci terbuka lebar dan memperlihatkan jalan.", "story": "Pintu baja tidak dapat dibuka siapa pun. Tiba-tiba terbuka dan jalan baru terlihat. Al-Fattah — Yang Maha Membuka.", "prayer": "Ya Al-Fattah, bukakan bagi kami pintu ilmu, rezeki, dan jalan keluar.", "pair": null, "clue": null, "group": null}, {"n": 19, "arabic": "الْعَلِيمُ", "latin": "Al-‘Alim", "meaning": "Yang Maha Mengetahui", "icon": "📚🌐", "scene": "Perpustakaan besar terbuka dan seluruh pengetahuan terhubung.", "story": "Jutaan buku terbuka bersamaan dan tidak ada informasi yang tersembunyi. Al-‘Alim — Yang Maha Mengetahui.", "prayer": "Ya Al-‘Alim, ajarkan kepada kami ilmu yang bermanfaat dan pemahaman yang benar.", "pair": null, "clue": "Mengetahui segala sesuatu secara menyeluruh.", "group": "Pengetahuan"}, {"n": 20, "arabic": "الْقَابِضُ", "latin": "Al-Qabidh", "meaning": "Yang Maha Menyempitkan", "icon": "✊📦", "scene": "Sebuah kotak besar dipadatkan menjadi ruang yang sempit.", "story": "Ruang yang luas perlahan mengecil seperti digenggam hingga menjadi sempit. Al-Qabidh — Yang Maha Menyempitkan.", "prayer": "Ya Al-Qabidh, lindungi kami saat menghadapi kesempitan dan kuatkan hati kami.", "pair": 21, "clue": null, "group": null}, {"n": 21, "arabic": "الْبَاسِطُ", "latin": "Al-Basith", "meaning": "Yang Maha Melapangkan", "icon": "👐🌄", "scene": "Tangan terbuka dan pemandangan luas terbentang di depannya.", "story": "Dinding yang membatasi terbuka, lalu terlihat lembah luas tanpa penghalang. Al-Basith — Yang Maha Melapangkan.", "prayer": "Ya Al-Basith, lapangkan hati, rezeki, dan urusan kami dalam kebaikan.", "pair": 20, "clue": null, "group": null}, {"n": 22, "arabic": "الْخَافِضُ", "latin": "Al-Khafidh", "meaning": "Yang Maha Merendahkan", "icon": "⬇️🏗️", "scene": "Platform yang tinggi diturunkan perlahan ke bawah.", "story": "Sebuah panggung tinggi turun sampai sejajar dengan tanah. Al-Khafidh — Yang Maha Merendahkan.", "prayer": "Ya Al-Khafidh, rendahkan kesombongan dalam diri kami dan jadikan kami tawaduk.", "pair": 23, "clue": null, "group": null}, {"n": 23, "arabic": "الرَّافِعُ", "latin": "Ar-Rafi‘", "meaning": "Yang Maha Meninggikan", "icon": "⬆️🎈", "scene": "Balon mengangkat beban dari bawah ke tempat yang tinggi.", "story": "Beban berat terangkat perlahan hingga berada jauh di atas. Ar-Rafi‘ — Yang Maha Meninggikan.", "prayer": "Ya Ar-Rafi‘, angkatlah derajat kami dengan iman, ilmu, dan amal saleh.", "pair": 22, "clue": null, "group": null}, {"n": 24, "arabic": "الْمُعِزُّ", "latin": "Al-Mu‘izz", "meaning": "Yang Maha Memuliakan", "icon": "🟥", "scene": "Karpet merah dibentangkan untuk seseorang yang diangkat kehormatannya.", "story": "Seseorang yang semula tidak dikenal dipersilakan berjalan di atas karpet merah sebagai tanda dimuliakan. Al-Mu‘izz — Yang Maha Memuliakan.", "prayer": "Ya Al-Mu‘izz, muliakan kami dengan ketaatan dan akhlak yang baik.", "pair": 25, "clue": null, "group": null}, {"n": 25, "arabic": "الْمُذِلُّ", "latin": "Al-Mudzill", "meaning": "Yang Maha Menghinakan", "icon": "📉👤", "scene": "Seseorang yang sombong turun dari podium dan kehilangan kedudukannya.", "story": "Orang yang membanggakan kedudukannya tiba-tiba turun dari podium hingga tidak lagi diagungkan. Al-Mudzill — Yang Maha Menghinakan.", "prayer": "Ya Al-Mudzill, lindungi kami dari kehinaan akibat dosa dan kesombongan.", "pair": 24, "clue": null, "group": null}, {"n": 26, "arabic": "السَّمِيعُ", "latin": "As-Sami‘", "meaning": "Yang Maha Mendengar", "icon": "👂🔈", "scene": "Telinga menangkap suara yang sangat lirih.", "story": "Di tengah keramaian, bisikan paling pelan tetap terdengar jelas. As-Sami‘ — Yang Maha Mendengar.", "prayer": "Ya As-Sami‘, dengarkan doa kami dan bimbing lisan kami kepada kebaikan.", "pair": null, "clue": null, "group": null}, {"n": 27, "arabic": "الْبَصِيرُ", "latin": "Al-Bashir", "meaning": "Yang Maha Melihat", "icon": "👁️🔭", "scene": "Mata dengan teleskop melihat sangat jauh dan jelas.", "story": "Benda yang sangat jauh dan kecil tetap terlihat jelas. Al-Bashir — Yang Maha Melihat.", "prayer": "Ya Al-Bashir, jagalah pandangan kami dan tuntun kami melihat kebenaran.", "pair": null, "clue": null, "group": null}, {"n": 28, "arabic": "الْحَكَمُ", "latin": "Al-Hakam", "meaning": "Yang Maha Menetapkan", "icon": "🔨📜", "scene": "Palu keputusan diketuk di atas sebuah ketetapan.", "story": "Perdebatan panjang berhenti ketika keputusan akhir diketuk dan ditetapkan. Al-Hakam — Yang Maha Menetapkan.", "prayer": "Ya Al-Hakam, tetapkan bagi kami keputusan yang terbaik dan paling adil.", "pair": null, "clue": "Menetapkan keputusan akhir yang tidak dapat dibantah.", "group": "Keadilan & Ketetapan"}, {"n": 29, "arabic": "الْعَدْلُ", "latin": "Al-‘Adl", "meaning": "Yang Maha Adil", "icon": "⚖️", "scene": "Timbangan berada tepat seimbang di kedua sisi.", "story": "Dua beban berbeda diletakkan di atas timbangan lalu diseimbangkan dengan tepat. Al-‘Adl — Yang Maha Adil.", "prayer": "Ya Al-‘Adl, jadikan kami berlaku adil kepada diri sendiri dan sesama.", "pair": null, "clue": "Adil sebagai keseimbangan yang sempurna.", "group": "Keadilan & Ketetapan"}, {"n": 30, "arabic": "اللَّطِيفُ", "latin": "Al-Lathif", "meaning": "Yang Maha Lembut", "icon": "🪶🌬️", "scene": "Bulu bergerak sangat lembut ditiup angin.", "story": "Bulu tipis menyentuh permukaan air tanpa membuatnya bergejolak. Al-Lathif — Yang Maha Lembut.", "prayer": "Ya Al-Lathif, lembutkan hati kami dan mudahkan urusan kami dengan kelembutan-Mu.", "pair": null, "clue": null, "group": null}, {"n": 31, "arabic": "الْخَبِيرُ", "latin": "Al-Khabir", "meaning": "Yang Maha Mengetahui secara mendalam", "icon": "🔬🧠", "scene": "Mikroskop memperlihatkan detail yang tidak terlihat mata biasa.", "story": "Sesuatu tampak sederhana, tetapi di bawah mikroskop setiap detail tersembunyi terlihat. Al-Khabir — Yang Maha Mengetahui secara mendalam.", "prayer": "Ya Al-Khabir, bimbing kami dengan pengetahuan-Mu atas segala yang tersembunyi.", "pair": null, "clue": "Mengetahui detail terdalam dan yang tersembunyi.", "group": "Pengetahuan"}, {"n": 32, "arabic": "الْحَلِيمُ", "latin": "Al-Halim", "meaning": "Yang Maha Penyantun", "icon": "🕯️😌", "scene": "Lilin tetap menyala tenang meski ada gangguan di sekitarnya.", "story": "Angin kecil dan suara gaduh datang, tetapi nyala lilin tetap tenang. Al-Halim — Yang Maha Penyantun.", "prayer": "Ya Al-Halim, karuniakan kepada kami kesabaran, kelembutan, dan pengendalian diri.", "pair": null, "clue": null, "group": null}, {"n": 33, "arabic": "الْعَظِيمُ", "latin": "Al-‘Azhim", "meaning": "Yang Maha Agung", "icon": "🗿🌄", "scene": "Monumen raksasa menjulang dan membuat manusia di sekitarnya tampak sangat kecil.", "story": "Orang-orang berdiri di depan monumen yang luar biasa besar hingga mereka tampak kecil. Al-‘Azhim — Yang Maha Agung.", "prayer": "Ya Al-‘Azhim, tanamkan dalam hati kami rasa kagum dan tunduk kepada kebesaran-Mu.", "pair": null, "clue": "Agung; keagungan-Nya tak terjangkau akal.", "group": "Keagungan & Ketinggian"}, {"n": 34, "arabic": "الْغَفُورُ", "latin": "Al-Ghafur", "meaning": "Yang Maha Pengampun", "icon": "🪟", "scene": "Sebuah tirai menutup noda pada jendela hingga noda itu tidak lagi terlihat.", "story": "Sebuah jendela penuh noda ditutup tirai hingga noda itu tidak lagi tampak. Al-Ghafur — Yang Maha Pengampun.", "prayer": "Ya Al-Ghafur, tutupilah aib kami dan ampunilah kesalahan kami.", "pair": null, "clue": "Mengampuni secara sempurna, menutupi aib dan kesalahan.", "group": "Ampunan"}, {"n": 35, "arabic": "الشَّكُورُ", "latin": "Asy-Syakur", "meaning": "Yang Maha Membalas Kebaikan", "icon": "🌰➡️🌾", "scene": "Satu benih kecil tumbuh menjadi banyak bulir sebagai gambaran balasan kebaikan yang berlipat.", "story": "Satu benih kecil ditanam, lalu menghasilkan panen berlipat-lipat. Asy-Syakur — Yang Maha Membalas Kebaikan.", "prayer": "Ya Asy-Syakur, terimalah amal kecil kami dan lipatgandakan kebaikannya.", "pair": null, "clue": null, "group": null}, {"n": 36, "arabic": "الْعَلِيُّ", "latin": "Al-‘Aliyy", "meaning": "Yang Maha Tinggi", "icon": "🗼", "scene": "Sebuah menara berdiri sangat tinggi di atas bangunan lain.", "story": "Di tengah kota, satu menara menjulang jauh lebih tinggi daripada bangunan di sekitarnya. Al-‘Aliyy — Yang Maha Tinggi.", "prayer": "Ya Al-‘Aliyy, tinggikan iman, ilmu, dan akhlak kami.", "pair": null, "clue": "Tinggi kedudukan-Nya di atas segala sesuatu.", "group": "Keagungan & Ketinggian"}, {"n": 37, "arabic": "الْكَبِيرُ", "latin": "Al-Kabir", "meaning": "Yang Maha Besar", "icon": "🐘🐜", "scene": "Seekor gajah raksasa berdiri di samping seekor semut kecil; perbedaan ukurannya sangat jauh.", "story": "Seekor semut merasa dirinya besar, sampai ia berdiri di samping gajah dan sadar betapa kecil dirinya. Al-Kabir — Yang Maha Besar.", "prayer": "Ya Al-Kabir, jauhkan hati kami dari merasa besar di hadapan sesama.", "pair": null, "clue": "Besar; tak ada yang sebanding dengan-Nya.", "group": "Keagungan & Ketinggian"}, {"n": 38, "arabic": "الْحَفِيظُ", "latin": "Al-Hafizh", "meaning": "Yang Maha Memelihara", "icon": "🫙", "scene": "Sebuah benda berharga disimpan rapat dalam wadah pelindung agar tidak hilang atau rusak.", "story": "Benda berharga dimasukkan ke dalam wadah pelindung dan tetap terjaga dengan aman. Al-Hafizh — Yang Maha Memelihara.", "prayer": "Ya Al-Hafizh, jagalah iman, keluarga, kesehatan, dan amanah kami.", "pair": null, "clue": "Menjaga agar tidak hilang dan tidak rusak.", "group": "Pemeliharaan & Pengawasan"}, {"n": 39, "arabic": "الْمُقِيتُ", "latin": "Al-Muqit", "meaning": "Yang Maha Memberi Kecukupan", "icon": "🥣✅", "scene": "Mangkuk berisi tepat sebanyak yang dibutuhkan.", "story": "Seseorang lapar menemukan mangkuk berisi makanan yang pas—tidak kurang dan tidak berlebihan. Al-Muqit — Yang Maha Memberi Kecukupan.", "prayer": "Ya Al-Muqit, cukupkan kebutuhan kami dan kuatkan kami untuk taat.", "pair": null, "clue": "Memberi makanan dan kekuatan secukupnya bagi setiap makhluk.", "group": "Pemberian & Kecukupan"}, {"n": 40, "arabic": "الْحَسِيبُ", "latin": "Al-Hasib", "meaning": "Yang Maha Membuat Perhitungan", "icon": "🧮📊", "scene": "Sempoa menghitung setiap angka secara tepat.", "story": "Ratusan angka masuk ke sempoa dan semuanya terhitung tanpa satu pun terlewat. Al-Hasib — Yang Maha Membuat Perhitungan.", "prayer": "Ya Al-Hasib, mudahkan perhitungan amal kami dan ampunilah kekurangan kami.", "pair": null, "clue": "Memperhitungkan amal hamba dan mencukupinya.", "group": "Perhitungan"}, {"n": 41, "arabic": "الْجَلِيلُ", "latin": "Al-Jalil", "meaning": "Yang Maha Luhur", "icon": "🏛️✨", "scene": "Bangunan agung menjulang dengan wibawa.", "story": "Orang-orang memasuki aula yang begitu agung hingga semuanya diam karena takjub. Al-Jalil — Yang Maha Luhur.", "prayer": "Ya Al-Jalil, penuhi hati kami dengan penghormatan kepada keagungan-Mu.", "pair": null, "clue": "Luhur; memiliki sifat-sifat kesempurnaan yang berwibawa.", "group": "Keagungan & Ketinggian"}, {"n": 42, "arabic": "الْكَرِيمُ", "latin": "Al-Karim", "meaning": "Yang Maha Pemurah", "icon": "🍽️", "scene": "Sebuah meja jamuan penuh hidangan terbuka bagi tamu sebagai lambang kemurahan.", "story": "Tamu datang tanpa membawa apa pun, lalu disambut meja jamuan yang melimpah. Al-Karim — Yang Maha Pemurah.", "prayer": "Ya Al-Karim, muliakan kami dengan kemurahan-Mu dan ajari kami menjadi dermawan.", "pair": null, "clue": "Pemurah; memberi dengan melimpah dan memuliakan.", "group": "Pemberian & Kecukupan"}, {"n": 43, "arabic": "الرَّقِيبُ", "latin": "Ar-Raqib", "meaning": "Yang Maha Mengawasi", "icon": "📡", "scene": "Radar terus berputar dan memantau setiap gerakan di wilayahnya.", "story": "Radar berputar tanpa berhenti dan setiap gerakan yang masuk ke wilayahnya segera terdeteksi. Ar-Raqib — Yang Maha Mengawasi.", "prayer": "Ya Ar-Raqib, jagalah kami agar selalu sadar bahwa setiap perbuatan berada dalam pengawasan-Mu.", "pair": null, "clue": "Mengawasi setiap gerak tanpa henti.", "group": "Pemeliharaan & Pengawasan"}, {"n": 44, "arabic": "الْمُجِيبُ", "latin": "Al-Mujib", "meaning": "Yang Maha Mengabulkan", "icon": "📩✅", "scene": "Pesan permohonan mendapat jawaban.", "story": "Sebuah permohonan dikirim, lalu tanda jawaban datang kembali. Al-Mujib — Yang Maha Mengabulkan.", "prayer": "Ya Al-Mujib, kabulkan doa kami yang terbaik bagi dunia dan akhirat kami.", "pair": null, "clue": null, "group": null}, {"n": 45, "arabic": "الْوَاسِعُ", "latin": "Al-Wasi‘", "meaning": "Yang Maha Luas", "icon": "🌊↔️", "scene": "Samudra membentang tanpa batas terlihat.", "story": "Perahu berlayar berjam-jam tetapi tepi samudra belum terlihat. Al-Wasi‘ — Yang Maha Luas.", "prayer": "Ya Al-Wasi‘, luaskan rahmat, ilmu, dan rezeki yang baik bagi kami.", "pair": null, "clue": null, "group": null}, {"n": 46, "arabic": "الْحَكِيمُ", "latin": "Al-Hakim", "meaning": "Yang Maha Bijaksana", "icon": "♟️🧠", "scene": "Bidak catur ditempatkan dengan langkah yang tepat.", "story": "Satu langkah kecil tampak biasa, tetapi akhirnya membuat seluruh permainan tersusun sempurna. Al-Hakim — Yang Maha Bijaksana.", "prayer": "Ya Al-Hakim, karuniakan hikmah dalam setiap keputusan dan tindakan kami.", "pair": null, "clue": "Bijaksana; setiap ketetapan-Nya penuh hikmah.", "group": "Keadilan & Ketetapan"}, {"n": 47, "arabic": "الْوَدُودُ", "latin": "Al-Wadud", "meaning": "Yang Maha Mengasihi", "icon": "💞🏡", "scene": "Dua hati berada dalam rumah yang hangat dan penuh kasih.", "story": "Rumah yang dingin menjadi hangat ketika semua penghuninya saling mengasihi. Al-Wadud — Yang Maha Mengasihi.", "prayer": "Ya Al-Wadud, tumbuhkan kasih sayang yang tulus dalam keluarga dan persaudaraan kami.", "pair": null, "clue": "Mencintai hamba-hamba-Nya yang taat dan dicintai oleh mereka.", "group": "Rahmat & Kasih"}, {"n": 48, "arabic": "الْمَجِيدُ", "latin": "Al-Majīd", "meaning": "Yang Maha Mulia", "icon": "🌟", "scene": "Sebuah bintang bersinar sangat terang dan memancarkan kemuliaan yang tampak agung serta terpuji.", "story": "Di langit gelap, satu bintang bersinar paling terang sehingga semua mata tertuju kepadanya. Al-Majīd — Yang Maha Mulia.", "prayer": "Ya Al-Majīd, muliakan hidup kami dengan iman dan amal yang Engkau ridhai.", "pair": null, "clue": "Kemuliaan yang sangat luas, terpancar, dan terpuji.", "group": "Keagungan & Ketinggian"}, {"n": 49, "arabic": "الْبَاعِثُ", "latin": "Al-Ba‘its", "meaning": "Yang Maha Membangkitkan", "icon": "⏰🛌", "scene": "Alarm berbunyi dan orang yang tertidur segera bangkit.", "story": "Ruangan sunyi, lalu alarm berbunyi dan orang yang tertidur bangun. Al-Ba‘its — Yang Maha Membangkitkan.", "prayer": "Ya Al-Ba‘its, bangkitkan semangat kami untuk berbuat baik dan memperbaiki diri.", "pair": null, "clue": null, "group": null}, {"n": 50, "arabic": "الشَّهِيدُ", "latin": "Asy-Syahid", "meaning": "Yang Maha Menyaksikan", "icon": "📝👁️", "scene": "Seorang saksi melihat lalu mencatat apa yang terjadi.", "story": "Sebuah kejadian berlangsung dan saksi mencatatnya tepat seperti yang dilihat. Asy-Syahid — Yang Maha Menyaksikan.", "prayer": "Ya Asy-Syahid, jadikan kami jujur karena sadar Engkau menyaksikan setiap perbuatan.", "pair": null, "clue": "Menjadi saksi atas setiap kejadian.", "group": "Pemeliharaan & Pengawasan"}, {"n": 51, "arabic": "الْحَقُّ", "latin": "Al-Haqq", "meaning": "Yang Maha Benar", "icon": "✅🪨", "scene": "Tanda benar terpahat pada batu kokoh.", "story": "Tulisan benar dipahat pada batu dan tidak berubah meski terkena hujan. Al-Haqq — Yang Maha Benar.", "prayer": "Ya Al-Haqq, teguhkan kami di atas kebenaran dan jauhkan kami dari kebatilan.", "pair": null, "clue": null, "group": null}, {"n": 52, "arabic": "الْوَكِيلُ", "latin": "Al-Wakil", "meaning": "Yang Maha Memelihara dan Mengurus", "icon": "📋", "scene": "Daftar urusan penting diserahkan kepada pihak yang dipercaya untuk ditangani.", "story": "Semua urusan penting ditulis dalam satu daftar lalu diserahkan kepada pihak yang dipercaya mengurusnya. Al-Wakil — Yang Maha Memelihara dan Mengurus.", "prayer": "Ya Al-Wakil, kami serahkan urusan kami kepada-Mu, maka uruslah dengan sebaik-baiknya.", "pair": null, "clue": "Tempat menyerahkan urusan; Dia yang mengurusnya.", "group": "Pemeliharaan & Pengawasan"}, {"n": 53, "arabic": "الْقَوِيُّ", "latin": "Al-Qawiyy", "meaning": "Yang Maha Kuat", "icon": "🏋️", "scene": "Barbel yang sangat berat terangkat dengan mudah dan tetap stabil.", "story": "Beban yang tidak mampu diangkat banyak orang terangkat dengan mudah oleh satu kekuatan besar. Al-Qawiyy — Yang Maha Kuat.", "prayer": "Ya Al-Qawiyy, kuatkan kami dalam ketaatan, kesabaran, dan menghadapi ujian.", "pair": null, "clue": "Kekuatan sempurna yang tidak pernah melemah.", "group": "Kekuatan & Kuasa"}, {"n": 54, "arabic": "الْمَتِينُ", "latin": "Al-Matin", "meaning": "Yang Maha Kokoh", "icon": "🧱🔩", "scene": "Dinding bata diperkuat baut besar dan tidak retak.", "story": "Badai menghantam tembok, tetapi dinding tetap kokoh tanpa bergeser. Al-Matin — Yang Maha Kokoh.", "prayer": "Ya Al-Matin, kokohkan iman dan pendirian kami dalam kebenaran.", "pair": null, "clue": "Kokoh dan teguh, tidak goyah sedikit pun.", "group": "Kekuatan & Kuasa"}, {"n": 55, "arabic": "الْوَلِيُّ", "latin": "Al-Waliyy", "meaning": "Yang Maha Melindungi", "icon": "🛡️☂️", "scene": "Perisai dan payung melindungi dari serangan dan hujan.", "story": "Hujan dan benda berbahaya datang, tetapi perisai besar melindungi yang berada di bawahnya. Al-Waliyy — Yang Maha Melindungi.", "prayer": "Ya Al-Waliyy, lindungi dan tuntun kami dalam setiap langkah kehidupan.", "pair": null, "clue": "Pelindung dan penolong orang-orang beriman.", "group": "Kerajaan & Perlindungan"}, {"n": 56, "arabic": "الْحَمِيدُ", "latin": "Al-Hamid", "meaning": "Yang Maha Terpuji", "icon": "📣", "scene": "Suara pujian terdengar jelas dan terarah kepada yang benar-benar terpuji.", "story": "Di tengah keramaian, suara pujian dikumandangkan dengan jelas. Al-Hamid — Yang Maha Terpuji.", "prayer": "Ya Al-Hamid, jadikan kami hamba yang banyak memuji dan bersyukur kepada-Mu.", "pair": null, "clue": null, "group": null}, {"n": 57, "arabic": "الْمُحْصِي", "latin": "Al-Muhshi", "meaning": "Yang Maha Menghitung", "icon": "🔢🧾", "scene": "Nomor-nomor dicatat satu per satu tanpa ada yang terlewat.", "story": "Seribu benda masuk satu demi satu dan setiap nomor tercatat tepat. Al-Muhshi — Yang Maha Menghitung.", "prayer": "Ya Al-Muhshi, bimbing kami memperbanyak kebaikan yang Engkau hitung dan catat.", "pair": null, "clue": "Menghitung segala sesuatu satu per satu, tanpa terlewat.", "group": "Perhitungan"}, {"n": 58, "arabic": "الْمُبْدِئُ", "latin": "Al-Mubdi’", "meaning": "Yang Maha Memulai", "icon": "🎬", "scene": "Papan clapper dibuka untuk menandai dimulainya sebuah adegan pertama.", "story": "Sebelum apa pun berlangsung, papan clapper berbunyi dan adegan pertama dimulai. Al-Mubdi’ — Yang Maha Memulai.", "prayer": "Ya Al-Mubdi’, bimbing kami memulai setiap kebaikan dengan niat yang benar.", "pair": null, "clue": null, "group": null}, {"n": 59, "arabic": "الْمُعِيدُ", "latin": "Al-Mu‘id", "meaning": "Yang Maha Mengembalikan", "icon": "↩️🏠", "scene": "Sesuatu yang pergi kembali ke tempat asalnya.", "story": "Sebuah benda terlempar jauh lalu kembali tepat ke tempat semula. Al-Mu‘id — Yang Maha Mengembalikan.", "prayer": "Ya Al-Mu‘id, kembalikan hati kami kepada jalan-Mu setiap kali kami menyimpang.", "pair": null, "clue": null, "group": null}, {"n": 60, "arabic": "الْمُحْيِي", "latin": "Al-Muhyi", "meaning": "Yang Maha Menghidupkan", "icon": "🌱💧", "scene": "Tanah kering mendapat air lalu tumbuh tunas.", "story": "Tanah retak dan kering terkena air; segera muncul tunas hijau. Al-Muhyi — Yang Maha Menghidupkan.", "prayer": "Ya Al-Muhyi, hidupkan hati kami dengan iman, ilmu, dan amal saleh.", "pair": null, "clue": null, "group": null}, {"n": 61, "arabic": "الْمُمِيتُ", "latin": "Al-Mumit", "meaning": "Yang Maha Mematikan", "icon": "🍂🌙", "scene": "Daun hijau mengering lalu gugur ketika siklusnya selesai.", "story": "Daun yang semula hijau perlahan menguning dan akhirnya gugur. Al-Mumit — Yang Maha Mematikan.", "prayer": "Ya Al-Mumit, wafatkan kami dalam keadaan beriman dan husnul khatimah.", "pair": null, "clue": null, "group": null}, {"n": 62, "arabic": "الْحَيُّ", "latin": "Al-Hayy", "meaning": "Yang Maha Hidup", "icon": "💓", "scene": "Denyut jantung bergerak terus sebagai simbol kehidupan.", "story": "Di tengah keheningan, denyut terus bergerak dan menandakan kehidupan. Al-Hayy — Yang Maha Hidup.", "prayer": "Ya Al-Hayy, hidupkan hati kami dengan mengingat-Mu dan ketaatan kepada-Mu.", "pair": null, "clue": null, "group": null}, {"n": 63, "arabic": "الْقَيُّومُ", "latin": "Al-Qayyum", "meaning": "Yang Maha Berdiri Sendiri dan Menegakkan", "icon": "⛺", "scene": "Satu tiang utama berdiri tegak dan menopang seluruh tenda.", "story": "Angin bertiup kencang, tetapi seluruh tenda tetap berdiri karena satu tiang utama yang tegak menopangnya. Al-Qayyum — Yang Maha Berdiri Sendiri dan Menegakkan.", "prayer": "Ya Al-Qayyum, teguhkan kami dan jangan biarkan kami bergantung selain kepada-Mu.", "pair": null, "clue": null, "group": null}, {"n": 64, "arabic": "الْوَاجِدُ", "latin": "Al-Wajid", "meaning": "Yang Maha Menemukan", "icon": "🔎💍", "scene": "Kaca pembesar menyorot sebuah cincin yang dikira hilang, padahal cincin itu tidak pernah luput dari pandangan.", "story": "Pemiliknya mengira cincin itu hilang, tetapi di bawah kaca pembesar tampak bahwa cincin itu tidak pernah luput dari pandangan. Al-Wajid — Yang Maha Menemukan.", "prayer": "Ya Al-Wajid, tunjukkan kepada kami apa yang kami cari dalam jalan kebaikan.", "pair": null, "clue": null, "group": null}, {"n": 65, "arabic": "الْمَاجِدُ", "latin": "Al-Mājid", "meaning": "Yang Maha Mulia", "icon": "🏵️", "scene": "Sebuah ornamen kehormatan yang indah ditempatkan di tempat paling terhormat sebagai lambang pemilik kemuliaan luhur.", "story": "Sebuah ornamen kehormatan dipasang di tempat paling terhormat sebagai tanda kemuliaan luhur. Al-Mājid — Yang Maha Mulia.", "prayer": "Ya Al-Mājid, hiasi kami dengan kemuliaan akhlak dan amal yang baik.", "pair": null, "clue": "Pemilik kemuliaan yang luhur dan sempurna.", "group": "Keagungan & Ketinggian"}, {"n": 66, "arabic": "الْوَاحِدُ", "latin": "Al-Wahid", "meaning": "Yang Maha Esa", "icon": "1️⃣", "scene": "Satu angka berdiri di hadapan banyak benda.", "story": "Di tengah seratus bentuk, hanya satu angka berdiri sendiri. Al-Wahid — Yang Maha Esa.", "prayer": "Ya Al-Wahid, satukan tujuan hidup kami untuk mencari ridha-Mu.", "pair": null, "clue": "Esa; tiada yang kedua.", "group": "Keesaan"}, {"n": 67, "arabic": "الْأَحَدُ", "latin": "Al-Ahad", "meaning": "Yang Maha Tunggal", "icon": "🔘🚫", "scene": "Satu titik utuh tanpa bagian atau pasangan.", "story": "Satu lingkaran utuh berdiri sendiri; tidak ada pasangan dan tidak terbagi. Al-Ahad — Yang Maha Tunggal.", "prayer": "Ya Al-Ahad, teguhkan tauhid kami dan bersihkan hati dari segala bentuk penyekutuan.", "pair": null, "clue": "Tunggal; tidak terbagi dan tiada yang menyerupai.", "group": "Keesaan"}, {"n": 68, "arabic": "الصَّمَدُ", "latin": "Ash-Shamad", "meaning": "Yang Maha Dibutuhkan", "icon": "🎯➡️", "scene": "Semua panah kebutuhan mengarah pada satu pusat.", "story": "Banyak orang datang dari arah berbeda, tetapi semua kebutuhan mereka mengarah ke satu pusat. Ash-Shamad — Yang Maha Dibutuhkan.", "prayer": "Ya Ash-Shamad, kepada-Mu kami bergantung, maka cukupilah segala kebutuhan kami.", "pair": null, "clue": null, "group": null}, {"n": 69, "arabic": "الْقَادِرُ", "latin": "Al-Qadir", "meaning": "Yang Maha Kuasa", "icon": "🔌", "scene": "Satu saklar daya menunjukkan kemampuan untuk mengaktifkan atau tidak mengaktifkan sebuah sistem besar.", "story": "Sistem besar tidak bergerak sampai satu saklar daya diaktifkan dan semuanya bekerja. Al-Qadir — Yang Maha Kuasa.", "prayer": "Ya Al-Qadir, mampukan kami melakukan kebaikan yang Engkau ridhai.", "pair": null, "clue": "Mampu melakukan apa saja yang Dia kehendaki.", "group": "Kekuatan & Kuasa"}, {"n": 70, "arabic": "الْمُقْتَدِرُ", "latin": "Al-Muqtadir", "meaning": "Yang Maha Menentukan", "icon": "🎛️📏", "scene": "Panel kendali mengatur ukuran dan kadar secara presisi.", "story": "Banyak pengaturan berubah hanya dengan satu panel yang menentukan kadarnya. Al-Muqtadir — Yang Maha Menentukan.", "prayer": "Ya Al-Muqtadir, tetapkan bagi kami kehidupan yang terbaik menurut kehendak-Mu.", "pair": null, "clue": "Menentukan kadar segala sesuatu dengan kuasa penuh.", "group": "Kekuatan & Kuasa"}, {"n": 71, "arabic": "الْمُقَدِّمُ", "latin": "Al-Muqaddim", "meaning": "Yang Maha Mendahulukan", "icon": "⏩👥", "scene": "Seseorang dari barisan belakang dimajukan ke posisi paling depan.", "story": "Seseorang yang berada di belakang dipindahkan ke barisan pertama. Al-Muqaddim — Yang Maha Mendahulukan.", "prayer": "Ya Al-Muqaddim, dahulukan kami dalam amal baik dan kesempatan yang membawa manfaat.", "pair": 72, "clue": null, "group": null}, {"n": 72, "arabic": "الْمُؤَخِّرُ", "latin": "Al-Mu’akhkhir", "meaning": "Yang Maha Mengakhirkan", "icon": "⏪🕰️", "scene": "Sesuatu dipindahkan ke belakang dan waktunya ditunda.", "story": "Sebuah jadwal yang semula di depan digeser jauh ke waktu berikutnya. Al-Mu’akhkhir — Yang Maha Mengakhirkan.", "prayer": "Ya Al-Mu’akhkhir, jauhkan dan tunda dari kami perkara yang membawa keburukan.", "pair": 71, "clue": null, "group": null}, {"n": 73, "arabic": "الْأَوَّلُ", "latin": "Al-Awwal", "meaning": "Yang Maha Awal", "icon": "🌅", "scene": "Fajar pertama muncul sebelum aktivitas lain dimulai.", "story": "Sebelum kota bangun, cahaya fajar sudah hadir terlebih dahulu. Al-Awwal — Yang Maha Awal.", "prayer": "Ya Al-Awwal, jadikan Engkau tujuan pertama dalam niat dan langkah kami.", "pair": null, "clue": null, "group": null}, {"n": 74, "arabic": "الْآخِرُ", "latin": "Al-Akhir", "meaning": "Yang Maha Akhir", "icon": "🏁", "scene": "Garis akhir menandai berakhirnya perjalanan panjang.", "story": "Setelah perjalanan panjang, pelari akhirnya mencapai garis akhir. Al-Akhir — Yang Maha Akhir.", "prayer": "Ya Al-Akhir, jadikan akhir hidup kami baik dan kembali kepada-Mu dalam ridha.", "pair": null, "clue": null, "group": null}, {"n": 75, "arabic": "الظَّاهِرُ", "latin": "Azh-Zhahir", "meaning": "Yang Maha Nyata", "icon": "☀️", "scene": "Matahari bersinar di langit siang; keberadaannya tampak jelas bagi siapa pun yang melihat.", "story": "Di siang hari tak seorang pun dapat menyangkal adanya matahari; tanda-tandanya tampak di mana-mana. Azh-Zhahir — Yang Maha Nyata.", "prayer": "Ya Azh-Zhahir, tampakkan kepada kami kebenaran dan bukti-bukti kebesaran-Mu.", "pair": null, "clue": null, "group": null}, {"n": 76, "arabic": "الْبَاطِنُ", "latin": "Al-Bathin", "meaning": "Yang Maha Tersembunyi", "icon": "🫥📦", "scene": "Sesuatu berada di dalam kotak tetapi tidak terlihat dari luar.", "story": "Kotak tampak kosong dari luar, tetapi ada sesuatu tersimpan jauh di dalamnya. Al-Bathin — Yang Maha Tersembunyi.", "prayer": "Ya Al-Bathin, bersihkan batin kami dan perbaikilah apa yang tersembunyi dalam hati.", "pair": null, "clue": null, "group": null}, {"n": 77, "arabic": "الْوَالِي", "latin": "Al-Wali", "meaning": "Yang Maha Memerintah", "icon": "🗺️🏢", "scene": "Peta wilayah terhubung ke satu pusat pemerintahan yang mengatur seluruh daerah.", "story": "Berbagai wilayah pada peta menerima aturan dari satu pusat pemerintahan. Al-Wali — Yang Maha Memerintah.", "prayer": "Ya Al-Wali, aturlah urusan kami dan bimbing kami menjalankan setiap amanah dengan benar.", "pair": null, "clue": "Mengurus dan menjalankan pengaturan atas seluruh urusan.", "group": "Kerajaan & Perlindungan"}, {"n": 78, "arabic": "الْمُتَعَالِي", "latin": "Al-Muta‘ali", "meaning": "Yang Maha Tinggi", "icon": "🚀☁️", "scene": "Roket terus naik melewati awan dan ketinggian lain.", "story": "Roket naik melewati menara, gunung, dan awan sampai jauh di atas semuanya. Al-Muta‘ali — Yang Maha Tinggi.", "prayer": "Ya Al-Muta‘ali, angkat hati kami dari perkara rendah menuju ketaatan yang lebih tinggi.", "pair": null, "clue": "Melampaui segala ketinggian.", "group": "Keagungan & Ketinggian"}, {"n": 79, "arabic": "الْبَرُّ", "latin": "Al-Barr", "meaning": "Yang Maha Dermawan", "icon": "🌉", "scene": "Sebuah jembatan membantu orang melewati jurang menuju tempat aman.", "story": "Seseorang tidak bisa menyeberangi jurang sampai menemukan jembatan yang menolongnya lewat. Al-Barr — Yang Maha Dermawan.", "prayer": "Ya Al-Barr, limpahkan kebaikan-Mu kepada kami dan jadikan kami bermanfaat bagi sesama.", "pair": null, "clue": "Berbuat baik kepada hamba dan menolongnya melewati kesulitan.", "group": "Pemberian & Kecukupan"}, {"n": 80, "arabic": "التَّوَّابُ", "latin": "At-Tawwab", "meaning": "Yang Maha Penerima Tobat", "icon": "↪️🛣️", "scene": "Orang yang salah jalan berbalik dan kembali ke jalan benar.", "story": "Seorang musafir sadar salah arah, berputar kembali, lalu menemukan jalan yang benar. At-Tawwab — Yang Maha Penerima Tobat.", "prayer": "Ya At-Tawwab, terimalah tobat kami dan kembalikan hati kami kepada-Mu.", "pair": null, "clue": "Menerima tobat; menyambut hamba yang kembali kepada-Nya.", "group": "Ampunan"}, {"n": 81, "arabic": "الْمُنْتَقِمُ", "latin": "Al-Muntaqim", "meaning": "Yang Maha Memberi Balasan", "icon": "⚡📜", "scene": "Sebuah ketetapan tertulis diikuti akibat yang tegas setelah pelanggaran.", "story": "Setelah pelanggaran dicatat dalam ketetapan, akibat yang tegas datang. Al-Muntaqim — Yang Maha Memberi Balasan.", "prayer": "Ya Al-Muntaqim, lindungi kami dari kezaliman dan dari menjadi orang yang zalim.", "pair": null, "clue": null, "group": null}, {"n": 82, "arabic": "الْعَفُوُّ", "latin": "Al-‘Afuww", "meaning": "Yang Maha Pemaaf", "icon": "🧹🫧", "scene": "Bekas coretan dihapus sampai tidak meninggalkan jejak.", "story": "Papan penuh coretan disapu bersih; bukan hanya tulisan, bekasnya pun hilang. Al-‘Afuww — Yang Maha Pemaaf.", "prayer": "Ya Al-‘Afuww, maafkan kesalahan kami dan hapuskan bekas dosa-dosa kami.", "pair": null, "clue": "Memaafkan hingga bekas dosanya pun terhapus.", "group": "Ampunan"}, {"n": 83, "arabic": "الرَّؤُوفُ", "latin": "Ar-Ra’uf", "meaning": "Yang Maha Belas Kasih", "icon": "🩹🌸", "scene": "Luka dibalut dengan sangat lembut, lalu bunga diletakkan sebagai tanda belas kasih.", "story": "Seseorang terluka; lukanya dibalut perlahan dan diberi bunga untuk menenangkan hati. Ar-Ra’uf — Yang Maha Belas Kasih.", "prayer": "Ya Ar-Ra’uf, kasihanilah kelemahan kami dan lembutkan hati kami kepada sesama.", "pair": null, "clue": "Belas kasih yang sangat lembut kepada yang lemah dan terluka.", "group": "Rahmat & Kasih"}, {"n": 84, "arabic": "مَالِكُ الْمُلْكِ", "latin": "Malikul-Mulk", "meaning": "Yang Maha Penguasa Kerajaan", "icon": "🌍", "scene": "Seluruh dunia tampak sebagai satu wilayah kekuasaan yang utuh.", "story": "Banyak kerajaan dan negeri terlihat berada dalam satu dunia yang sama. Malikul-Mulk — Yang Maha Penguasa Kerajaan.", "prayer": "Ya Malikul-Mulk, karuniakan amanah kepada kami dan jauhkan kami dari penyalahgunaan kekuasaan.", "pair": null, "clue": "Pemilik seluruh kerajaan; memberi dan mencabutnya.", "group": "Kerajaan & Perlindungan"}, {"n": 85, "arabic": "ذُو الْجَلَالِ وَالْإِكْرَامِ", "latin": "Dzul-Jalali wal-Ikram", "meaning": "Yang Memiliki Keagungan dan Kemuliaan", "icon": "🏔️", "scene": "Gunung bersalju menjulang megah, sementara mata air dari kakinya mengalir dan menghidupi lembah di bawahnya.", "story": "Para pendaki terdiam melihat puncak yang begitu agung, lalu meminum air jernih yang mengalir darinya. Dzul-Jalali wal-Ikram — Yang Memiliki Keagungan dan Kemuliaan.", "prayer": "Ya Dzul-Jalali wal-Ikram, muliakan kami dengan rahmat-Mu dan dekatkan kami kepada ketaatan.", "pair": null, "clue": "Jalal = keagungan; Ikram = kemuliaan yang dilimpahkan.", "group": "Keagungan & Ketinggian"}, {"n": 86, "arabic": "الْمُقْسِطُ", "latin": "Al-Muqsith", "meaning": "Yang Maha Adil", "icon": "📏", "scene": "Sebuah penggaris membagi sesuatu dengan ukuran yang tepat dan proporsional sesuai hak masing-masing.", "story": "Sebuah roti dibagi dengan penggaris sehingga setiap bagian tepat sesuai haknya. Al-Muqsith — Yang Maha Adil.", "prayer": "Ya Al-Muqsith, bimbing kami memberi setiap orang haknya dengan adil.", "pair": null, "clue": "Adil dalam membagi; setiap pihak mendapat haknya.", "group": "Keadilan & Ketetapan"}, {"n": 87, "arabic": "الْجَامِعُ", "latin": "Al-Jami‘", "meaning": "Yang Maha Mengumpulkan", "icon": "🧲🧩", "scene": "Magnet menarik potongan-potongan terpisah ke satu tempat.", "story": "Potongan yang tersebar di seluruh meja bergerak dan berkumpul menjadi satu. Al-Jami‘ — Yang Maha Mengumpulkan.", "prayer": "Ya Al-Jami‘, kumpulkan keluarga dan orang-orang yang kami cintai dalam kebaikan.", "pair": null, "clue": null, "group": null}, {"n": 88, "arabic": "الْغَنِيُّ", "latin": "Al-Ghaniyy", "meaning": "Yang Maha Kaya", "icon": "🏦💰", "scene": "Sebuah perbendaharaan tetap penuh dan tidak membutuhkan tambahan dari luar.", "story": "Perbendaharaan tetap penuh meski tidak menerima apa pun dari luar. Al-Ghaniyy — Yang Maha Kaya.", "prayer": "Ya Al-Ghaniyy, cukupkan kami dengan karunia-Mu dan jauhkan hati dari ketergantungan kepada selain-Mu.", "pair": null, "clue": "Kaya; tidak membutuhkan apa pun dari siapa pun.", "group": "Pemberian & Kecukupan"}, {"n": 89, "arabic": "الْمُغْنِي", "latin": "Al-Mughni", "meaning": "Yang Maha Memberi Kekayaan", "icon": "👛", "scene": "Dompet yang kosong perlahan menjadi penuh hingga kebutuhan tercukupi.", "story": "Dompet yang kosong terisi hingga pemiliknya menjadi berkecukupan. Al-Mughni — Yang Maha Memberi Kekayaan.", "prayer": "Ya Al-Mughni, cukupkan kebutuhan kami dan kayakan hati kami dengan rasa syukur.", "pair": null, "clue": "Menjadikan hamba berkecukupan, dari kekurangan menjadi cukup.", "group": "Pemberian & Kecukupan"}, {"n": 90, "arabic": "الْمَانِعُ", "latin": "Al-Mani‘", "meaning": "Yang Maha Mencegah", "icon": "🚧🛑", "scene": "Penghalang kuat menghentikan sesuatu agar tidak melewati batas.", "story": "Kendaraan melaju cepat, tetapi palang turun dan menghentikannya sebelum melewati batas. Al-Mani‘ — Yang Maha Mencegah.", "prayer": "Ya Al-Mani‘, cegahlah kami dari dosa, bahaya, dan perkara yang merusak.", "pair": null, "clue": null, "group": null}, {"n": 91, "arabic": "الضَّارُّ", "latin": "Adh-Dharr", "meaning": "Yang Menetapkan Kemudaratan", "icon": "🌩️⚠️", "scene": "Langit cerah tiba-tiba berubah menjadi badai yang menghalangi perjalanan.", "story": "Langit cerah berubah menjadi badai yang merusak perjalanan; manusia sadar bahwa mudarat pun berada dalam ketetapan Allah. Adh-Dharr — Yang Menetapkan Kemudaratan.", "prayer": "Ya Adh-Dharr, lindungi kami dari kemudaratan dan beri kekuatan saat menghadapi ujian.", "pair": 92, "clue": null, "group": null}, {"n": 92, "arabic": "النَّافِعُ", "latin": "An-Nafi‘", "meaning": "Yang Memberi Manfaat", "icon": "🌳🍎", "scene": "Pohon memberi teduh dan buah kepada banyak orang.", "story": "Orang-orang berteduh, makan buah, dan memperoleh manfaat dari satu pohon. An-Nafi‘ — Yang Memberi Manfaat.", "prayer": "Ya An-Nafi‘, berikan kepada kami ilmu, rezeki, dan amal yang bermanfaat.", "pair": 91, "clue": null, "group": null}, {"n": 93, "arabic": "النُّورُ", "latin": "An-Nur", "meaning": "Yang Maha Bercahaya", "icon": "💡🌑", "scene": "Lampu menerangi ruangan yang sebelumnya gelap.", "story": "Satu cahaya menyala dan seluruh ruangan gelap menjadi terang. An-Nur — Yang Maha Bercahaya.", "prayer": "Ya An-Nur, terangilah hati dan jalan hidup kami dengan petunjuk-Mu.", "pair": null, "clue": null, "group": null}, {"n": 94, "arabic": "الْهَادِي", "latin": "Al-Hadi", "meaning": "Yang Maha Pemberi Petunjuk", "icon": "🧭➡️", "scene": "Kompas menunjukkan arah yang benar.", "story": "Musafir tersesat membuka kompas dan menemukan arah perjalanan yang tepat. Al-Hadi — Yang Maha Pemberi Petunjuk.", "prayer": "Ya Al-Hadi, tunjukilah kami jalan yang lurus dan pilihan yang benar.", "pair": null, "clue": "Menunjukkan arah yang benar.", "group": "Petunjuk"}, {"n": 95, "arabic": "الْبَدِيعُ", "latin": "Al-Badi‘", "meaning": "Yang Maha Pencipta tanpa contoh", "icon": "🌠🆕", "scene": "Bentuk baru muncul di langit tanpa meniru bentuk sebelumnya.", "story": "Semua orang menunggu pola lama, tetapi muncul bentuk baru yang belum pernah ada. Al-Badi‘ — Yang Maha Pencipta tanpa contoh.", "prayer": "Ya Al-Badi‘, hadirkan bagi kami kebaikan dengan cara yang tak pernah kami sangka.", "pair": null, "clue": "Mencipta sesuatu yang baru tanpa contoh sebelumnya.", "group": "Penciptaan"}, {"n": 96, "arabic": "الْبَاقِي", "latin": "Al-Baqi", "meaning": "Yang Maha Kekal", "icon": "♾️", "scene": "Garis tak berujung terus berlanjut tanpa titik akhir, sementara segala sesuatu di sekitarnya berlalu.", "story": "Bangunan runtuh, pohon tumbang, dan zaman berganti; hanya garis tak berujung itu yang tetap tanpa akhir. Al-Baqi — Yang Maha Kekal.", "prayer": "Ya Al-Baqi, jadikan amal kami bernilai kekal untuk kehidupan akhirat.", "pair": null, "clue": null, "group": null}, {"n": 97, "arabic": "الْوَارِثُ", "latin": "Al-Warits", "meaning": "Yang Maha Pewaris", "icon": "🗝️🏚️", "scene": "Kunci kembali kepada pemilik terakhir setelah semua penghuni pergi.", "story": "Sebuah rumah berganti penghuni berkali-kali; ketika semuanya pergi, kuncinya kembali kepada pemilik terakhir. Al-Warits — Yang Maha Pewaris.", "prayer": "Ya Al-Warits, jadikan peninggalan kami amal, ilmu, dan keturunan saleh yang bermanfaat.", "pair": null, "clue": null, "group": null}, {"n": 98, "arabic": "الرَّشِيدُ", "latin": "Ar-Rasyid", "meaning": "Yang Maha Membimbing", "icon": "🌀", "scene": "Sebuah labirin memiliki satu jalur tepat yang membawa keluar menuju tujuan.", "story": "Banyak jalur di labirin membingungkan, tetapi satu rute yang benar membawa langsung keluar. Ar-Rasyid — Yang Maha Membimbing.", "prayer": "Ya Ar-Rasyid, bimbing kami mengambil keputusan yang tepat dan matang.", "pair": null, "clue": "Membimbing hingga tujuan dengan langkah yang tepat.", "group": "Petunjuk"}, {"n": 99, "arabic": "الصَّبُورُ", "latin": "Ash-Shabur", "meaning": "Yang Maha Sabar", "icon": "⏳", "scene": "Jam pasir berjalan lama tanpa tergesa-gesa.", "story": "Butir pasir terus turun perlahan sampai waktu berlalu dengan tenang. Ash-Shabur — Yang Maha Sabar.", "prayer": "Ya Ash-Shabur, karuniakan kesabaran, keteguhan, dan ketenangan dalam setiap ujian.", "pair": null, "clue": null, "group": null}];
+let current=0, quiz=[], qi=0, score=0, answered=false;
+let mastered=new Set(JSON.parse(localStorage.getItem('ah_mastered')||'[]'));
+
+function save(){localStorage.setItem('ah_mastered',JSON.stringify([...mastered])); updateProgress();}
+function updateProgress(){
+  const p=Math.round(mastered.size/99*100);
+  document.getElementById('homeProgress').style.width=p+'%';
+  document.getElementById('homeProgressText').textContent=`${mastered.size} / 99 dikuasai (${p}%)`;
+  document.getElementById('pbar').style.width=p+'%';
+  document.getElementById('ptext').textContent=`${mastered.size} dari 99 nama sudah Anda tandai dikuasai.`;
+}
+function showPage(id){
+  ['home','list','learn','quiz','meaningquiz','symbolquiz','confusion','progress'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  let n=document.getElementById('nav-'+id); if(n)n.classList.add('active');
+  if(id==='list')renderGrid(); if(id==='progress'||id==='home')updateProgress();
+  window.scrollTo(0,0);
+}
+function renderGrid(){
+ const q=norm(document.getElementById('search').value||'');
+ const grid=document.getElementById('grid'); grid.innerHTML='';
+ DATA.filter(x=>norm(x.latin+' '+x.meaning+' '+x.arabic+' '+x.scene+' '+x.story+' '+x.icon+' '+x.prayer+' '+(x.clue||'')+' '+(x.group||'')).includes(q)).forEach(x=>{
+   const d=document.createElement('div'); d.className='tile '+(mastered.has(x.n)?'done':'');
+   d.innerHTML=`<div class="num">${x.n}</div><div style="font-size:28px">${x.icon}</div><div class="arabic">${x.arabic}</div><div class="latin">${x.latin}</div>`;
+   d.onclick=()=>openLearn(x.n-1); grid.appendChild(d);
+ });
+}
+function openLearn(i){ current=i; const x=DATA[i];
+ document.getElementById('learnNum').textContent=`${x.n} / 99`;
+ document.getElementById('learnArabic').textContent=x.arabic;
+ document.getElementById('learnLatin').textContent=x.latin;
+ document.getElementById('learnMeaning').textContent=x.meaning;
+ document.getElementById('learnIcon').textContent=x.icon;
+ document.getElementById('learnScene').textContent=x.scene;
+ document.getElementById('learnStory').textContent=x.story;
+ document.getElementById('learnPrayer').textContent=x.prayer;
+ const cb=document.getElementById('learnClueBox');
+ if(x.clue){document.getElementById('learnClue').textContent=x.clue; const g=document.getElementById('learnGroup'); g.textContent=x.group?`Kelompok rawan tertukar: ${x.group}`:''; g.style.display=x.group?'inline-block':'none'; cb.classList.remove('hidden');} else cb.classList.add('hidden');
+ const pb=document.getElementById('learnPairBox');
+ if(x.pair){const p=DATA[x.pair-1]; const pbtn=document.getElementById('learnPair'); pbtn.textContent=`${p.icon}  #${p.n} ${p.latin} — ${p.meaning}`; pbtn.onclick=()=>openLearn(p.n-1); pb.classList.remove('hidden');} else pb.classList.add('hidden');
+ document.getElementById('recallBox').classList.add('hidden');
+ document.getElementById('recallAnswer').classList.add('hidden');
+ document.getElementById('masterBtn').textContent=mastered.has(x.n)?'Sudah Dikuasai ✓':'Sudah Ingat ✓';
+ showPage('learn');
+}
+function startNext(){let x=DATA.findIndex(d=>!mastered.has(d.n)); openLearn(x<0?0:x);}
+function nextName(){openLearn((current+1)%99)} function prevName(){openLearn((current+98)%99)}
+function toggleMaster(){const n=DATA[current].n; if(mastered.has(n)) mastered.delete(n); else mastered.add(n); save(); openLearn(current);}
+function toggleRecall(){const b=document.getElementById('recallBox'); b.classList.toggle('hidden'); const x=DATA[current]; document.getElementById('recallPrompt').textContent=x.arabic; document.getElementById('recallAnswer').classList.add('hidden');}
+function revealRecall(){const x=DATA[current]; let a=document.getElementById('recallAnswer'); a.textContent=`${x.latin} — ${x.meaning}`+(x.clue?`\nClue: ${x.clue}`:'')+`\n${x.prayer}`; a.style.whiteSpace='pre-line'; a.classList.remove('hidden');}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b}
+function norm(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[‘’'`ʿʾ]/g,'').toLowerCase()}
+// Pengecoh tidak boleh memiliki arti yang sama dengan jawaban (mis. Al-Jabbar/Al-Qadir), dan arti antar-pengecoh tidak boleh kembar.
+// A6: pengecoh diambil dulu dari Kelompok Rawan yang sama (dataset kolom K), lalu dilengkapi secara acak.
+// Pengecoh tidak boleh berarti sama dengan jawaban, dan arti antar-pengecoh tidak boleh kembar.
+function pickWrong(x){
+  const seen=new Set([x.meaning]),out=[];
+  const same=x.group?shuffle(DATA.filter(d=>d.group===x.group)):[];
+  for(const d of [...same,...shuffle(DATA)]){if(d.n===x.n||seen.has(d.meaning))continue;seen.add(d.meaning);out.push(d);if(out.length===3)break;}
+  return out}
+const TPL={};['quizBox','meaningQuizBox','symbolQuizBox','confusionBox'].forEach(id=>TPL[id]=document.getElementById(id).innerHTML);
+function resetBox(id){document.getElementById(id).innerHTML=TPL[id]}
+function startQuiz(){
+ resetBox('quizBox'); quiz=shuffle(DATA).slice(0,10); qi=0; score=0; answered=false; document.getElementById('quizBox').classList.remove('hidden'); renderQ();
+}
+function renderQ(){
+ const x=quiz[qi]; document.getElementById('qCount').textContent=`Soal ${qi+1} / 10 • Skor ${score}`;
+ document.getElementById('qArabic').textContent=x.arabic; document.getElementById('qLatin').textContent=x.latin;
+ const wrong=pickWrong(x).map(d=>d.meaning);
+ const opts=shuffle([x.meaning,...wrong]); const c=document.getElementById('choices'); c.innerHTML='';
+ document.getElementById('feedback').textContent=''; document.getElementById('nextQ').classList.add('hidden'); answered=false;
+ opts.forEach(o=>{let b=document.createElement('button'); b.className='quizChoice'; b.textContent=o; b.onclick=()=>answerQ(b,o,x.meaning); c.appendChild(b);});
+}
+function answerQ(btn,val,correct){if(answered)return; answered=true; const good=val===correct;if(good)score++;
+ document.querySelectorAll('.quizChoice').forEach(b=>{if(b.textContent===correct)b.classList.add('correct'); else if(b===btn)b.classList.add('wrong')});
+ document.getElementById('feedback').textContent=good?'Benar ✓':`Jawaban: ${correct}`;
+ document.getElementById('nextQ').classList.remove('hidden');
+}
+function nextQuestion(){qi++; if(qi>=10){document.getElementById('quizBox').innerHTML=`<div class="bigLatin">Selesai</div><div class="meaning">Skor ${score} / 10</div><button class="btn primary" onclick="startQuiz()">Ulangi</button>`;} else renderQ();}
+
+
+
+let meaningQuiz=[], mqi=0, mqScore=0, mqAnswered=false;
+
+function startMeaningQuiz(){
+  resetBox('meaningQuizBox'); meaningQuiz=shuffle(DATA).slice(0,10);
+  mqi=0; mqScore=0; mqAnswered=false;
+  document.getElementById('meaningQuizBox').classList.remove('hidden');
+  renderMeaningQuestion();
+}
+
+function renderMeaningQuestion(){
+  const x=meaningQuiz[mqi];
+  document.getElementById('mqCount').textContent=`Soal ${mqi+1} / ${meaningQuiz.length} • Skor ${mqScore}`;
+  document.getElementById('mqMeaning').textContent=x.meaning;
+
+  const wrong=pickWrong(x).map(d=>d.latin);
+  const opts=shuffle([x.latin,...wrong]);
+  const c=document.getElementById('mqChoices');
+  c.innerHTML='';
+
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='quizChoice';
+    b.textContent=o;
+    b.onclick=()=>answerMeaningQuestion(b,o,x);
+    c.appendChild(b);
+  });
+
+  document.getElementById('mqFeedback').textContent='';
+  document.getElementById('mqNext').classList.add('hidden');
+  mqAnswered=false;
+}
+
+function answerMeaningQuestion(btn,val,x){
+  if(mqAnswered)return;
+  mqAnswered=true;
+  const good=val===x.latin;
+  if(good)mqScore++;
+
+  document.querySelectorAll('#mqChoices .quizChoice').forEach(b=>{
+    if(b.textContent===x.latin)b.classList.add('correct');
+    else if(b===btn)b.classList.add('wrong');
+  });
+
+  document.getElementById('mqFeedback').textContent=
+    (good?'Benar ✓ — ':'Belum tepat — ')+`${x.meaning} = ${x.latin} ${x.icon}`;
+
+  document.getElementById('mqNext').classList.remove('hidden');
+}
+
+function nextMeaningQuestion(){
+  mqi++;
+  if(mqi>=meaningQuiz.length){
+    const box=document.getElementById('meaningQuizBox');
+    box.innerHTML=`<div class="bigLatin">Quiz Arti Selesai</div>
+      <div class="meaning">Skor ${mqScore} / ${meaningQuiz.length}</div>
+      <p class="small">Latihan ini memperkuat jalur recall dari arti menuju nama Asmaul Husna.</p>
+      <button class="btn primary" onclick="startMeaningQuiz()">Ulangi</button>`;
+  }else{
+    renderMeaningQuestion();
+  }
+}
+
+let symbolQuiz=[], sqi=0, sqScore=0, sqAnswered=false;
+
+function startSymbolQuiz(){
+  resetBox('symbolQuizBox'); symbolQuiz=shuffle(DATA).slice(0,10);
+  sqi=0; sqScore=0; sqAnswered=false;
+  document.getElementById('symbolQuizBox').classList.remove('hidden');
+  renderSymbolQuestion();
+}
+
+function renderSymbolQuestion(){
+  const x=symbolQuiz[sqi];
+  document.getElementById('sqCount').textContent=`Soal ${sqi+1} / ${symbolQuiz.length} • Skor ${sqScore}`;
+  document.getElementById('sqSymbol').textContent=x.icon;
+
+  const wrong=pickWrong(x).map(d=>d.latin);
+  const opts=shuffle([x.latin,...wrong]);
+  const c=document.getElementById('sqChoices');
+  c.innerHTML='';
+
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='quizChoice';
+    b.textContent=o;
+    b.onclick=()=>answerSymbolQuestion(b,o,x);
+    c.appendChild(b);
+  });
+
+  document.getElementById('sqFeedback').textContent='';
+  document.getElementById('sqNext').classList.add('hidden');
+  sqAnswered=false;
+}
+
+function answerSymbolQuestion(btn,val,x){
+  if(sqAnswered)return;
+  sqAnswered=true;
+  const good=val===x.latin;
+  if(good)sqScore++;
+
+  document.querySelectorAll('#sqChoices .quizChoice').forEach(b=>{
+    if(b.textContent===x.latin)b.classList.add('correct');
+    else if(b===btn)b.classList.add('wrong');
+  });
+
+  document.getElementById('sqFeedback').textContent=
+    (good?'Benar ✓ — ':'Belum tepat — ')+`${x.icon} = ${x.latin} — ${x.meaning}`;
+
+  document.getElementById('sqNext').classList.remove('hidden');
+}
+
+function nextSymbolQuestion(){
+  sqi++;
+  if(sqi>=symbolQuiz.length){
+    const box=document.getElementById('symbolQuizBox');
+    box.innerHTML=`<div class="bigLatin">Quiz Simbol Selesai</div>
+      <div class="meaning">Skor ${sqScore} / ${symbolQuiz.length}</div>
+      <p class="small">Latihan ini memperkuat jalur recall dari simbol mnemonic menuju nama Asmaul Husna.</p>
+      <button class="btn primary" onclick="startSymbolQuiz()">Ulangi</button>`;
+  }else{
+    renderSymbolQuestion();
+  }
+}
+
+// A4: semua pasangan dengan arti identik, dibangun dari dataset; pembeda diambil dari kolom Clue Pembeda.
+const CONFUSION_PAIRS=[];
+DATA.forEach(a=>DATA.forEach(b=>{if(a.n<b.n&&a.meaning===b.meaning)CONFUSION_PAIRS.push({a:a.n,b:b.n,aMeaning:a.clue,bMeaning:b.clue});}));
+
+let confusionQuiz=[], cqi=0, cqScore=0, cqAnswered=false;
+
+function buildConfusionQuestions(){
+  const out=[];
+  CONFUSION_PAIRS.forEach(p=>{
+    const a=DATA.find(x=>x.n===p.a), b=DATA.find(x=>x.n===p.b);
+    out.push({
+      type:"Makna",
+      prompt:p.aMeaning,
+      answer:a.latin,
+      options:[a.latin,b.latin],
+      explain:`${a.latin} — ${a.meaning} • ${p.aMeaning}`
+    });
+    out.push({
+      type:"Makna",
+      prompt:p.bMeaning,
+      answer:b.latin,
+      options:[a.latin,b.latin],
+      explain:`${b.latin} — ${b.meaning} • ${p.bMeaning}`
+    });
+    out.push({
+      type:"Simbol",
+      prompt:a.icon,
+      answer:a.latin,
+      options:[a.latin,b.latin],
+      explain:`${a.icon} = ${a.latin} — ${a.meaning}`
+    });
+    out.push({
+      type:"Simbol",
+      prompt:b.icon,
+      answer:b.latin,
+      options:[a.latin,b.latin],
+      explain:`${b.icon} = ${b.latin} — ${b.meaning}`
+    });
+  });
+  return shuffle(out);
+}
+
+function startConfusionQuiz(){
+  resetBox('confusionBox'); confusionQuiz=buildConfusionQuestions();
+  cqi=0; cqScore=0; cqAnswered=false;
+  document.getElementById('confusionBox').classList.remove('hidden');
+  renderConfusionQuestion();
+}
+
+function renderConfusionQuestion(){
+  const q=confusionQuiz[cqi];
+  document.getElementById('cqCount').textContent=`Soal ${cqi+1} / ${confusionQuiz.length} • Skor ${cqScore}`;
+  document.getElementById('cqType').textContent=q.type==="Makna"?"Pembeda Makna":"Pembeda Simbol";
+
+  const prompt=document.getElementById('cqPrompt');
+  const symbol=document.getElementById('cqSymbol');
+  if(q.type==="Simbol"){
+    prompt.textContent="Nama mana yang cocok dengan simbol ini?";
+    symbol.textContent=q.prompt;
+    symbol.classList.remove('hidden');
+  }else{
+    prompt.textContent=q.prompt;
+    symbol.textContent="";
+    symbol.classList.add('hidden');
+  }
+
+  const c=document.getElementById('cqChoices');
+  c.innerHTML='';
+  shuffle(q.options).forEach(o=>{
+    const b=document.createElement('button');
+    b.className='quizChoice';
+    b.textContent=o;
+    b.onclick=()=>answerConfusion(b,o,q);
+    c.appendChild(b);
+  });
+
+  document.getElementById('cqFeedback').textContent='';
+  document.getElementById('cqNext').classList.add('hidden');
+  cqAnswered=false;
+}
+
+function answerConfusion(btn,val,q){
+  if(cqAnswered)return;
+  cqAnswered=true;
+  const good=val===q.answer;
+  if(good)cqScore++;
+
+  document.querySelectorAll('#cqChoices .quizChoice').forEach(b=>{
+    if(b.textContent===q.answer)b.classList.add('correct');
+    else if(b===btn)b.classList.add('wrong');
+  });
+
+  document.getElementById('cqFeedback').textContent=(good?'Benar ✓ — ':'Belum tepat — ')+q.explain;
+  document.getElementById('cqNext').classList.remove('hidden');
+}
+
+function nextConfusionQuestion(){
+  cqi++;
+  if(cqi>=confusionQuiz.length){
+    const box=document.getElementById('confusionBox');
+    box.innerHTML=`<div class="bigLatin">Confusion Quiz Selesai</div>
+      <div class="meaning">Skor ${cqScore} / ${confusionQuiz.length}</div>
+      <p class="small">Fokus latihan ini adalah membedakan pasangan yang arti atau bunyinya sangat dekat.</p>
+      <button class="btn primary" onclick="startConfusionQuiz()">Ulangi</button>`;
+  } else {
+    renderConfusionQuestion();
+  }
+}
+
+
+function resetProgress(){if(confirm('Reset semua progress?')){mastered.clear();save();renderGrid();}}
+updateProgress(); renderGrid();
+document.getElementById('pairCount').textContent=CONFUSION_PAIRS.length;
+document.getElementById('pairList').innerHTML=CONFUSION_PAIRS.map(p=>`<b>${DATA[p.a-1].latin}–${DATA[p.b-1].latin}</b>`).join(', ');
+</script>
+</body>
+</html>
