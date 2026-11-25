@@ -225,6 +225,17 @@
     padding-top:18px;
   }
   footer .credit{color:var(--amber);}
+  .about{margin:0 auto 16px;max-width:560px;}
+  .about-name{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;color:var(--ink);}
+  .about-role{font-size:.72rem;color:var(--muted);margin:2px 0 12px;}
+  .links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
+  .links a{
+    display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 12px;
+    font-size:.74rem;font-weight:500;color:var(--ink);text-decoration:none;
+    border:1px solid var(--border);background:var(--panel);
+  }
+  .links a:hover{border-color:var(--amber);color:var(--amber);}
+  .links a span{font-size:.62rem;color:var(--muted);letter-spacing:.04em;}
 
   /* ===== desktop layout ===== */
   @media (min-width:680px){
@@ -774,6 +785,16 @@
   </nav>
 
   <footer>
+    <div class="about">
+      <div class="about-name">Chilmar Buchari</div>
+      <div class="about-role">Industrial Engineering &amp; People Development · Kaizen, TWI, 5S, JIT</div>
+      <div class="links">
+        <a href="https://independent.academia.edu/chilmarbuchari" target="_blank" rel="noopener">📚 Academia.edu <span>Buku &amp; Handbook</span></a>
+        <a href="https://www.linkedin.com/in/chilmar-buchari" target="_blank" rel="noopener">💼 LinkedIn</a>
+        <a href="https://www.youtube.com/@chlmr9" target="_blank" rel="noopener">▶️ YouTube</a>
+        <a href="https://chilmarbuchari.blogspot.com" target="_blank" rel="noopener">✍️ Blog</a>
+      </div>
+    </div>
     Buka dari HP: cukup ketuk salah satu kartu di atas.<br>
     <span class="credit">Ide: Chilmar</span> &nbsp;•&nbsp; Creator: Claude
   </footer>
